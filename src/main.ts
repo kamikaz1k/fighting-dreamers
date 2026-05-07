@@ -36,6 +36,7 @@ type Fighter = {
   maxShield: number;
   currentMoveId: string | null;
   moveFrame: number;
+  hitOpponentThisMove: boolean;
 };
 
 type FighterState = "idle" | "run" | "jump" | "fall" | "attack" | "shield" | "hitstun" | "ko";
@@ -185,6 +186,7 @@ const fighters: Fighter[] = [
     maxShield: 100,
     currentMoveId: null,
     moveFrame: 0,
+    hitOpponentThisMove: false,
   },
   {
     name: "CPU",
@@ -204,6 +206,7 @@ const fighters: Fighter[] = [
     maxShield: 100,
     currentMoveId: null,
     moveFrame: 0,
+    hitOpponentThisMove: false,
   },
 ];
 
@@ -251,6 +254,7 @@ function update(): void {
     updateMovementState(fighters[index]);
   }
 
+  resolveAttackCollisions();
   updateFacing();
   totalSimulatedSeconds += FIXED_TIMESTEP_SECONDS;
   simulationFrames += 1;
@@ -271,6 +275,7 @@ function startAttack(fighter: Fighter, move: MoveDefinition): void {
   fighter.state = "attack";
   fighter.currentMoveId = move.id;
   fighter.moveFrame = 0;
+  fighter.hitOpponentThisMove = false;
 }
 
 function updateAttack(fighter: Fighter): void {
@@ -289,7 +294,28 @@ function updateAttack(fighter: Fighter): void {
     fighter.state = fighter.grounded ? "idle" : "fall";
     fighter.currentMoveId = null;
     fighter.moveFrame = 0;
+    fighter.hitOpponentThisMove = false;
   }
+}
+
+function resolveAttackCollisions(): void {
+  resolveAttackCollision(fighters[0], fighters[1]);
+  resolveAttackCollision(fighters[1], fighters[0]);
+}
+
+function resolveAttackCollision(attacker: Fighter, defender: Fighter): void {
+  const move = getCurrentMove(attacker);
+
+  if (!move || !isMoveActive(attacker, move) || attacker.hitOpponentThisMove) {
+    return;
+  }
+
+  if (!rectsOverlap(getMoveHitbox(attacker, move), getHurtbox(defender))) {
+    return;
+  }
+
+  defender.health = clamp(defender.health - move.damage, 0, defender.maxHealth);
+  attacker.hitOpponentThisMove = true;
 }
 
 function updateMovementState(fighter: Fighter): void {
@@ -341,6 +367,25 @@ function getMoveHitbox(
     width: move.hitbox.width,
     height: move.hitbox.height,
   };
+}
+
+function getHurtbox(fighter: Fighter): { x: number; y: number; width: number; height: number } {
+  return {
+    x: fighter.x - fighter.width / 2,
+    y: fighter.y - fighter.height,
+    width: fighter.width,
+    height: fighter.height,
+  };
+}
+
+function rectsOverlap(
+  a: { x: number; y: number; width: number; height: number },
+  b: { x: number; y: number; width: number; height: number },
+): boolean {
+  return a.x < b.x + b.width
+    && a.x + a.width > b.x
+    && a.y < b.y + b.height
+    && a.y + a.height > b.y;
 }
 
 function applyMovement(fighter: Fighter, command: FighterCommand): void {
@@ -449,19 +494,21 @@ function renderStage(): void {
 
 function renderFighters(): void {
   for (const fighter of fighters) {
-    const left = fighter.x - fighter.width / 2;
-    const top = fighter.y - fighter.height;
+    const hurtbox = getHurtbox(fighter);
 
     ctx.fillStyle = fighter.color;
-    ctx.fillRect(left, top, fighter.width, fighter.height);
+    ctx.fillRect(hurtbox.x, hurtbox.y, hurtbox.width, hurtbox.height);
+
+    ctx.strokeStyle = "#e0f2fe";
+    ctx.strokeRect(hurtbox.x, hurtbox.y, hurtbox.width, hurtbox.height);
 
     ctx.fillStyle = "#e2e8f0";
-    ctx.fillRect(fighter.x + fighter.facing * 8 - 3, top + 20, 6, 6);
+    ctx.fillRect(fighter.x + fighter.facing * 8 - 3, hurtbox.y + 20, 6, 6);
 
     ctx.fillStyle = "#cbd5e1";
     ctx.font = "13px system-ui, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(fighter.name, fighter.x, top - 12);
+    ctx.fillText(fighter.name, fighter.x, hurtbox.y - 12);
 
     ctx.fillStyle = "#94a3b8";
     ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
