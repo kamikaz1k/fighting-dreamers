@@ -30,6 +30,10 @@ type Fighter = {
   velocityX: number;
   velocityY: number;
   grounded: boolean;
+  health: number;
+  maxHealth: number;
+  shield: number;
+  maxShield: number;
 };
 
 type FighterState = "idle" | "run" | "jump" | "fall" | "attack" | "shield" | "hitstun" | "ko";
@@ -140,6 +144,10 @@ const fighters: Fighter[] = [
     velocityX: 0,
     velocityY: 0,
     grounded: true,
+    health: 100,
+    maxHealth: 100,
+    shield: 100,
+    maxShield: 100,
   },
   {
     name: "CPU",
@@ -153,6 +161,10 @@ const fighters: Fighter[] = [
     velocityX: 0,
     velocityY: 0,
     grounded: true,
+    health: 100,
+    maxHealth: 100,
+    shield: 100,
+    maxShield: 100,
   },
 ];
 
@@ -344,6 +356,8 @@ function renderFighters(): void {
 }
 
 function renderHud(interpolationAlpha: number): void {
+  renderResourceBars();
+
   ctx.fillStyle = "#f1f5f9";
   ctx.font = "24px system-ui, sans-serif";
   ctx.textAlign = "center";
@@ -356,6 +370,46 @@ function renderHud(interpolationAlpha: number): void {
   ctx.fillText(`Render alpha: ${interpolationAlpha.toFixed(2)}`, WORLD_WIDTH / 2, 126);
 
   renderCommandReadout();
+}
+
+function renderResourceBars(): void {
+  renderFighterBars(fighters[0], 28, 28, 330, "left");
+  renderFighterBars(fighters[1], WORLD_WIDTH - 358, 28, 330, "right");
+}
+
+function renderFighterBars(
+  fighter: Fighter,
+  x: number,
+  y: number,
+  width: number,
+  align: CanvasTextAlign,
+): void {
+  ctx.fillStyle = "#cbd5e1";
+  ctx.font = "14px system-ui, sans-serif";
+  ctx.textAlign = align;
+  ctx.fillText(fighter.name, align === "left" ? x : x + width, y - 8);
+
+  renderBar(x, y, width, 16, fighter.health / fighter.maxHealth, "#22c55e");
+  renderBar(x, y + 22, width, 8, fighter.shield / fighter.maxShield, "#60a5fa");
+}
+
+function renderBar(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  ratio: number,
+  fill: string,
+): void {
+  ctx.fillStyle = "#111827";
+  ctx.fillRect(x, y, width, height);
+
+  ctx.fillStyle = fill;
+  ctx.fillRect(x, y, width * clamp(ratio, 0, 1), height);
+
+  ctx.strokeStyle = "#334155";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x, y, width, height);
 }
 
 function renderCommandReadout(): void {
