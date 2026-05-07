@@ -220,9 +220,69 @@ const idleCommand: FighterCommand = {
   shieldHeld: false,
 };
 
-class IdleController implements Controller {
-  update(): FighterCommand {
-    return idleCommand;
+type CpuIntent = "approach" | "retreat" | "attack" | "shield" | "recover";
+
+class CpuController implements Controller {
+  intent: CpuIntent = "approach";
+  private reactionFramesRemaining = 0;
+  private attackCooldownFrames = 30;
+  private shieldFramesRemaining = 0;
+  private cachedCommand: FighterCommand = idleCommand;
+
+  update(context: ControllerContext): FighterCommand {
+    this.attackCooldownFrames = Math.max(0, this.attackCooldownFrames - 1);
+    this.reactionFramesRemaining -= 1;
+
+    if (this.reactionFramesRemaining > 0) {
+      return this.cachedCommand;
+    }
+
+    this.reactionFramesRemaining = 10 + (context.frame % 9);
+    this.cachedCommand = this.chooseCommand(context);
+    return this.cachedCommand;
+  }
+
+  private chooseCommand(context: ControllerContext): FighterCommand {
+    const distanceX = context.opponent.x - context.self.x;
+    const absDistanceX = Math.abs(distanceX);
+    const verticalDelta = context.opponent.y - context.self.y;
+    const directionToOpponent = Math.sign(distanceX) as -1 | 0 | 1;
+
+    if (context.self.state === "hitstun" || context.self.state === "ko") {
+      this.intent = "recover";
+      return idleCommand;
+    }
+
+    if (this.shieldFramesRemaining > 0) {
+      this.intent = "shield";
+      this.shieldFramesRemaining -= this.reactionFramesRemaining;
+      return { ...idleCommand, shieldHeld: true };
+    }
+
+    if (context.opponent.state === "attack" && absDistanceX < 120 && context.self.shield > 20) {
+      this.intent = "shield";
+      this.shieldFramesRemaining = 18;
+      return { ...idleCommand, shieldHeld: true };
+    }
+
+    if (absDistanceX < 58) {
+      this.intent = "retreat";
+      return { ...idleCommand, moveX: directionToOpponent === -1 ? 1 : -1 };
+    }
+
+    if (absDistanceX < 110 && this.attackCooldownFrames === 0) {
+      this.intent = "attack";
+      this.attackCooldownFrames = 42;
+
+      if (verticalDelta < -24) {
+        return { ...idleCommand, moveY: -1, punchPressed: true };
+      }
+
+      return { ...idleCommand, moveX: directionToOpponent, kickPressed: true };
+    }
+
+    this.intent = "approach";
+    return { ...idleCommand, moveX: directionToOpponent };
   }
 }
 
@@ -334,7 +394,8 @@ const fighters: Fighter[] = [
   },
 ];
 
-const controllers: Controller[] = [new KeyboardController(), new IdleController()];
+const cpuController = new CpuController();
+const controllers: Controller[] = [new KeyboardController(), cpuController];
 const latestCommands: FighterCommand[] = [{ ...idleCommand }, { ...idleCommand }];
 
 const canvas = document.createElement("canvas");
@@ -871,6 +932,8 @@ function renderCommandReadout(): void {
       y,
     );
   });
+
+  ctx.fillText(`CPU intent: ${cpuController.intent}`, 24, 540 - 10);
 }
 
 function frame(currentTimeMilliseconds: number): void {
