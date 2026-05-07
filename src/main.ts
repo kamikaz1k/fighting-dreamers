@@ -3,8 +3,20 @@ import "./styles.css";
 const WORLD_WIDTH = 960;
 const WORLD_HEIGHT = 540;
 const FLOOR_Y = 450;
+const STAGE_LEFT = 40;
+const STAGE_RIGHT = 920;
 const FIXED_TIMESTEP_SECONDS = 1 / 60;
 const MAX_ACCUMULATED_SECONDS = 0.25;
+
+const movementConfig = {
+  groundAcceleration: 2600,
+  airAcceleration: 1450,
+  maxGroundSpeed: 285,
+  maxAirSpeed: 245,
+  groundFriction: 2100,
+  gravity: 1850,
+  jumpVelocity: -720,
+};
 
 type Fighter = {
   name: string;
@@ -14,6 +26,9 @@ type Fighter = {
   height: number;
   color: string;
   facing: -1 | 1;
+  velocityX: number;
+  velocityY: number;
+  grounded: boolean;
 };
 
 type FighterCommand = {
@@ -118,6 +133,9 @@ const fighters: Fighter[] = [
     height: 104,
     color: "#38bdf8",
     facing: 1,
+    velocityX: 0,
+    velocityY: 0,
+    grounded: true,
   },
   {
     name: "CPU",
@@ -127,6 +145,9 @@ const fighters: Fighter[] = [
     height: 104,
     color: "#fb7185",
     facing: -1,
+    velocityX: 0,
+    velocityY: 0,
+    grounded: true,
   },
 ];
 
@@ -168,8 +189,89 @@ function update(): void {
     }) ?? idleCommand;
   }
 
+  for (let index = 0; index < fighters.length; index += 1) {
+    applyMovement(fighters[index], latestCommands[index]);
+  }
+
+  updateFacing();
   totalSimulatedSeconds += FIXED_TIMESTEP_SECONDS;
   simulationFrames += 1;
+}
+
+function applyMovement(fighter: Fighter, command: FighterCommand): void {
+  const acceleration = fighter.grounded
+    ? movementConfig.groundAcceleration
+    : movementConfig.airAcceleration;
+  const maxSpeed = fighter.grounded ? movementConfig.maxGroundSpeed : movementConfig.maxAirSpeed;
+
+  if (command.moveX !== 0) {
+    fighter.velocityX += command.moveX * acceleration * FIXED_TIMESTEP_SECONDS;
+  } else if (fighter.grounded) {
+    fighter.velocityX = moveToward(
+      fighter.velocityX,
+      0,
+      movementConfig.groundFriction * FIXED_TIMESTEP_SECONDS,
+    );
+  }
+
+  fighter.velocityX = clamp(fighter.velocityX, -maxSpeed, maxSpeed);
+
+  if (command.jumpPressed && fighter.grounded) {
+    fighter.velocityY = movementConfig.jumpVelocity;
+    fighter.grounded = false;
+  }
+
+  if (!fighter.grounded) {
+    fighter.velocityY += movementConfig.gravity * FIXED_TIMESTEP_SECONDS;
+  }
+
+  fighter.x += fighter.velocityX * FIXED_TIMESTEP_SECONDS;
+  fighter.y += fighter.velocityY * FIXED_TIMESTEP_SECONDS;
+
+  const halfWidth = fighter.width / 2;
+  const minX = STAGE_LEFT + halfWidth;
+  const maxX = STAGE_RIGHT - halfWidth;
+
+  if (fighter.x < minX) {
+    fighter.x = minX;
+    fighter.velocityX = Math.max(0, fighter.velocityX);
+  } else if (fighter.x > maxX) {
+    fighter.x = maxX;
+    fighter.velocityX = Math.min(0, fighter.velocityX);
+  }
+
+  if (fighter.y >= FLOOR_Y) {
+    fighter.y = FLOOR_Y;
+    fighter.velocityY = 0;
+    fighter.grounded = true;
+  }
+}
+
+function updateFacing(): void {
+  const [player, cpu] = fighters;
+
+  if (!player || !cpu) {
+    return;
+  }
+
+  player.facing = player.x <= cpu.x ? 1 : -1;
+  cpu.facing = cpu.x <= player.x ? 1 : -1;
+}
+
+function moveToward(value: number, target: number, amount: number): number {
+  if (value < target) {
+    return Math.min(value + amount, target);
+  }
+
+  if (value > target) {
+    return Math.max(value - amount, target);
+  }
+
+  return target;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
 }
 
 function render(interpolationAlpha: number): void {
@@ -211,6 +313,14 @@ function renderFighters(): void {
     ctx.font = "13px system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(fighter.name, fighter.x, top - 12);
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+    ctx.fillText(
+      `${fighter.grounded ? "ground" : "air"} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)}`,
+      fighter.x,
+      fighter.y + 24,
+    );
   }
 }
 
