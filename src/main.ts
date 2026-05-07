@@ -20,6 +20,7 @@ const movementConfig = {
 
 type Fighter = {
   name: string;
+  state: FighterState;
   x: number;
   y: number;
   width: number;
@@ -30,6 +31,8 @@ type Fighter = {
   velocityY: number;
   grounded: boolean;
 };
+
+type FighterState = "idle" | "run" | "jump" | "fall" | "attack" | "shield" | "hitstun" | "ko";
 
 type FighterCommand = {
   moveX: -1 | 0 | 1;
@@ -127,6 +130,7 @@ class KeyboardController implements Controller {
 const fighters: Fighter[] = [
   {
     name: "Player 1",
+    state: "idle",
     x: 360,
     y: FLOOR_Y,
     width: 52,
@@ -139,6 +143,7 @@ const fighters: Fighter[] = [
   },
   {
     name: "CPU",
+    state: "idle",
     x: 600,
     y: FLOOR_Y,
     width: 52,
@@ -191,11 +196,25 @@ function update(): void {
 
   for (let index = 0; index < fighters.length; index += 1) {
     applyMovement(fighters[index], latestCommands[index]);
+    updateMovementState(fighters[index]);
   }
 
   updateFacing();
   totalSimulatedSeconds += FIXED_TIMESTEP_SECONDS;
   simulationFrames += 1;
+}
+
+function updateMovementState(fighter: Fighter): void {
+  if (fighter.state === "attack" || fighter.state === "shield" || fighter.state === "hitstun" || fighter.state === "ko") {
+    return;
+  }
+
+  if (!fighter.grounded) {
+    fighter.state = fighter.velocityY < 0 ? "jump" : "fall";
+    return;
+  }
+
+  fighter.state = Math.abs(fighter.velocityX) > 5 ? "run" : "idle";
 }
 
 function applyMovement(fighter: Fighter, command: FighterCommand): void {
@@ -317,7 +336,7 @@ function renderFighters(): void {
     ctx.fillStyle = "#94a3b8";
     ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
     ctx.fillText(
-      `${fighter.grounded ? "ground" : "air"} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)}`,
+      `${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)}`,
       fighter.x,
       fighter.y + 24,
     );
