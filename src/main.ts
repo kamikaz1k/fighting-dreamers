@@ -32,6 +32,10 @@ const roundConfig = {
   koPauseFrames: 90,
 };
 
+const debugConfig = {
+  enabled: import.meta.env.DEV,
+};
+
 type Fighter = {
   name: string;
   state: FighterState;
@@ -427,6 +431,13 @@ let totalSimulatedSeconds = 0;
 let simulationFrames = 0;
 let roundPauseFrames = 0;
 let winnerName: string | null = null;
+let debugEnabled = debugConfig.enabled;
+
+window.addEventListener("keydown", (event) => {
+  if (event.code === "Backquote") {
+    debugEnabled = !debugEnabled;
+  }
+});
 
 function update(): void {
   for (let index = 0; index < fighters.length; index += 1) {
@@ -883,8 +894,10 @@ function renderFighters(): void {
     ctx.fillStyle = fighter.color;
     ctx.fillRect(hurtbox.x, hurtbox.y, hurtbox.width, hurtbox.height);
 
-    ctx.strokeStyle = "#e0f2fe";
-    ctx.strokeRect(hurtbox.x, hurtbox.y, hurtbox.width, hurtbox.height);
+    if (debugEnabled) {
+      ctx.strokeStyle = "#e0f2fe";
+      ctx.strokeRect(hurtbox.x, hurtbox.y, hurtbox.width, hurtbox.height);
+    }
 
     ctx.fillStyle = "#e2e8f0";
     ctx.fillRect(fighter.x + fighter.facing * 8 - 3, hurtbox.y + 20, 6, 6);
@@ -894,17 +907,9 @@ function renderFighters(): void {
     ctx.textAlign = "center";
     ctx.fillText(fighter.name, fighter.x, hurtbox.y - 12);
 
-    ctx.fillStyle = "#94a3b8";
-    ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
-    ctx.fillText(
-      `${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)}`,
-      fighter.x,
-      fighter.y + 24,
-    );
-
     const move = getCurrentMove(fighter);
 
-    if (move) {
+    if (move && debugEnabled) {
       const hitbox = getMoveHitbox(fighter, move);
       const active = isMoveActive(fighter, move);
 
@@ -916,7 +921,31 @@ function renderFighters(): void {
       ctx.fillStyle = "#fde68a";
       ctx.fillText(`${move.id}:${fighter.moveFrame}`, fighter.x, fighter.y + 40);
     }
+
+    if (debugEnabled) {
+      renderFighterDebug(fighter);
+    }
   }
+}
+
+function renderFighterDebug(fighter: Fighter): void {
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(
+    `${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)}`,
+    fighter.x,
+    fighter.y + 24,
+  );
+
+  ctx.strokeStyle = "#a78bfa";
+  ctx.beginPath();
+  ctx.moveTo(fighter.x, fighter.y - fighter.height / 2);
+  ctx.lineTo(
+    fighter.x + fighter.velocityX * 0.12,
+    fighter.y - fighter.height / 2 + fighter.velocityY * 0.06,
+  );
+  ctx.stroke();
 }
 
 function renderHud(interpolationAlpha: number): void {
@@ -929,9 +958,20 @@ function renderHud(interpolationAlpha: number): void {
 
   ctx.fillStyle = "#94a3b8";
   ctx.font = "14px system-ui, sans-serif";
-  ctx.fillText(`Fixed timestep: ${simulationFrames} frames`, WORLD_WIDTH / 2, 82);
-  ctx.fillText(`Sim time: ${totalSimulatedSeconds.toFixed(2)}s`, WORLD_WIDTH / 2, 104);
-  ctx.fillText(`Render alpha: ${interpolationAlpha.toFixed(2)}`, WORLD_WIDTH / 2, 126);
+  ctx.fillText(`Debug: ${debugEnabled ? "on" : "off"}`, WORLD_WIDTH / 2, 82);
+
+  if (debugEnabled) {
+    renderDebugHud(interpolationAlpha);
+  }
+}
+
+function renderDebugHud(interpolationAlpha: number): void {
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = "14px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(`Fixed timestep: ${simulationFrames} frames`, WORLD_WIDTH / 2, 104);
+  ctx.fillText(`Sim time: ${totalSimulatedSeconds.toFixed(2)}s`, WORLD_WIDTH / 2, 126);
+  ctx.fillText(`Render alpha: ${interpolationAlpha.toFixed(2)}`, WORLD_WIDTH / 2, 148);
 
   renderCommandReadout();
 }
