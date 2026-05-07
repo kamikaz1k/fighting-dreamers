@@ -22,6 +22,12 @@ const inputConfig = {
   bufferFrames: 6,
 };
 
+const shieldConfig = {
+  holdDrainPerSecond: 12,
+  regenPerSecond: 20,
+  minToActivate: 10,
+};
+
 type Fighter = {
   name: string;
   state: FighterState;
@@ -416,6 +422,12 @@ function updateActions(fighter: Fighter, command: FighterCommand): void {
     return;
   }
 
+  updateShield(fighter, command);
+
+  if (fighter.state === "shield") {
+    return;
+  }
+
   const bufferedAction = fighter.bufferedAction;
 
   if (bufferedAction) {
@@ -423,6 +435,33 @@ function updateActions(fighter: Fighter, command: FighterCommand): void {
     fighter.bufferedAction = null;
     return;
   }
+}
+
+function updateShield(fighter: Fighter, command: FighterCommand): void {
+  if (command.shieldHeld && fighter.shield >= shieldConfig.minToActivate) {
+    fighter.state = "shield";
+    fighter.velocityX = moveToward(
+      fighter.velocityX,
+      0,
+      movementConfig.groundFriction * FIXED_TIMESTEP_SECONDS,
+    );
+    fighter.shield = clamp(
+      fighter.shield - shieldConfig.holdDrainPerSecond * FIXED_TIMESTEP_SECONDS,
+      0,
+      fighter.maxShield,
+    );
+    return;
+  }
+
+  if (fighter.state === "shield") {
+    fighter.state = fighter.grounded ? "idle" : "fall";
+  }
+
+  fighter.shield = clamp(
+    fighter.shield + shieldConfig.regenPerSecond * FIXED_TIMESTEP_SECONDS,
+    0,
+    fighter.maxShield,
+  );
 }
 
 function updateInputBuffer(fighter: Fighter, command: FighterCommand): void {
@@ -517,14 +556,20 @@ function resolveAttackCollision(attacker: Fighter, defender: Fighter): void {
     return;
   }
 
-  defender.health = clamp(defender.health - move.damage, 0, defender.maxHealth);
-  defender.velocityX = attacker.facing * move.knockback.x;
-  defender.velocityY = move.knockback.y;
-  defender.grounded = false;
-  defender.state = "hitstun";
-  defender.currentMoveId = null;
-  defender.moveFrame = 0;
-  defender.hitstunFrames = getHitstunFrames(move);
+  if (defender.state === "shield" && defender.shield > 0) {
+    defender.shield = clamp(defender.shield - move.shieldDamage, 0, defender.maxShield);
+    defender.velocityX = attacker.facing * move.knockback.x * 0.35;
+  } else {
+    defender.health = clamp(defender.health - move.damage, 0, defender.maxHealth);
+    defender.velocityX = attacker.facing * move.knockback.x;
+    defender.velocityY = move.knockback.y;
+    defender.grounded = false;
+    defender.state = "hitstun";
+    defender.currentMoveId = null;
+    defender.moveFrame = 0;
+    defender.hitstunFrames = getHitstunFrames(move);
+  }
+
   defender.hitstopFrames = move.hitstopFrames;
   attacker.hitstopFrames = move.hitstopFrames;
   attacker.hitOpponentThisMove = true;
@@ -627,7 +672,11 @@ function applyMovement(fighter: Fighter, command: FighterCommand): void {
     fighter.velocityX *= getCurrentMove(fighter)?.movementMultiplier ?? 1;
   }
 
-  if (command.jumpPressed && fighter.grounded && fighter.state !== "hitstun") {
+  if (fighter.state === "shield") {
+    fighter.velocityX = 0;
+  }
+
+  if (command.jumpPressed && fighter.grounded && fighter.state !== "hitstun" && fighter.state !== "shield") {
     fighter.velocityY = movementConfig.jumpVelocity;
     fighter.grounded = false;
   }
