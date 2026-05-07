@@ -50,6 +50,65 @@ class IdleController implements Controller {
   }
 }
 
+class KeyboardController implements Controller {
+  private readonly heldKeys = new Set<string>();
+  private readonly pressedKeys = new Set<string>();
+
+  constructor() {
+    window.addEventListener("keydown", (event) => {
+      if (!this.heldKeys.has(event.code)) {
+        this.pressedKeys.add(event.code);
+      }
+
+      this.heldKeys.add(event.code);
+    });
+
+    window.addEventListener("keyup", (event) => {
+      this.heldKeys.delete(event.code);
+    });
+  }
+
+  update(): FighterCommand {
+    const command: FighterCommand = {
+      moveX: this.readHorizontal(),
+      moveY: this.readVertical(),
+      jumpPressed: this.consumePressed("KeyW"),
+      punchPressed: this.consumePressed("KeyJ"),
+      kickPressed: this.consumePressed("KeyK"),
+      shieldHeld: this.heldKeys.has("KeyL"),
+    };
+
+    this.pressedKeys.clear();
+    return command;
+  }
+
+  private readHorizontal(): -1 | 0 | 1 {
+    const left = this.heldKeys.has("KeyA");
+    const right = this.heldKeys.has("KeyD");
+
+    if (left === right) {
+      return 0;
+    }
+
+    return left ? -1 : 1;
+  }
+
+  private readVertical(): -1 | 0 | 1 {
+    const up = this.heldKeys.has("KeyW");
+    const down = this.heldKeys.has("KeyS");
+
+    if (up === down) {
+      return 0;
+    }
+
+    return up ? -1 : 1;
+  }
+
+  private consumePressed(code: string): boolean {
+    return this.pressedKeys.has(code);
+  }
+}
+
 const fighters: Fighter[] = [
   {
     name: "Player 1",
@@ -71,7 +130,8 @@ const fighters: Fighter[] = [
   },
 ];
 
-const controllers: Controller[] = [new IdleController(), new IdleController()];
+const controllers: Controller[] = [new KeyboardController(), new IdleController()];
+const latestCommands: FighterCommand[] = [{ ...idleCommand }, { ...idleCommand }];
 
 const canvas = document.createElement("canvas");
 canvas.width = WORLD_WIDTH;
@@ -101,7 +161,11 @@ function update(): void {
   for (let index = 0; index < fighters.length; index += 1) {
     const fighter = fighters[index];
     const opponent = fighters[index === 0 ? 1 : 0];
-    controllers[index]?.update({ self: fighter, opponent, frame: simulationFrames });
+    latestCommands[index] = controllers[index]?.update({
+      self: fighter,
+      opponent,
+      frame: simulationFrames,
+    }) ?? idleCommand;
   }
 
   totalSimulatedSeconds += FIXED_TIMESTEP_SECONDS;
@@ -161,6 +225,23 @@ function renderHud(interpolationAlpha: number): void {
   ctx.fillText(`Fixed timestep: ${simulationFrames} frames`, WORLD_WIDTH / 2, 82);
   ctx.fillText(`Sim time: ${totalSimulatedSeconds.toFixed(2)}s`, WORLD_WIDTH / 2, 104);
   ctx.fillText(`Render alpha: ${interpolationAlpha.toFixed(2)}`, WORLD_WIDTH / 2, 126);
+
+  renderCommandReadout();
+}
+
+function renderCommandReadout(): void {
+  ctx.fillStyle = "#cbd5e1";
+  ctx.font = "13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+  ctx.textAlign = "left";
+
+  latestCommands.forEach((command, index) => {
+    const y = 500 + index * 20;
+    ctx.fillText(
+      `P${index + 1} x:${command.moveX} y:${command.moveY} jump:${Number(command.jumpPressed)} punch:${Number(command.punchPressed)} kick:${Number(command.kickPressed)} shield:${Number(command.shieldHeld)}`,
+      24,
+      y,
+    );
+  });
 }
 
 function frame(currentTimeMilliseconds: number): void {
