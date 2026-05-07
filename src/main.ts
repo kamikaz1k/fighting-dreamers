@@ -18,6 +18,10 @@ const movementConfig = {
   jumpVelocity: -720,
 };
 
+const inputConfig = {
+  bufferFrames: 6,
+};
+
 type Fighter = {
   name: string;
   state: FighterState;
@@ -39,10 +43,18 @@ type Fighter = {
   hitOpponentThisMove: boolean;
   hitstopFrames: number;
   hitstunFrames: number;
+  bufferedAction: BufferedAction | null;
 };
 
 type FighterState = "idle" | "run" | "jump" | "fall" | "attack" | "shield" | "hitstun" | "ko";
 type AttackDirection = "neutral" | "side" | "up" | "down";
+type AttackButton = "punch" | "kick";
+
+type BufferedAction = {
+  button: AttackButton;
+  direction: AttackDirection;
+  framesRemaining: number;
+};
 
 type MoveDefinition = {
   id: string;
@@ -289,6 +301,7 @@ const fighters: Fighter[] = [
     hitOpponentThisMove: false,
     hitstopFrames: 0,
     hitstunFrames: 0,
+    bufferedAction: null,
   },
   {
     name: "CPU",
@@ -311,6 +324,7 @@ const fighters: Fighter[] = [
     hitOpponentThisMove: false,
     hitstopFrames: 0,
     hitstunFrames: 0,
+    bufferedAction: null,
   },
 ];
 
@@ -391,6 +405,8 @@ function updateHitstun(fighter: Fighter): void {
 }
 
 function updateActions(fighter: Fighter, command: FighterCommand): void {
+  updateInputBuffer(fighter, command);
+
   if (fighter.state === "hitstun" || fighter.state === "ko") {
     return;
   }
@@ -400,24 +416,43 @@ function updateActions(fighter: Fighter, command: FighterCommand): void {
     return;
   }
 
-  if (command.punchPressed) {
-    startAttack(fighter, getMoveForCommand("punch", command));
-    return;
-  }
+  const bufferedAction = fighter.bufferedAction;
 
-  if (command.kickPressed) {
-    startAttack(fighter, getMoveForCommand("kick", command));
+  if (bufferedAction) {
+    startAttack(fighter, getMoveForBufferedAction(bufferedAction));
+    fighter.bufferedAction = null;
+    return;
   }
 }
 
-function getMoveForCommand(button: "punch" | "kick", command: FighterCommand): MoveDefinition {
-  const direction = getAttackDirection(command);
+function updateInputBuffer(fighter: Fighter, command: FighterCommand): void {
+  if (command.punchPressed || command.kickPressed) {
+    fighter.bufferedAction = {
+      button: command.punchPressed ? "punch" : "kick",
+      direction: getAttackDirection(command),
+      framesRemaining: inputConfig.bufferFrames,
+    };
+    return;
+  }
+
+  if (!fighter.bufferedAction) {
+    return;
+  }
+
+  fighter.bufferedAction.framesRemaining -= 1;
+
+  if (fighter.bufferedAction.framesRemaining <= 0) {
+    fighter.bufferedAction = null;
+  }
+}
+
+function getMoveForBufferedAction(action: BufferedAction): MoveDefinition {
   const move = Object.values(moveDefinitions).find((definition) => {
-    return definition.button === button && definition.direction === direction;
+    return definition.button === action.button && definition.direction === action.direction;
   });
 
   if (!move) {
-    throw new Error(`Missing move definition for ${direction} ${button}`);
+    throw new Error(`Missing move definition for ${action.direction} ${action.button}`);
   }
 
   return move;
