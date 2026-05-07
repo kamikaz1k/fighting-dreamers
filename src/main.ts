@@ -74,6 +74,104 @@ const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 4,
     movementMultiplier: 0.45,
   },
+  sidePunch: {
+    id: "sidePunch",
+    button: "punch",
+    direction: "side",
+    startupFrames: 7,
+    activeFrames: 4,
+    recoveryFrames: 14,
+    damage: 8,
+    knockback: { x: 390, y: -70 },
+    hitbox: { x: 28, y: -76, width: 48, height: 24 },
+    shieldDamage: 15,
+    hitstopFrames: 5,
+    movementMultiplier: 0.4,
+  },
+  upPunch: {
+    id: "upPunch",
+    button: "punch",
+    direction: "up",
+    startupFrames: 6,
+    activeFrames: 5,
+    recoveryFrames: 15,
+    damage: 7,
+    knockback: { x: 140, y: -430 },
+    hitbox: { x: -14, y: -124, width: 44, height: 48 },
+    shieldDamage: 14,
+    hitstopFrames: 5,
+    movementMultiplier: 0.5,
+  },
+  downPunch: {
+    id: "downPunch",
+    button: "punch",
+    direction: "down",
+    startupFrames: 6,
+    activeFrames: 4,
+    recoveryFrames: 13,
+    damage: 6,
+    knockback: { x: 260, y: 160 },
+    hitbox: { x: 18, y: -38, width: 42, height: 26 },
+    shieldDamage: 13,
+    hitstopFrames: 4,
+    movementMultiplier: 0.45,
+  },
+  neutralKick: {
+    id: "neutralKick",
+    button: "kick",
+    direction: "neutral",
+    startupFrames: 8,
+    activeFrames: 5,
+    recoveryFrames: 18,
+    damage: 9,
+    knockback: { x: 440, y: -110 },
+    hitbox: { x: 22, y: -58, width: 54, height: 28 },
+    shieldDamage: 18,
+    hitstopFrames: 6,
+    movementMultiplier: 0.35,
+  },
+  sideKick: {
+    id: "sideKick",
+    button: "kick",
+    direction: "side",
+    startupFrames: 10,
+    activeFrames: 5,
+    recoveryFrames: 20,
+    damage: 11,
+    knockback: { x: 560, y: -120 },
+    hitbox: { x: 30, y: -62, width: 66, height: 30 },
+    shieldDamage: 22,
+    hitstopFrames: 7,
+    movementMultiplier: 0.28,
+  },
+  upKick: {
+    id: "upKick",
+    button: "kick",
+    direction: "up",
+    startupFrames: 9,
+    activeFrames: 6,
+    recoveryFrames: 19,
+    damage: 10,
+    knockback: { x: 160, y: -540 },
+    hitbox: { x: -16, y: -132, width: 50, height: 58 },
+    shieldDamage: 20,
+    hitstopFrames: 6,
+    movementMultiplier: 0.32,
+  },
+  downKick: {
+    id: "downKick",
+    button: "kick",
+    direction: "down",
+    startupFrames: 9,
+    activeFrames: 5,
+    recoveryFrames: 18,
+    damage: 9,
+    knockback: { x: 360, y: 220 },
+    hitbox: { x: 16, y: -32, width: 58, height: 30 },
+    shieldDamage: 19,
+    hitstopFrames: 6,
+    movementMultiplier: 0.35,
+  },
 };
 
 type FighterCommand = {
@@ -303,8 +401,42 @@ function updateActions(fighter: Fighter, command: FighterCommand): void {
   }
 
   if (command.punchPressed) {
-    startAttack(fighter, moveDefinitions.neutralPunch);
+    startAttack(fighter, getMoveForCommand("punch", command));
+    return;
   }
+
+  if (command.kickPressed) {
+    startAttack(fighter, getMoveForCommand("kick", command));
+  }
+}
+
+function getMoveForCommand(button: "punch" | "kick", command: FighterCommand): MoveDefinition {
+  const direction = getAttackDirection(command);
+  const move = Object.values(moveDefinitions).find((definition) => {
+    return definition.button === button && definition.direction === direction;
+  });
+
+  if (!move) {
+    throw new Error(`Missing move definition for ${direction} ${button}`);
+  }
+
+  return move;
+}
+
+function getAttackDirection(command: FighterCommand): AttackDirection {
+  if (command.moveY === -1) {
+    return "up";
+  }
+
+  if (command.moveY === 1) {
+    return "down";
+  }
+
+  if (command.moveX !== 0) {
+    return "side";
+  }
+
+  return "neutral";
 }
 
 function startAttack(fighter: Fighter, move: MoveDefinition): void {
