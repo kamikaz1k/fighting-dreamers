@@ -37,6 +37,8 @@ type Fighter = {
   currentMoveId: string | null;
   moveFrame: number;
   hitOpponentThisMove: boolean;
+  hitstopFrames: number;
+  hitstunFrames: number;
 };
 
 type FighterState = "idle" | "run" | "jump" | "fall" | "attack" | "shield" | "hitstun" | "ko";
@@ -187,6 +189,8 @@ const fighters: Fighter[] = [
     currentMoveId: null,
     moveFrame: 0,
     hitOpponentThisMove: false,
+    hitstopFrames: 0,
+    hitstunFrames: 0,
   },
   {
     name: "CPU",
@@ -207,6 +211,8 @@ const fighters: Fighter[] = [
     currentMoveId: null,
     moveFrame: 0,
     hitOpponentThisMove: false,
+    hitstopFrames: 0,
+    hitstunFrames: 0,
   },
 ];
 
@@ -249,6 +255,11 @@ function update(): void {
   }
 
   for (let index = 0; index < fighters.length; index += 1) {
+    if (updateHitstop(fighters[index])) {
+      continue;
+    }
+
+    updateHitstun(fighters[index]);
     updateActions(fighters[index], latestCommands[index]);
     applyMovement(fighters[index], latestCommands[index]);
     updateMovementState(fighters[index]);
@@ -260,7 +271,32 @@ function update(): void {
   simulationFrames += 1;
 }
 
+function updateHitstop(fighter: Fighter): boolean {
+  if (fighter.hitstopFrames <= 0) {
+    return false;
+  }
+
+  fighter.hitstopFrames -= 1;
+  return true;
+}
+
+function updateHitstun(fighter: Fighter): void {
+  if (fighter.hitstunFrames <= 0) {
+    return;
+  }
+
+  fighter.hitstunFrames -= 1;
+
+  if (fighter.hitstunFrames === 0) {
+    fighter.state = fighter.grounded ? "idle" : "fall";
+  }
+}
+
 function updateActions(fighter: Fighter, command: FighterCommand): void {
+  if (fighter.state === "hitstun" || fighter.state === "ko") {
+    return;
+  }
+
   if (fighter.state === "attack") {
     updateAttack(fighter);
     return;
@@ -315,6 +351,15 @@ function resolveAttackCollision(attacker: Fighter, defender: Fighter): void {
   }
 
   defender.health = clamp(defender.health - move.damage, 0, defender.maxHealth);
+  defender.velocityX = attacker.facing * move.knockback.x;
+  defender.velocityY = move.knockback.y;
+  defender.grounded = false;
+  defender.state = "hitstun";
+  defender.currentMoveId = null;
+  defender.moveFrame = 0;
+  defender.hitstunFrames = getHitstunFrames(move);
+  defender.hitstopFrames = move.hitstopFrames;
+  attacker.hitstopFrames = move.hitstopFrames;
   attacker.hitOpponentThisMove = true;
 }
 
@@ -346,6 +391,11 @@ function getCurrentMove(fighter: Fighter): MoveDefinition | null {
 
 function getMoveTotalFrames(move: MoveDefinition): number {
   return move.startupFrames + move.activeFrames + move.recoveryFrames;
+}
+
+function getHitstunFrames(move: MoveDefinition): number {
+  const knockbackMagnitude = Math.hypot(move.knockback.x, move.knockback.y);
+  return Math.round(10 + knockbackMagnitude / 42);
 }
 
 function isMoveActive(fighter: Fighter, move: MoveDefinition): boolean {
@@ -410,7 +460,7 @@ function applyMovement(fighter: Fighter, command: FighterCommand): void {
     fighter.velocityX *= getCurrentMove(fighter)?.movementMultiplier ?? 1;
   }
 
-  if (command.jumpPressed && fighter.grounded) {
+  if (command.jumpPressed && fighter.grounded && fighter.state !== "hitstun") {
     fighter.velocityY = movementConfig.jumpVelocity;
     fighter.grounded = false;
   }
