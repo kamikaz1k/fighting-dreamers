@@ -28,6 +28,10 @@ const shieldConfig = {
   minToActivate: 10,
 };
 
+const roundConfig = {
+  koPauseFrames: 90,
+};
+
 type Fighter = {
   name: string;
   state: FighterState;
@@ -421,6 +425,8 @@ let previousTimeSeconds = performance.now() / 1000;
 let accumulatedSeconds = 0;
 let totalSimulatedSeconds = 0;
 let simulationFrames = 0;
+let roundPauseFrames = 0;
+let winnerName: string | null = null;
 
 function update(): void {
   for (let index = 0; index < fighters.length; index += 1) {
@@ -445,9 +451,59 @@ function update(): void {
   }
 
   resolveAttackCollisions();
+  updateRoundFlow();
   updateFacing();
   totalSimulatedSeconds += FIXED_TIMESTEP_SECONDS;
   simulationFrames += 1;
+}
+
+function updateRoundFlow(): void {
+  if (roundPauseFrames > 0) {
+    roundPauseFrames -= 1;
+
+    if (roundPauseFrames === 0) {
+      resetRound();
+    }
+
+    return;
+  }
+
+  const loser = fighters.find((fighter) => fighter.health <= 0);
+
+  if (!loser) {
+    return;
+  }
+
+  const winner = fighters.find((fighter) => fighter !== loser);
+  loser.state = "ko";
+  loser.velocityX = 0;
+  loser.velocityY = 0;
+  winnerName = winner?.name ?? null;
+  roundPauseFrames = roundConfig.koPauseFrames;
+}
+
+function resetRound(): void {
+  resetFighter(fighters[0], 360, 1);
+  resetFighter(fighters[1], 600, -1);
+  winnerName = null;
+}
+
+function resetFighter(fighter: Fighter, x: number, facing: -1 | 1): void {
+  fighter.state = "idle";
+  fighter.x = x;
+  fighter.y = FLOOR_Y;
+  fighter.facing = facing;
+  fighter.velocityX = 0;
+  fighter.velocityY = 0;
+  fighter.grounded = true;
+  fighter.health = fighter.maxHealth;
+  fighter.shield = fighter.maxShield;
+  fighter.currentMoveId = null;
+  fighter.moveFrame = 0;
+  fighter.hitOpponentThisMove = false;
+  fighter.hitstopFrames = 0;
+  fighter.hitstunFrames = 0;
+  fighter.bufferedAction = null;
 }
 
 function updateHitstop(fighter: Fighter): boolean {
@@ -802,6 +858,7 @@ function render(interpolationAlpha: number): void {
   renderStage();
   renderFighters();
   renderHud(interpolationAlpha);
+  renderRoundOverlay();
 }
 
 function renderStage(): void {
@@ -877,6 +934,24 @@ function renderHud(interpolationAlpha: number): void {
   ctx.fillText(`Render alpha: ${interpolationAlpha.toFixed(2)}`, WORLD_WIDTH / 2, 126);
 
   renderCommandReadout();
+}
+
+function renderRoundOverlay(): void {
+  if (!winnerName) {
+    return;
+  }
+
+  ctx.fillStyle = "rgba(15, 17, 23, 0.52)";
+  ctx.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+  ctx.fillStyle = "#f8fafc";
+  ctx.font = "34px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(`${winnerName} wins`, WORLD_WIDTH / 2, WORLD_HEIGHT / 2 - 12);
+
+  ctx.fillStyle = "#cbd5e1";
+  ctx.font = "16px system-ui, sans-serif";
+  ctx.fillText("Resetting round...", WORLD_WIDTH / 2, WORLD_HEIGHT / 2 + 22);
 }
 
 function renderResourceBars(): void {
