@@ -16,6 +16,40 @@ type Fighter = {
   facing: -1 | 1;
 };
 
+type FighterCommand = {
+  moveX: -1 | 0 | 1;
+  moveY: -1 | 0 | 1;
+  jumpPressed: boolean;
+  punchPressed: boolean;
+  kickPressed: boolean;
+  shieldHeld: boolean;
+};
+
+type ControllerContext = {
+  self: Fighter;
+  opponent: Fighter;
+  frame: number;
+};
+
+interface Controller {
+  update(context: ControllerContext): FighterCommand;
+}
+
+const idleCommand: FighterCommand = {
+  moveX: 0,
+  moveY: 0,
+  jumpPressed: false,
+  punchPressed: false,
+  kickPressed: false,
+  shieldHeld: false,
+};
+
+class IdleController implements Controller {
+  update(): FighterCommand {
+    return idleCommand;
+  }
+}
+
 const fighters: Fighter[] = [
   {
     name: "Player 1",
@@ -36,6 +70,8 @@ const fighters: Fighter[] = [
     facing: -1,
   },
 ];
+
+const controllers: Controller[] = [new IdleController(), new IdleController()];
 
 const canvas = document.createElement("canvas");
 canvas.width = WORLD_WIDTH;
@@ -62,6 +98,12 @@ let totalSimulatedSeconds = 0;
 let simulationFrames = 0;
 
 function update(): void {
+  for (let index = 0; index < fighters.length; index += 1) {
+    const fighter = fighters[index];
+    const opponent = fighters[index === 0 ? 1 : 0];
+    controllers[index]?.update({ self: fighter, opponent, frame: simulationFrames });
+  }
+
   totalSimulatedSeconds += FIXED_TIMESTEP_SECONDS;
   simulationFrames += 1;
 }
