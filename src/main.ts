@@ -34,9 +34,44 @@ type Fighter = {
   maxHealth: number;
   shield: number;
   maxShield: number;
+  currentMoveId: string | null;
+  moveFrame: number;
 };
 
 type FighterState = "idle" | "run" | "jump" | "fall" | "attack" | "shield" | "hitstun" | "ko";
+type AttackDirection = "neutral" | "side" | "up" | "down";
+
+type MoveDefinition = {
+  id: string;
+  button: "punch" | "kick";
+  direction: AttackDirection;
+  startupFrames: number;
+  activeFrames: number;
+  recoveryFrames: number;
+  damage: number;
+  knockback: { x: number; y: number };
+  hitbox: { x: number; y: number; width: number; height: number };
+  shieldDamage: number;
+  hitstopFrames: number;
+  movementMultiplier?: number;
+};
+
+const moveDefinitions: Record<string, MoveDefinition> = {
+  neutralPunch: {
+    id: "neutralPunch",
+    button: "punch",
+    direction: "neutral",
+    startupFrames: 5,
+    activeFrames: 4,
+    recoveryFrames: 12,
+    damage: 6,
+    knockback: { x: 320, y: -80 },
+    hitbox: { x: 24, y: -78, width: 38, height: 24 },
+    shieldDamage: 12,
+    hitstopFrames: 4,
+    movementMultiplier: 0.45,
+  },
+};
 
 type FighterCommand = {
   moveX: -1 | 0 | 1;
@@ -148,6 +183,8 @@ const fighters: Fighter[] = [
     maxHealth: 100,
     shield: 100,
     maxShield: 100,
+    currentMoveId: null,
+    moveFrame: 0,
   },
   {
     name: "CPU",
@@ -165,6 +202,8 @@ const fighters: Fighter[] = [
     maxHealth: 100,
     shield: 100,
     maxShield: 100,
+    currentMoveId: null,
+    moveFrame: 0,
   },
 ];
 
@@ -207,6 +246,7 @@ function update(): void {
   }
 
   for (let index = 0; index < fighters.length; index += 1) {
+    updateActions(fighters[index], latestCommands[index]);
     applyMovement(fighters[index], latestCommands[index]);
     updateMovementState(fighters[index]);
   }
@@ -216,8 +256,49 @@ function update(): void {
   simulationFrames += 1;
 }
 
+function updateActions(fighter: Fighter, command: FighterCommand): void {
+  if (fighter.state === "attack") {
+    updateAttack(fighter);
+    return;
+  }
+
+  if (command.punchPressed) {
+    startAttack(fighter, moveDefinitions.neutralPunch);
+  }
+}
+
+function startAttack(fighter: Fighter, move: MoveDefinition): void {
+  fighter.state = "attack";
+  fighter.currentMoveId = move.id;
+  fighter.moveFrame = 0;
+}
+
+function updateAttack(fighter: Fighter): void {
+  const move = getCurrentMove(fighter);
+
+  if (!move) {
+    fighter.state = "idle";
+    fighter.currentMoveId = null;
+    fighter.moveFrame = 0;
+    return;
+  }
+
+  fighter.moveFrame += 1;
+
+  if (fighter.moveFrame >= getMoveTotalFrames(move)) {
+    fighter.state = fighter.grounded ? "idle" : "fall";
+    fighter.currentMoveId = null;
+    fighter.moveFrame = 0;
+  }
+}
+
 function updateMovementState(fighter: Fighter): void {
-  if (fighter.state === "attack" || fighter.state === "shield" || fighter.state === "hitstun" || fighter.state === "ko") {
+  if (
+    fighter.state === "attack"
+    || fighter.state === "shield"
+    || fighter.state === "hitstun"
+    || fighter.state === "ko"
+  ) {
     return;
   }
 
@@ -227,6 +308,39 @@ function updateMovementState(fighter: Fighter): void {
   }
 
   fighter.state = Math.abs(fighter.velocityX) > 5 ? "run" : "idle";
+}
+
+function getCurrentMove(fighter: Fighter): MoveDefinition | null {
+  if (!fighter.currentMoveId) {
+    return null;
+  }
+
+  return moveDefinitions[fighter.currentMoveId] ?? null;
+}
+
+function getMoveTotalFrames(move: MoveDefinition): number {
+  return move.startupFrames + move.activeFrames + move.recoveryFrames;
+}
+
+function isMoveActive(fighter: Fighter, move: MoveDefinition): boolean {
+  return fighter.moveFrame >= move.startupFrames
+    && fighter.moveFrame < move.startupFrames + move.activeFrames;
+}
+
+function getMoveHitbox(
+  fighter: Fighter,
+  move: MoveDefinition,
+): { x: number; y: number; width: number; height: number } {
+  const x = fighter.facing === 1
+    ? fighter.x + move.hitbox.x
+    : fighter.x - move.hitbox.x - move.hitbox.width;
+
+  return {
+    x,
+    y: fighter.y + move.hitbox.y,
+    width: move.hitbox.width,
+    height: move.hitbox.height,
+  };
 }
 
 function applyMovement(fighter: Fighter, command: FighterCommand): void {
@@ -246,6 +360,10 @@ function applyMovement(fighter: Fighter, command: FighterCommand): void {
   }
 
   fighter.velocityX = clamp(fighter.velocityX, -maxSpeed, maxSpeed);
+
+  if (fighter.state === "attack") {
+    fighter.velocityX *= getCurrentMove(fighter)?.movementMultiplier ?? 1;
+  }
 
   if (command.jumpPressed && fighter.grounded) {
     fighter.velocityY = movementConfig.jumpVelocity;
@@ -352,6 +470,21 @@ function renderFighters(): void {
       fighter.x,
       fighter.y + 24,
     );
+
+    const move = getCurrentMove(fighter);
+
+    if (move) {
+      const hitbox = getMoveHitbox(fighter, move);
+      const active = isMoveActive(fighter, move);
+
+      ctx.fillStyle = active ? "rgba(250, 204, 21, 0.45)" : "rgba(148, 163, 184, 0.22)";
+      ctx.fillRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+      ctx.strokeStyle = active ? "#facc15" : "#94a3b8";
+      ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+
+      ctx.fillStyle = "#fde68a";
+      ctx.fillText(`${move.id}:${fighter.moveFrame}`, fighter.x, fighter.y + 40);
+    }
   }
 }
 
