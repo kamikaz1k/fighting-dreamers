@@ -1102,6 +1102,7 @@ function renderDebugHud(interpolationAlpha: number): void {
   ctx.fillText(`Render alpha: ${interpolationAlpha.toFixed(2)}`, WORLD_WIDTH / 2, 148);
 
   renderCommandReadout();
+  renderControlsGuide();
 }
 
 function renderRoundOverlay(): void {
@@ -1185,6 +1186,38 @@ function renderCommandReadout(): void {
   });
 
   ctx.fillText(`CPU intent: ${cpuController.intent}`, 24, 540 - 10);
+}
+
+function renderControlsGuide(): void {
+  const lines = [
+    "Controls",
+    "A/D: move + face",
+    "W: jump / up",
+    "S: down",
+    "J: punch",
+    "K: kick",
+    "L: shield",
+    "`: debug",
+  ];
+  const lineHeight = 16;
+  const padding = 12;
+  const width = 166;
+  const height = padding * 2 + lines.length * lineHeight;
+  const x = WORLD_WIDTH - width - 18;
+  const y = WORLD_HEIGHT - height - 18;
+
+  ctx.fillStyle = "rgba(15, 23, 42, 0.78)";
+  ctx.fillRect(x, y, width, height);
+  ctx.strokeStyle = "#334155";
+  ctx.strokeRect(x, y, width, height);
+
+  ctx.textAlign = "left";
+  ctx.font = "13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+
+  lines.forEach((line, index) => {
+    ctx.fillStyle = index === 0 ? "#f8fafc" : "#cbd5e1";
+    ctx.fillText(line, x + padding, y + padding + lineHeight * (index + 0.8));
+  });
 }
 
 function frame(currentTimeMilliseconds: number): void {
