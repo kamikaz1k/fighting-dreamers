@@ -43,7 +43,15 @@ const debugConfig = {
   enabled: import.meta.env.DEV,
 };
 
+const spawnPoints = [
+  { x: 360, facing: 1 },
+  { x: 600, facing: -1 },
+  { x: 260, facing: 1 },
+  { x: 700, facing: -1 },
+] satisfies Array<{ x: number; facing: -1 | 1 }>;
+
 type Fighter = {
+  id: string;
   name: string;
   state: FighterState;
   x: number;
@@ -61,7 +69,7 @@ type Fighter = {
   maxShield: number;
   currentMoveId: string | null;
   moveFrame: number;
-  hitOpponentThisMove: boolean;
+  hitFighterIdsThisMove: Set<string>;
   hitstopFrames: number;
   hitstunFrames: number;
   landingJumpCooldownFrames: number;
@@ -226,7 +234,7 @@ type FighterCommand = {
 
 type ControllerContext = {
   self: Fighter;
-  opponent: Fighter;
+  opponents: Fighter[];
   frame: number;
 };
 
@@ -266,9 +274,16 @@ class CpuController implements Controller {
   }
 
   private chooseCommand(context: ControllerContext): FighterCommand {
-    const distanceX = context.opponent.x - context.self.x;
+    const opponent = getNearestOpponent(context.self, context.opponents);
+
+    if (!opponent) {
+      this.intent = "recover";
+      return idleCommand;
+    }
+
+    const distanceX = opponent.x - context.self.x;
     const absDistanceX = Math.abs(distanceX);
-    const verticalDelta = context.opponent.y - context.self.y;
+    const verticalDelta = opponent.y - context.self.y;
     const directionToOpponent = Math.sign(distanceX) as -1 | 0 | 1;
 
     if (context.self.state === "hitstun" || context.self.state === "ko") {
@@ -282,7 +297,7 @@ class CpuController implements Controller {
       return { ...idleCommand, shieldHeld: true };
     }
 
-    if (context.opponent.state === "attack" && absDistanceX < 120 && context.self.shield > 20) {
+    if (opponent.state === "attack" && absDistanceX < 120 && context.self.shield > 20) {
       this.intent = "shield";
       this.shieldFramesRemaining = 18;
       return { ...idleCommand, shieldHeld: true };
@@ -370,6 +385,7 @@ class KeyboardController implements Controller {
 
 const fighters: Fighter[] = [
   {
+    id: "p1",
     name: "Player 1",
     state: "idle",
     x: 360,
@@ -387,13 +403,14 @@ const fighters: Fighter[] = [
     maxShield: 100,
     currentMoveId: null,
     moveFrame: 0,
-    hitOpponentThisMove: false,
+    hitFighterIdsThisMove: new Set(),
     hitstopFrames: 0,
     hitstunFrames: 0,
     landingJumpCooldownFrames: 0,
     bufferedAction: null,
   },
   {
+    id: "cpu",
     name: "CPU",
     state: "idle",
     x: 600,
@@ -411,7 +428,7 @@ const fighters: Fighter[] = [
     maxShield: 100,
     currentMoveId: null,
     moveFrame: 0,
-    hitOpponentThisMove: false,
+    hitFighterIdsThisMove: new Set(),
     hitstopFrames: 0,
     hitstunFrames: 0,
     landingJumpCooldownFrames: 0,
@@ -420,8 +437,11 @@ const fighters: Fighter[] = [
 ];
 
 const cpuController = new CpuController();
-const controllers: Controller[] = [new KeyboardController(), cpuController];
-const latestCommands: FighterCommand[] = [{ ...idleCommand }, { ...idleCommand }];
+const controllersByFighterId = new Map<string, Controller>([
+  ["p1", new KeyboardController()],
+  ["cpu", cpuController],
+]);
+const latestCommandsByFighterId = new Map<string, FighterCommand>();
 
 const canvas = document.createElement("canvas");
 canvas.width = WORLD_WIDTH;
@@ -457,25 +477,26 @@ window.addEventListener("keydown", (event) => {
 });
 
 function update(): void {
-  for (let index = 0; index < fighters.length; index += 1) {
-    const fighter = fighters[index];
-    const opponent = fighters[index === 0 ? 1 : 0];
-    latestCommands[index] = controllers[index]?.update({
+  for (const fighter of fighters) {
+    const opponents = getOpponents(fighter);
+    const controller = controllersByFighterId.get(fighter.id);
+    latestCommandsByFighterId.set(fighter.id, controller?.update({
       self: fighter,
-      opponent,
+      opponents,
       frame: simulationFrames,
-    }) ?? idleCommand;
+    }) ?? idleCommand);
   }
 
-  for (let index = 0; index < fighters.length; index += 1) {
-    if (updateHitstop(fighters[index])) {
+  for (const fighter of fighters) {
+    if (updateHitstop(fighter)) {
       continue;
     }
 
-    updateHitstun(fighters[index]);
-    updateActions(fighters[index], latestCommands[index]);
-    applyMovement(fighters[index], latestCommands[index]);
-    updateMovementState(fighters[index]);
+    const command = latestCommandsByFighterId.get(fighter.id) ?? idleCommand;
+    updateHitstun(fighter);
+    updateActions(fighter, command);
+    applyMovement(fighter, command);
+    updateMovementState(fighter);
   }
 
   resolveAttackCollisions();
@@ -483,6 +504,30 @@ function update(): void {
   updateFacing();
   totalSimulatedSeconds += FIXED_TIMESTEP_SECONDS;
   simulationFrames += 1;
+}
+
+function getOpponents(fighter: Fighter): Fighter[] {
+  return fighters.filter((candidate) => candidate.id !== fighter.id);
+}
+
+function getNearestOpponent(fighter: Fighter, opponents: Fighter[]): Fighter | null {
+  let nearest: Fighter | null = null;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+
+  for (const opponent of opponents) {
+    if (opponent.state === "ko") {
+      continue;
+    }
+
+    const distance = Math.abs(opponent.x - fighter.x);
+
+    if (distance < nearestDistance) {
+      nearest = opponent;
+      nearestDistance = distance;
+    }
+  }
+
+  return nearest;
 }
 
 function updateRoundFlow(): void {
@@ -496,24 +541,41 @@ function updateRoundFlow(): void {
     return;
   }
 
-  const loser = fighters.find((fighter) => fighter.health <= 0);
+  const activeFighters = fighters.filter((fighter) => fighter.health > 0);
 
-  if (!loser) {
+  if (activeFighters.length > 1) {
     return;
   }
 
-  const winner = fighters.find((fighter) => fighter !== loser);
-  loser.state = "ko";
-  loser.velocityX = 0;
-  loser.velocityY = 0;
-  winnerName = winner?.name ?? null;
+  for (const fighter of fighters) {
+    if (fighter.health <= 0) {
+      fighter.state = "ko";
+      fighter.velocityX = 0;
+      fighter.velocityY = 0;
+    }
+  }
+
+  winnerName = activeFighters[0]?.name ?? null;
   roundPauseFrames = roundConfig.koPauseFrames;
 }
 
 function resetRound(): void {
-  resetFighter(fighters[0], 360, 1);
-  resetFighter(fighters[1], 600, -1);
+  fighters.forEach((fighter, index) => {
+    const spawnPoint = spawnPoints[index] ?? getFallbackSpawnPoint(index);
+    resetFighter(fighter, spawnPoint.x, spawnPoint.facing);
+  });
   winnerName = null;
+}
+
+function getFallbackSpawnPoint(index: number): { x: number; facing: -1 | 1 } {
+  const usableWidth = STAGE_RIGHT - STAGE_LEFT;
+  const spacing = usableWidth / (fighters.length + 1);
+  const x = STAGE_LEFT + spacing * (index + 1);
+
+  return {
+    x,
+    facing: x < WORLD_WIDTH / 2 ? 1 : -1,
+  };
 }
 
 function resetFighter(fighter: Fighter, x: number, facing: -1 | 1): void {
@@ -528,7 +590,7 @@ function resetFighter(fighter: Fighter, x: number, facing: -1 | 1): void {
   fighter.shield = fighter.maxShield;
   fighter.currentMoveId = null;
   fighter.moveFrame = 0;
-  fighter.hitOpponentThisMove = false;
+  fighter.hitFighterIdsThisMove.clear();
   fighter.hitstopFrames = 0;
   fighter.hitstunFrames = 0;
   fighter.landingJumpCooldownFrames = 0;
@@ -663,7 +725,7 @@ function startAttack(fighter: Fighter, move: MoveDefinition): void {
   fighter.state = "attack";
   fighter.currentMoveId = move.id;
   fighter.moveFrame = 0;
-  fighter.hitOpponentThisMove = false;
+  fighter.hitFighterIdsThisMove.clear();
 }
 
 function updateAttack(fighter: Fighter): void {
@@ -682,19 +744,24 @@ function updateAttack(fighter: Fighter): void {
     fighter.state = fighter.grounded ? "idle" : "fall";
     fighter.currentMoveId = null;
     fighter.moveFrame = 0;
-    fighter.hitOpponentThisMove = false;
+    fighter.hitFighterIdsThisMove.clear();
   }
 }
 
 function resolveAttackCollisions(): void {
-  resolveAttackCollision(fighters[0], fighters[1]);
-  resolveAttackCollision(fighters[1], fighters[0]);
+  for (const attacker of fighters) {
+    for (const defender of fighters) {
+      if (attacker.id !== defender.id) {
+        resolveAttackCollision(attacker, defender);
+      }
+    }
+  }
 }
 
 function resolveAttackCollision(attacker: Fighter, defender: Fighter): void {
   const move = getCurrentMove(attacker);
 
-  if (!move || !isMoveActive(attacker, move) || attacker.hitOpponentThisMove) {
+  if (!move || !isMoveActive(attacker, move) || attacker.hitFighterIdsThisMove.has(defender.id)) {
     return;
   }
 
@@ -723,7 +790,7 @@ function resolveAttackCollision(attacker: Fighter, defender: Fighter): void {
 
   defender.hitstopFrames = move.hitstopFrames;
   attacker.hitstopFrames = move.hitstopFrames;
-  attacker.hitOpponentThisMove = true;
+  attacker.hitFighterIdsThisMove.add(defender.id);
 }
 
 function updateMovementState(fighter: Fighter): void {
@@ -886,14 +953,13 @@ function startJump(fighter: Fighter): void {
 }
 
 function updateFacing(): void {
-  const [player, cpu] = fighters;
+  for (const fighter of fighters) {
+    const nearestOpponent = getNearestOpponent(fighter, getOpponents(fighter));
 
-  if (!player || !cpu) {
-    return;
+    if (nearestOpponent) {
+      fighter.facing = fighter.x <= nearestOpponent.x ? 1 : -1;
+    }
   }
-
-  player.facing = player.x <= cpu.x ? 1 : -1;
-  cpu.facing = cpu.x <= player.x ? 1 : -1;
 }
 
 function moveToward(value: number, target: number, amount: number): number {
@@ -1067,8 +1133,15 @@ function renderRoundOverlay(): void {
 }
 
 function renderResourceBars(): void {
-  renderFighterBars(fighters[0], 28, 28, 330, "left");
-  renderFighterBars(fighters[1], WORLD_WIDTH - 358, 28, 330, "right");
+  fighters.forEach((fighter, index) => {
+    const isLeftSide = index % 2 === 0;
+    const row = Math.floor(index / 2);
+    const width = 330;
+    const x = isLeftSide ? 28 : WORLD_WIDTH - 28 - width;
+    const y = 28 + row * 58;
+
+    renderFighterBars(fighter, x, y, width, isLeftSide ? "left" : "right");
+  });
 }
 
 function renderFighterBars(
@@ -1111,10 +1184,11 @@ function renderCommandReadout(): void {
   ctx.font = "13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
   ctx.textAlign = "left";
 
-  latestCommands.forEach((command, index) => {
+  fighters.forEach((fighter, index) => {
+    const command = latestCommandsByFighterId.get(fighter.id) ?? idleCommand;
     const y = 500 + index * 20;
     ctx.fillText(
-      `P${index + 1} x:${command.moveX} y:${command.moveY} jump:${Number(command.jumpPressed)} punch:${Number(command.punchPressed)} kick:${Number(command.kickPressed)} shield:${Number(command.shieldHeld)}`,
+      `${fighter.id} x:${command.moveX} y:${command.moveY} jump:${Number(command.jumpPressed)} punch:${Number(command.punchPressed)} kick:${Number(command.kickPressed)} shield:${Number(command.shieldHeld)}`,
       24,
       y,
     );
