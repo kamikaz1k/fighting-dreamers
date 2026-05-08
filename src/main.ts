@@ -26,6 +26,12 @@ const shieldConfig = {
   holdDrainPerSecond: 12,
   regenPerSecond: 20,
   minToActivate: 10,
+  box: {
+    width: 92,
+    height: 122,
+    offsetX: 0,
+    offsetY: -62,
+  },
 };
 
 const roundConfig = {
@@ -83,6 +89,13 @@ type MoveDefinition = {
   shieldDamage: number;
   hitstopFrames: number;
   movementMultiplier?: number;
+};
+
+type Rect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 };
 
 const moveDefinitions: Record<string, MoveDefinition> = {
@@ -680,11 +693,16 @@ function resolveAttackCollision(attacker: Fighter, defender: Fighter): void {
     return;
   }
 
-  if (!rectsOverlap(getMoveHitbox(attacker, move), getHurtbox(defender))) {
+  const moveHitbox = getMoveHitbox(attacker, move);
+  const blockedByShield = defender.state === "shield"
+    && defender.shield > 0
+    && rectsOverlap(moveHitbox, getShieldBox(defender));
+
+  if (!blockedByShield && !rectsOverlap(moveHitbox, getHurtbox(defender))) {
     return;
   }
 
-  if (defender.state === "shield" && defender.shield > 0) {
+  if (blockedByShield) {
     defender.shield = clamp(defender.shield - move.shieldDamage, 0, defender.maxShield);
     defender.velocityX = attacker.facing * move.knockback.x * 0.35;
   } else {
@@ -746,7 +764,7 @@ function isMoveActive(fighter: Fighter, move: MoveDefinition): boolean {
 function getMoveHitbox(
   fighter: Fighter,
   move: MoveDefinition,
-): { x: number; y: number; width: number; height: number } {
+): Rect {
   const x = fighter.facing === 1
     ? fighter.x + move.hitbox.x
     : fighter.x - move.hitbox.x - move.hitbox.width;
@@ -759,7 +777,7 @@ function getMoveHitbox(
   };
 }
 
-function getHurtbox(fighter: Fighter): { x: number; y: number; width: number; height: number } {
+function getHurtbox(fighter: Fighter): Rect {
   return {
     x: fighter.x - fighter.width / 2,
     y: fighter.y - fighter.height,
@@ -768,10 +786,16 @@ function getHurtbox(fighter: Fighter): { x: number; y: number; width: number; he
   };
 }
 
-function rectsOverlap(
-  a: { x: number; y: number; width: number; height: number },
-  b: { x: number; y: number; width: number; height: number },
-): boolean {
+function getShieldBox(fighter: Fighter): Rect {
+  return {
+    x: fighter.x + shieldConfig.box.offsetX - shieldConfig.box.width / 2,
+    y: fighter.y + shieldConfig.box.offsetY - shieldConfig.box.height / 2,
+    width: shieldConfig.box.width,
+    height: shieldConfig.box.height,
+  };
+}
+
+function rectsOverlap(a: Rect, b: Rect): boolean {
   return a.x < b.x + b.width
     && a.x + a.width > b.x
     && a.y < b.y + b.height
@@ -891,6 +915,10 @@ function renderFighters(): void {
   for (const fighter of fighters) {
     const hurtbox = getHurtbox(fighter);
 
+    if (fighter.state === "shield") {
+      renderShield(fighter);
+    }
+
     ctx.fillStyle = fighter.color;
     ctx.fillRect(hurtbox.x, hurtbox.y, hurtbox.width, hurtbox.height);
 
@@ -925,6 +953,24 @@ function renderFighters(): void {
     if (debugEnabled) {
       renderFighterDebug(fighter);
     }
+  }
+}
+
+function renderShield(fighter: Fighter): void {
+  const shieldBox = getShieldBox(fighter);
+  const shieldRatio = fighter.shield / fighter.maxShield;
+
+  ctx.fillStyle = `rgba(96, 165, 250, ${0.18 + shieldRatio * 0.22})`;
+  ctx.fillRect(shieldBox.x, shieldBox.y, shieldBox.width, shieldBox.height);
+
+  ctx.strokeStyle = "#93c5fd";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(shieldBox.x, shieldBox.y, shieldBox.width, shieldBox.height);
+
+  if (debugEnabled) {
+    ctx.strokeStyle = "#38bdf8";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(shieldBox.x + 4, shieldBox.y + 4, shieldBox.width - 8, shieldBox.height - 8);
   }
 }
 
