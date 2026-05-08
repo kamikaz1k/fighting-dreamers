@@ -954,12 +954,24 @@ function startJump(fighter: Fighter): void {
 
 function updateFacing(): void {
   for (const fighter of fighters) {
+    if (!canAutoFace(fighter)) {
+      continue;
+    }
+
     const nearestOpponent = getNearestOpponent(fighter, getOpponents(fighter));
 
     if (nearestOpponent) {
       fighter.facing = fighter.x <= nearestOpponent.x ? 1 : -1;
     }
   }
+}
+
+function canAutoFace(fighter: Fighter): boolean {
+  return fighter.grounded
+    && fighter.landingJumpCooldownFrames === 0
+    && fighter.state !== "attack"
+    && fighter.state !== "hitstun"
+    && fighter.state !== "ko";
 }
 
 function moveToward(value: number, target: number, amount: number): number {
