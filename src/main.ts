@@ -16,6 +16,7 @@ const movementConfig = {
   groundFriction: 2100,
   gravity: 1850,
   jumpVelocity: -720,
+  landingJumpCooldownFrames: 5,
 };
 
 const inputConfig = {
@@ -63,6 +64,7 @@ type Fighter = {
   hitOpponentThisMove: boolean;
   hitstopFrames: number;
   hitstunFrames: number;
+  landingJumpCooldownFrames: number;
   bufferedAction: BufferedAction | null;
 };
 
@@ -388,6 +390,7 @@ const fighters: Fighter[] = [
     hitOpponentThisMove: false,
     hitstopFrames: 0,
     hitstunFrames: 0,
+    landingJumpCooldownFrames: 0,
     bufferedAction: null,
   },
   {
@@ -411,6 +414,7 @@ const fighters: Fighter[] = [
     hitOpponentThisMove: false,
     hitstopFrames: 0,
     hitstunFrames: 0,
+    landingJumpCooldownFrames: 0,
     bufferedAction: null,
   },
 ];
@@ -527,6 +531,7 @@ function resetFighter(fighter: Fighter, x: number, facing: -1 | 1): void {
   fighter.hitOpponentThisMove = false;
   fighter.hitstopFrames = 0;
   fighter.hitstunFrames = 0;
+  fighter.landingJumpCooldownFrames = 0;
   fighter.bufferedAction = null;
 }
 
@@ -803,6 +808,7 @@ function rectsOverlap(a: Rect, b: Rect): boolean {
 }
 
 function applyMovement(fighter: Fighter, command: FighterCommand): void {
+  const wasGrounded = fighter.grounded;
   const acceleration = fighter.grounded
     ? movementConfig.groundAcceleration
     : movementConfig.airAcceleration;
@@ -828,9 +834,12 @@ function applyMovement(fighter: Fighter, command: FighterCommand): void {
     fighter.velocityX = 0;
   }
 
-  if (command.jumpPressed && fighter.grounded && fighter.state !== "hitstun" && fighter.state !== "shield") {
-    fighter.velocityY = movementConfig.jumpVelocity;
-    fighter.grounded = false;
+  if (fighter.grounded && fighter.landingJumpCooldownFrames > 0) {
+    fighter.landingJumpCooldownFrames -= 1;
+  }
+
+  if (shouldStartJump(fighter, command)) {
+    startJump(fighter);
   }
 
   if (!fighter.grounded) {
@@ -856,7 +865,24 @@ function applyMovement(fighter: Fighter, command: FighterCommand): void {
     fighter.y = FLOOR_Y;
     fighter.velocityY = 0;
     fighter.grounded = true;
+
+    if (!wasGrounded) {
+      fighter.landingJumpCooldownFrames = movementConfig.landingJumpCooldownFrames;
+    }
   }
+}
+
+function shouldStartJump(fighter: Fighter, command: FighterCommand): boolean {
+  return fighter.grounded
+    && fighter.landingJumpCooldownFrames === 0
+    && fighter.state !== "hitstun"
+    && fighter.state !== "shield"
+    && (command.jumpPressed || command.moveY === -1);
+}
+
+function startJump(fighter: Fighter): void {
+  fighter.velocityY = movementConfig.jumpVelocity;
+  fighter.grounded = false;
 }
 
 function updateFacing(): void {
@@ -979,7 +1005,7 @@ function renderFighterDebug(fighter: Fighter): void {
   ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
   ctx.textAlign = "center";
   ctx.fillText(
-    `${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)}`,
+    `${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)} lcd:${fighter.landingJumpCooldownFrames}`,
     fighter.x,
     fighter.y + 24,
   );
