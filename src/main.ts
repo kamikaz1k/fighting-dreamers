@@ -501,7 +501,6 @@ function update(): void {
 
   resolveAttackCollisions();
   updateRoundFlow();
-  updateFacing();
   totalSimulatedSeconds += FIXED_TIMESTEP_SECONDS;
   simulationFrames += 1;
 }
@@ -882,6 +881,7 @@ function applyMovement(fighter: Fighter, command: FighterCommand): void {
   const maxSpeed = fighter.grounded ? movementConfig.maxGroundSpeed : movementConfig.maxAirSpeed;
 
   if (command.moveX !== 0) {
+    fighter.facing = command.moveX;
     fighter.velocityX += command.moveX * acceleration * FIXED_TIMESTEP_SECONDS;
   } else if (fighter.grounded) {
     fighter.velocityX = moveToward(
@@ -950,28 +950,6 @@ function shouldStartJump(fighter: Fighter, command: FighterCommand): boolean {
 function startJump(fighter: Fighter): void {
   fighter.velocityY = movementConfig.jumpVelocity;
   fighter.grounded = false;
-}
-
-function updateFacing(): void {
-  for (const fighter of fighters) {
-    if (!canAutoFace(fighter)) {
-      continue;
-    }
-
-    const nearestOpponent = getNearestOpponent(fighter, getOpponents(fighter));
-
-    if (nearestOpponent) {
-      fighter.facing = fighter.x <= nearestOpponent.x ? 1 : -1;
-    }
-  }
-}
-
-function canAutoFace(fighter: Fighter): boolean {
-  return fighter.grounded
-    && fighter.landingJumpCooldownFrames === 0
-    && fighter.state !== "attack"
-    && fighter.state !== "hitstun"
-    && fighter.state !== "ko";
 }
 
 function moveToward(value: number, target: number, amount: number): number {
