@@ -1,4 +1,10 @@
 import "./styles.css";
+import {
+  moveDefinitions,
+  type MoveButton,
+  type MoveDefinition,
+  type MoveDirection,
+} from "./moves";
 
 const WORLD_WIDTH = 960;
 const WORLD_HEIGHT = 540;
@@ -77,28 +83,11 @@ type Fighter = {
 };
 
 type FighterState = "idle" | "run" | "jump" | "fall" | "attack" | "shield" | "hitstun" | "ko";
-type AttackDirection = "neutral" | "side" | "up" | "down";
-type AttackButton = "punch" | "kick";
-
 type BufferedAction = {
-  button: AttackButton;
-  direction: AttackDirection;
+  button: MoveButton;
+  direction: MoveDirection;
+  grounded: boolean;
   framesRemaining: number;
-};
-
-type MoveDefinition = {
-  id: string;
-  button: "punch" | "kick";
-  direction: AttackDirection;
-  startupFrames: number;
-  activeFrames: number;
-  recoveryFrames: number;
-  damage: number;
-  knockback: { x: number; y: number };
-  hitbox: { x: number; y: number; width: number; height: number };
-  shieldDamage: number;
-  hitstopFrames: number;
-  movementMultiplier?: number;
 };
 
 type Rect = {
@@ -108,127 +97,13 @@ type Rect = {
   height: number;
 };
 
-const moveDefinitions: Record<string, MoveDefinition> = {
-  neutralPunch: {
-    id: "neutralPunch",
-    button: "punch",
-    direction: "neutral",
-    startupFrames: 5,
-    activeFrames: 4,
-    recoveryFrames: 12,
-    damage: 6,
-    knockback: { x: 320, y: -80 },
-    hitbox: { x: 24, y: -78, width: 38, height: 24 },
-    shieldDamage: 12,
-    hitstopFrames: 4,
-    movementMultiplier: 0.45,
-  },
-  sidePunch: {
-    id: "sidePunch",
-    button: "punch",
-    direction: "side",
-    startupFrames: 7,
-    activeFrames: 4,
-    recoveryFrames: 14,
-    damage: 8,
-    knockback: { x: 390, y: -70 },
-    hitbox: { x: 28, y: -76, width: 48, height: 24 },
-    shieldDamage: 15,
-    hitstopFrames: 5,
-    movementMultiplier: 0.4,
-  },
-  upPunch: {
-    id: "upPunch",
-    button: "punch",
-    direction: "up",
-    startupFrames: 6,
-    activeFrames: 5,
-    recoveryFrames: 15,
-    damage: 7,
-    knockback: { x: 140, y: -430 },
-    hitbox: { x: -14, y: -124, width: 44, height: 48 },
-    shieldDamage: 14,
-    hitstopFrames: 5,
-    movementMultiplier: 0.5,
-  },
-  downPunch: {
-    id: "downPunch",
-    button: "punch",
-    direction: "down",
-    startupFrames: 6,
-    activeFrames: 4,
-    recoveryFrames: 13,
-    damage: 6,
-    knockback: { x: 260, y: 160 },
-    hitbox: { x: 18, y: -38, width: 42, height: 26 },
-    shieldDamage: 13,
-    hitstopFrames: 4,
-    movementMultiplier: 0.45,
-  },
-  neutralKick: {
-    id: "neutralKick",
-    button: "kick",
-    direction: "neutral",
-    startupFrames: 8,
-    activeFrames: 5,
-    recoveryFrames: 18,
-    damage: 9,
-    knockback: { x: 440, y: -110 },
-    hitbox: { x: 22, y: -58, width: 54, height: 28 },
-    shieldDamage: 18,
-    hitstopFrames: 6,
-    movementMultiplier: 0.35,
-  },
-  sideKick: {
-    id: "sideKick",
-    button: "kick",
-    direction: "side",
-    startupFrames: 10,
-    activeFrames: 5,
-    recoveryFrames: 20,
-    damage: 11,
-    knockback: { x: 560, y: -120 },
-    hitbox: { x: 30, y: -62, width: 66, height: 30 },
-    shieldDamage: 22,
-    hitstopFrames: 7,
-    movementMultiplier: 0.28,
-  },
-  upKick: {
-    id: "upKick",
-    button: "kick",
-    direction: "up",
-    startupFrames: 9,
-    activeFrames: 6,
-    recoveryFrames: 19,
-    damage: 10,
-    knockback: { x: 160, y: -540 },
-    hitbox: { x: -16, y: -132, width: 50, height: 58 },
-    shieldDamage: 20,
-    hitstopFrames: 6,
-    movementMultiplier: 0.32,
-  },
-  downKick: {
-    id: "downKick",
-    button: "kick",
-    direction: "down",
-    startupFrames: 9,
-    activeFrames: 5,
-    recoveryFrames: 18,
-    damage: 9,
-    knockback: { x: 360, y: 220 },
-    hitbox: { x: 16, y: -32, width: 58, height: 30 },
-    shieldDamage: 19,
-    hitstopFrames: 6,
-    movementMultiplier: 0.35,
-  },
-};
 
 type FighterCommand = {
   moveX: -1 | 0 | 1;
   moveY: -1 | 0 | 1;
   jumpPressed: boolean;
-  punchPressed: boolean;
-  kickPressed: boolean;
+  weakPressed: boolean;
+  strongPressed: boolean;
   shieldHeld: boolean;
 };
 
@@ -246,8 +121,8 @@ const idleCommand: FighterCommand = {
   moveX: 0,
   moveY: 0,
   jumpPressed: false,
-  punchPressed: false,
-  kickPressed: false,
+  weakPressed: false,
+  strongPressed: false,
   shieldHeld: false,
 };
 
@@ -313,10 +188,10 @@ class CpuController implements Controller {
       this.attackCooldownFrames = 42;
 
       if (verticalDelta < -24) {
-        return { ...idleCommand, moveY: -1, punchPressed: true };
+        return { ...idleCommand, moveY: -1, weakPressed: true };
       }
 
-      return { ...idleCommand, moveX: directionToOpponent, kickPressed: true };
+      return { ...idleCommand, moveX: directionToOpponent, strongPressed: true };
     }
 
     this.intent = "approach";
@@ -347,8 +222,8 @@ class KeyboardController implements Controller {
       moveX: this.readHorizontal(),
       moveY: this.readVertical(),
       jumpPressed: this.consumePressed("KeyW"),
-      punchPressed: this.consumePressed("KeyJ"),
-      kickPressed: this.consumePressed("KeyK"),
+      weakPressed: this.consumePressed("KeyJ"),
+      strongPressed: this.consumePressed("KeyK"),
       shieldHeld: this.heldKeys.has("KeyL"),
     };
 
@@ -672,10 +547,11 @@ function updateShield(fighter: Fighter, command: FighterCommand): void {
 }
 
 function updateInputBuffer(fighter: Fighter, command: FighterCommand): void {
-  if (command.punchPressed || command.kickPressed) {
+  if (command.weakPressed || command.strongPressed) {
     fighter.bufferedAction = {
-      button: command.punchPressed ? "punch" : "kick",
-      direction: getAttackDirection(command),
+      button: command.weakPressed ? "weak" : "strong",
+      direction: getMoveDirection(fighter, command),
+      grounded: fighter.grounded,
       framesRemaining: inputConfig.bufferFrames,
     };
     return;
@@ -694,17 +570,20 @@ function updateInputBuffer(fighter: Fighter, command: FighterCommand): void {
 
 function getMoveForBufferedAction(action: BufferedAction): MoveDefinition {
   const move = Object.values(moveDefinitions).find((definition) => {
-    return definition.button === action.button && definition.direction === action.direction;
+    return definition.button === action.button
+      && definition.direction === action.direction
+      && definition.context === (action.grounded ? "ground" : "air");
   });
 
   if (!move) {
-    throw new Error(`Missing move definition for ${action.direction} ${action.button}`);
+    const context = action.grounded ? "ground" : "air";
+    throw new Error(`Missing move definition for ${context} ${action.direction} ${action.button}`);
   }
 
   return move;
 }
 
-function getAttackDirection(command: FighterCommand): AttackDirection {
+function getMoveDirection(fighter: Fighter, command: FighterCommand): MoveDirection {
   if (command.moveY === -1) {
     return "up";
   }
@@ -713,8 +592,12 @@ function getAttackDirection(command: FighterCommand): AttackDirection {
     return "down";
   }
 
-  if (command.moveX !== 0) {
-    return "side";
+  if (command.moveX === fighter.facing) {
+    return "forward";
+  }
+
+  if (command.moveX === -fighter.facing) {
+    return "back";
   }
 
   return "neutral";
@@ -1030,12 +913,29 @@ function renderFighters(): void {
 
       ctx.fillStyle = "#fde68a";
       ctx.fillText(`${move.id}:${fighter.moveFrame}`, fighter.x, fighter.y + 40);
+      renderMoveDebug(fighter, move);
     }
 
     if (debugEnabled) {
       renderFighterDebug(fighter);
     }
   }
+}
+
+function renderMoveDebug(fighter: Fighter, move: MoveDefinition): void {
+  ctx.fillStyle = "#fde68a";
+  ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(
+    `${move.context}/${move.direction}/${move.button} ${move.role}`,
+    fighter.x,
+    fighter.y + 56,
+  );
+  ctx.fillText(
+    `s/a/r ${move.startupFrames}/${move.activeFrames}/${move.recoveryFrames} dmg ${move.damage} kb ${move.knockback.x},${move.knockback.y} sh ${move.shieldDamage}`,
+    fighter.x,
+    fighter.y + 72,
+  );
 }
 
 function renderShield(fighter: Fighter): void {
@@ -1179,7 +1079,7 @@ function renderCommandReadout(): void {
     const command = latestCommandsByFighterId.get(fighter.id) ?? idleCommand;
     const y = 500 + index * 20;
     ctx.fillText(
-      `${fighter.id} x:${command.moveX} y:${command.moveY} jump:${Number(command.jumpPressed)} punch:${Number(command.punchPressed)} kick:${Number(command.kickPressed)} shield:${Number(command.shieldHeld)}`,
+      `${fighter.id} x:${command.moveX} y:${command.moveY} jump:${Number(command.jumpPressed)} weak:${Number(command.weakPressed)} strong:${Number(command.strongPressed)} shield:${Number(command.shieldHeld)}`,
       24,
       y,
     );
@@ -1194,8 +1094,8 @@ function renderControlsGuide(): void {
     "A/D: move + face",
     "W: jump / up",
     "S: down",
-    "J: punch",
-    "K: kick",
+    "J: weak",
+    "K: strong",
     "L: shield",
     "`: debug",
   ];
