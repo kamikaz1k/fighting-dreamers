@@ -1,121 +1,26 @@
 import "./styles.css";
 import {
+  FIXED_TIMESTEP_SECONDS,
+  FLOOR_Y,
+  MAX_ACCUMULATED_SECONDS,
+  STAGE_LEFT,
+  STAGE_RIGHT,
+  WORLD_HEIGHT,
+  WORLD_WIDTH,
+  debugConfig,
+  inputConfig,
+  movementConfig,
+  roundConfig,
+  shieldConfig,
+  spawnPoints,
+} from "./config";
+import { getHurtbox, getMoveHitbox, getShieldBox, rectsOverlap } from "./geometry";
+import { getMoveDirection, getMoveForBufferedAction } from "./moveLookup";
+import {
   moveDefinitions,
-  type MoveButton,
   type MoveDefinition,
-  type MoveDirection,
 } from "./moves";
-
-const WORLD_WIDTH = 960;
-const WORLD_HEIGHT = 540;
-const FLOOR_Y = 450;
-const STAGE_LEFT = 40;
-const STAGE_RIGHT = 920;
-const FIXED_TIMESTEP_SECONDS = 1 / 60;
-const MAX_ACCUMULATED_SECONDS = 0.25;
-
-const movementConfig = {
-  groundAcceleration: 2600,
-  airAcceleration: 1450,
-  maxGroundSpeed: 285,
-  maxAirSpeed: 245,
-  groundFriction: 2100,
-  gravity: 1850,
-  jumpVelocity: -720,
-  landingJumpCooldownFrames: 5,
-};
-
-const inputConfig = {
-  bufferFrames: 6,
-};
-
-const shieldConfig = {
-  holdDrainPerSecond: 12,
-  regenPerSecond: 20,
-  minToActivate: 10,
-  box: {
-    width: 92,
-    height: 122,
-    offsetX: 0,
-    offsetY: -62,
-  },
-};
-
-const roundConfig = {
-  koPauseFrames: 90,
-};
-
-const debugConfig = {
-  enabled: import.meta.env.DEV,
-};
-
-const spawnPoints = [
-  { x: 360, facing: 1 },
-  { x: 600, facing: -1 },
-  { x: 260, facing: 1 },
-  { x: 700, facing: -1 },
-] satisfies Array<{ x: number; facing: -1 | 1 }>;
-
-type Fighter = {
-  id: string;
-  name: string;
-  state: FighterState;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  color: string;
-  facing: -1 | 1;
-  velocityX: number;
-  velocityY: number;
-  grounded: boolean;
-  health: number;
-  maxHealth: number;
-  shield: number;
-  maxShield: number;
-  currentMoveId: string | null;
-  moveFrame: number;
-  hitFighterIdsThisMove: Set<string>;
-  hitstopFrames: number;
-  hitstunFrames: number;
-  landingJumpCooldownFrames: number;
-  bufferedAction: BufferedAction | null;
-};
-
-type FighterState = "idle" | "run" | "jump" | "fall" | "attack" | "shield" | "hitstun" | "ko";
-type BufferedAction = {
-  button: MoveButton;
-  direction: MoveDirection;
-  grounded: boolean;
-  framesRemaining: number;
-};
-
-type Rect = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-
-type FighterCommand = {
-  moveX: -1 | 0 | 1;
-  moveY: -1 | 0 | 1;
-  jumpPressed: boolean;
-  weakPressed: boolean;
-  strongPressed: boolean;
-  shieldHeld: boolean;
-};
-
-type ControllerContext = {
-  self: Fighter;
-  opponents: Fighter[];
-  frame: number;
-};
-
-interface Controller {
-  update(context: ControllerContext): FighterCommand;
-}
+import type { Controller, ControllerContext, Fighter, FighterCommand } from "./types";
 
 const idleCommand: FighterCommand = {
   moveX: 0,
@@ -568,41 +473,6 @@ function updateInputBuffer(fighter: Fighter, command: FighterCommand): void {
   }
 }
 
-function getMoveForBufferedAction(action: BufferedAction): MoveDefinition {
-  const move = Object.values(moveDefinitions).find((definition) => {
-    return definition.button === action.button
-      && definition.direction === action.direction
-      && definition.context === (action.grounded ? "ground" : "air");
-  });
-
-  if (!move) {
-    const context = action.grounded ? "ground" : "air";
-    throw new Error(`Missing move definition for ${context} ${action.direction} ${action.button}`);
-  }
-
-  return move;
-}
-
-function getMoveDirection(fighter: Fighter, command: FighterCommand): MoveDirection {
-  if (command.moveY === -1) {
-    return "up";
-  }
-
-  if (command.moveY === 1) {
-    return "down";
-  }
-
-  if (command.moveX === fighter.facing) {
-    return "forward";
-  }
-
-  if (command.moveX === -fighter.facing) {
-    return "back";
-  }
-
-  return "neutral";
-}
-
 function startAttack(fighter: Fighter, move: MoveDefinition): void {
   fighter.state = "attack";
   fighter.currentMoveId = move.id;
@@ -713,47 +583,6 @@ function getHitstunFrames(move: MoveDefinition): number {
 function isMoveActive(fighter: Fighter, move: MoveDefinition): boolean {
   return fighter.moveFrame >= move.startupFrames
     && fighter.moveFrame < move.startupFrames + move.activeFrames;
-}
-
-function getMoveHitbox(
-  fighter: Fighter,
-  move: MoveDefinition,
-): Rect {
-  const x = fighter.facing === 1
-    ? fighter.x + move.hitbox.x
-    : fighter.x - move.hitbox.x - move.hitbox.width;
-
-  return {
-    x,
-    y: fighter.y + move.hitbox.y,
-    width: move.hitbox.width,
-    height: move.hitbox.height,
-  };
-}
-
-function getHurtbox(fighter: Fighter): Rect {
-  return {
-    x: fighter.x - fighter.width / 2,
-    y: fighter.y - fighter.height,
-    width: fighter.width,
-    height: fighter.height,
-  };
-}
-
-function getShieldBox(fighter: Fighter): Rect {
-  return {
-    x: fighter.x + shieldConfig.box.offsetX - shieldConfig.box.width / 2,
-    y: fighter.y + shieldConfig.box.offsetY - shieldConfig.box.height / 2,
-    width: shieldConfig.box.width,
-    height: shieldConfig.box.height,
-  };
-}
-
-function rectsOverlap(a: Rect, b: Rect): boolean {
-  return a.x < b.x + b.width
-    && a.x + a.width > b.x
-    && a.y < b.y + b.height
-    && a.y + a.height > b.y;
 }
 
 function applyMovement(fighter: Fighter, command: FighterCommand): void {
