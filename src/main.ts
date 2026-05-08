@@ -1,5 +1,11 @@
 import "./styles.css";
 import {
+  getCurrentMove,
+  getMoveTotalFrames,
+  isMoveActive,
+  resolveAttackCollision,
+} from "./combat";
+import {
   FIXED_TIMESTEP_SECONDS,
   FLOOR_Y,
   MAX_ACCUMULATED_SECONDS,
@@ -14,12 +20,9 @@ import {
   shieldConfig,
   spawnPoints,
 } from "./config";
-import { getHurtbox, getMoveHitbox, getShieldBox, rectsOverlap } from "./geometry";
+import { getHurtbox, getMoveHitbox, getShieldBox } from "./geometry";
 import { getMoveDirection, getMoveForBufferedAction } from "./moveLookup";
-import {
-  moveDefinitions,
-  type MoveDefinition,
-} from "./moves";
+import type { MoveDefinition } from "./moves";
 import type { Controller, ControllerContext, Fighter, FighterCommand } from "./types";
 
 const idleCommand: FighterCommand = {
@@ -510,41 +513,6 @@ function resolveAttackCollisions(): void {
   }
 }
 
-function resolveAttackCollision(attacker: Fighter, defender: Fighter): void {
-  const move = getCurrentMove(attacker);
-
-  if (!move || !isMoveActive(attacker, move) || attacker.hitFighterIdsThisMove.has(defender.id)) {
-    return;
-  }
-
-  const moveHitbox = getMoveHitbox(attacker, move);
-  const blockedByShield = defender.state === "shield"
-    && defender.shield > 0
-    && rectsOverlap(moveHitbox, getShieldBox(defender));
-
-  if (!blockedByShield && !rectsOverlap(moveHitbox, getHurtbox(defender))) {
-    return;
-  }
-
-  if (blockedByShield) {
-    defender.shield = clamp(defender.shield - move.shieldDamage, 0, defender.maxShield);
-    defender.velocityX = attacker.facing * move.knockback.x * 0.35;
-  } else {
-    defender.health = clamp(defender.health - move.damage, 0, defender.maxHealth);
-    defender.velocityX = attacker.facing * move.knockback.x;
-    defender.velocityY = move.knockback.y;
-    defender.grounded = false;
-    defender.state = "hitstun";
-    defender.currentMoveId = null;
-    defender.moveFrame = 0;
-    defender.hitstunFrames = getHitstunFrames(move);
-  }
-
-  defender.hitstopFrames = move.hitstopFrames;
-  attacker.hitstopFrames = move.hitstopFrames;
-  attacker.hitFighterIdsThisMove.add(defender.id);
-}
-
 function updateMovementState(fighter: Fighter): void {
   if (
     fighter.state === "attack"
@@ -561,28 +529,6 @@ function updateMovementState(fighter: Fighter): void {
   }
 
   fighter.state = Math.abs(fighter.velocityX) > 5 ? "run" : "idle";
-}
-
-function getCurrentMove(fighter: Fighter): MoveDefinition | null {
-  if (!fighter.currentMoveId) {
-    return null;
-  }
-
-  return moveDefinitions[fighter.currentMoveId] ?? null;
-}
-
-function getMoveTotalFrames(move: MoveDefinition): number {
-  return move.startupFrames + move.activeFrames + move.recoveryFrames;
-}
-
-function getHitstunFrames(move: MoveDefinition): number {
-  const knockbackMagnitude = Math.hypot(move.knockback.x, move.knockback.y);
-  return Math.round(10 + knockbackMagnitude / 42);
-}
-
-function isMoveActive(fighter: Fighter, move: MoveDefinition): boolean {
-  return fighter.moveFrame >= move.startupFrames
-    && fighter.moveFrame < move.startupFrames + move.activeFrames;
 }
 
 function applyMovement(fighter: Fighter, command: FighterCommand): void {
