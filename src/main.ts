@@ -764,7 +764,10 @@ function applyMovement(fighter: Fighter, command: FighterCommand): void {
   const maxSpeed = fighter.grounded ? movementConfig.maxGroundSpeed : movementConfig.maxAirSpeed;
 
   if (command.moveX !== 0) {
-    fighter.facing = command.moveX;
+    if (canChangeFacing(fighter)) {
+      fighter.facing = command.moveX;
+    }
+
     fighter.velocityX += command.moveX * acceleration * FIXED_TIMESTEP_SECONDS;
   } else if (fighter.grounded) {
     fighter.velocityX = moveToward(
@@ -820,6 +823,12 @@ function applyMovement(fighter: Fighter, command: FighterCommand): void {
       fighter.landingJumpCooldownFrames = movementConfig.landingJumpCooldownFrames;
     }
   }
+}
+
+function canChangeFacing(fighter: Fighter): boolean {
+  return fighter.state !== "attack"
+    && fighter.state !== "hitstun"
+    && fighter.state !== "ko";
 }
 
 function shouldStartJump(fighter: Fighter, command: FighterCommand): boolean {
