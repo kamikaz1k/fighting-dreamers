@@ -6,21 +6,17 @@ import {
 } from "./combat";
 import {
   FIXED_TIMESTEP_SECONDS,
-  FLOOR_Y,
   MAX_ACCUMULATED_SECONDS,
-  STAGE_LEFT,
-  STAGE_RIGHT,
   WORLD_HEIGHT,
   WORLD_WIDTH,
   debugConfig,
   inputConfig,
   movementConfig,
-  roundConfig,
   shieldConfig,
-  spawnPoints,
 } from "./config";
 import { CpuController, KeyboardController, idleCommand } from "./controllers";
 import { getOpponents } from "./fighters";
+import { createInitialFighters, updateRoundFlow } from "./gameState";
 import { clamp, moveToward } from "./math";
 import { getMoveDirection, getMoveForBufferedAction } from "./moveLookup";
 import type { MoveDefinition } from "./moves";
@@ -28,59 +24,7 @@ import { applyMovement, updateMovementState } from "./physics";
 import { renderGame } from "./render";
 import type { Controller, Fighter, FighterCommand } from "./types";
 
-const fighters: Fighter[] = [
-  {
-    id: "p1",
-    name: "Player 1",
-    state: "idle",
-    x: 360,
-    y: FLOOR_Y,
-    width: 52,
-    height: 104,
-    color: "#38bdf8",
-    facing: 1,
-    velocityX: 0,
-    velocityY: 0,
-    grounded: true,
-    health: 100,
-    maxHealth: 100,
-    shield: 100,
-    maxShield: 100,
-    currentMoveId: null,
-    moveFrame: 0,
-    hitFighterIdsThisMove: new Set(),
-    hitstopFrames: 0,
-    hitstunFrames: 0,
-    landingJumpCooldownFrames: 0,
-    bufferedAction: null,
-  },
-  {
-    id: "cpu",
-    name: "CPU",
-    state: "idle",
-    x: 600,
-    y: FLOOR_Y,
-    width: 52,
-    height: 104,
-    color: "#fb7185",
-    facing: -1,
-    velocityX: 0,
-    velocityY: 0,
-    grounded: true,
-    health: 100,
-    maxHealth: 100,
-    shield: 100,
-    maxShield: 100,
-    currentMoveId: null,
-    moveFrame: 0,
-    hitFighterIdsThisMove: new Set(),
-    hitstopFrames: 0,
-    hitstunFrames: 0,
-    landingJumpCooldownFrames: 0,
-    bufferedAction: null,
-  },
-];
-
+const fighters = createInitialFighters();
 const cpuController = new CpuController();
 const controllersByFighterId = new Map<string, Controller>([
   ["p1", new KeyboardController()],
@@ -145,76 +89,12 @@ function update(): void {
   }
 
   resolveAttackCollisions();
-  updateRoundFlow();
+  ({ roundPauseFrames, winnerName } = updateRoundFlow(fighters, {
+    roundPauseFrames,
+    winnerName,
+  }));
   totalSimulatedSeconds += FIXED_TIMESTEP_SECONDS;
   simulationFrames += 1;
-}
-
-function updateRoundFlow(): void {
-  if (roundPauseFrames > 0) {
-    roundPauseFrames -= 1;
-
-    if (roundPauseFrames === 0) {
-      resetRound();
-    }
-
-    return;
-  }
-
-  const activeFighters = fighters.filter((fighter) => fighter.health > 0);
-
-  if (activeFighters.length > 1) {
-    return;
-  }
-
-  for (const fighter of fighters) {
-    if (fighter.health <= 0) {
-      fighter.state = "ko";
-      fighter.velocityX = 0;
-      fighter.velocityY = 0;
-    }
-  }
-
-  winnerName = activeFighters[0]?.name ?? null;
-  roundPauseFrames = roundConfig.koPauseFrames;
-}
-
-function resetRound(): void {
-  fighters.forEach((fighter, index) => {
-    const spawnPoint = spawnPoints[index] ?? getFallbackSpawnPoint(index);
-    resetFighter(fighter, spawnPoint.x, spawnPoint.facing);
-  });
-  winnerName = null;
-}
-
-function getFallbackSpawnPoint(index: number): { x: number; facing: -1 | 1 } {
-  const usableWidth = STAGE_RIGHT - STAGE_LEFT;
-  const spacing = usableWidth / (fighters.length + 1);
-  const x = STAGE_LEFT + spacing * (index + 1);
-
-  return {
-    x,
-    facing: x < WORLD_WIDTH / 2 ? 1 : -1,
-  };
-}
-
-function resetFighter(fighter: Fighter, x: number, facing: -1 | 1): void {
-  fighter.state = "idle";
-  fighter.x = x;
-  fighter.y = FLOOR_Y;
-  fighter.facing = facing;
-  fighter.velocityX = 0;
-  fighter.velocityY = 0;
-  fighter.grounded = true;
-  fighter.health = fighter.maxHealth;
-  fighter.shield = fighter.maxShield;
-  fighter.currentMoveId = null;
-  fighter.moveFrame = 0;
-  fighter.hitFighterIdsThisMove.clear();
-  fighter.hitstopFrames = 0;
-  fighter.hitstunFrames = 0;
-  fighter.landingJumpCooldownFrames = 0;
-  fighter.bufferedAction = null;
 }
 
 function updateHitstop(fighter: Fighter): boolean {
