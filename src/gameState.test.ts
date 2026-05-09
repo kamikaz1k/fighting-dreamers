@@ -48,6 +48,16 @@ describe("game state", () => {
     expect(fighter.bufferedAction).toBeNull();
   });
 
+  it("creates fighters from character definitions", () => {
+    const [player] = createInitialFighters();
+
+    expect(player.characterId).toBe("dreamer");
+    expect(player.width).toBe(52);
+    expect(player.height).toBe(104);
+    expect(player.maxHealth).toBe(100);
+    expect(player.maxShield).toBe(100);
+  });
+
   it("supports fallback spawn points beyond configured slots", () => {
     const spawn = getFallbackSpawnPoint(4, 5);
 

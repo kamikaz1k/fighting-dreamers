@@ -6,6 +6,7 @@ import {
   roundConfig,
   spawnPoints,
 } from "./config";
+import { getCharacter } from "./characters";
 import type { Fighter } from "./types";
 
 export type RoundState = {
@@ -17,6 +18,7 @@ export function createInitialFighters(): Fighter[] {
   return [
     createFighter({
       id: "p1",
+      characterId: "dreamer",
       name: "Player 1",
       x: 360,
       color: "#38bdf8",
@@ -24,6 +26,7 @@ export function createInitialFighters(): Fighter[] {
     }),
     createFighter({
       id: "cpu",
+      characterId: "dreamer",
       name: "CPU",
       x: 600,
       color: "#fb7185",
@@ -34,29 +37,34 @@ export function createInitialFighters(): Fighter[] {
 
 export function createFighter(config: {
   id: string;
+  characterId: string;
   name: string;
   x: number;
   color: string;
   facing: -1 | 1;
 }): Fighter {
+  const character = getCharacter(config.characterId);
+
   return {
     id: config.id,
+    characterId: config.characterId,
     name: config.name,
     state: "idle",
     x: config.x,
     y: FLOOR_Y,
-    width: 52,
-    height: 104,
+    width: character.size.width,
+    height: character.size.height,
     color: config.color,
     facing: config.facing,
     velocityX: 0,
     velocityY: 0,
     grounded: true,
-    health: 100,
-    maxHealth: 100,
-    shield: 100,
-    maxShield: 100,
+    health: character.maxHealth,
+    maxHealth: character.maxHealth,
+    shield: character.maxShield,
+    maxShield: character.maxShield,
     currentMoveId: null,
+    moveCooldowns: new Map(),
     moveFrame: 0,
     hitFighterIdsThisMove: new Set(),
     hitstopFrames: 0,

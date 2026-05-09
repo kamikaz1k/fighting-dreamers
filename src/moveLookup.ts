@@ -1,8 +1,10 @@
-import { moveDefinitions, type MoveDefinition } from "./moves";
+import { getCharacter } from "./characters";
+import type { MoveDefinition } from "./moves";
 import type { BufferedAction, Fighter, FighterCommand } from "./types";
 
-export function getMoveForBufferedAction(action: BufferedAction): MoveDefinition {
-  const move = Object.values(moveDefinitions).find((definition) => {
+export function getMoveForBufferedAction(fighter: Fighter, action: BufferedAction): MoveDefinition {
+  const character = getCharacter(fighter.characterId);
+  const move = Object.values(character.moves).find((definition) => {
     return definition.button === action.button
       && definition.direction === action.direction
       && definition.context === (action.grounded ? "ground" : "air");
@@ -10,7 +12,7 @@ export function getMoveForBufferedAction(action: BufferedAction): MoveDefinition
 
   if (!move) {
     const context = action.grounded ? "ground" : "air";
-    throw new Error(`Missing move definition for ${context} ${action.direction} ${action.button}`);
+    throw new Error(`Missing ${fighter.characterId} move definition for ${context} ${action.direction} ${action.button}`);
   }
 
   return move;

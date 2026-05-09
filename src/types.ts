@@ -11,6 +11,7 @@ export type BufferedAction = {
 
 export type Fighter = {
   id: string;
+  characterId: string;
   name: string;
   state: FighterState;
   x: number;
@@ -27,6 +28,7 @@ export type Fighter = {
   shield: number;
   maxShield: number;
   currentMoveId: string | null;
+  moveCooldowns: Map<string, number>;
   moveFrame: number;
   hitFighterIdsThisMove: Set<string>;
   hitstopFrames: number;

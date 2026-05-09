@@ -52,7 +52,7 @@ export function updateActions(fighter: Fighter, command: FighterCommand): void {
   const bufferedAction = fighter.bufferedAction;
 
   if (bufferedAction) {
-    startAttack(fighter, getMoveForBufferedAction(bufferedAction));
+    startAttack(fighter, getMoveForBufferedAction(fighter, bufferedAction));
     fighter.bufferedAction = null;
   }
 }

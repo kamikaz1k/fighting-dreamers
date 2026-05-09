@@ -1,5 +1,6 @@
 import { getHurtbox, getMoveHitbox, getShieldBox, rectsOverlap } from "./geometry";
-import { moveDefinitions, type MoveDefinition } from "./moves";
+import { getCharacter } from "./characters";
+import type { MoveDefinition } from "./moves";
 import type { Fighter } from "./types";
 
 export function resolveAttackCollision(attacker: Fighter, defender: Fighter): void {
@@ -42,7 +43,7 @@ export function getCurrentMove(fighter: Fighter): MoveDefinition | null {
     return null;
   }
 
-  return moveDefinitions[fighter.currentMoveId] ?? null;
+  return getCharacter(fighter.characterId).moves[fighter.currentMoveId] ?? null;
 }
 
 export function getMoveTotalFrames(move: MoveDefinition): number {

@@ -25,14 +25,16 @@ describe("move lookup", () => {
   });
 
   it("selects distinct ground and air moves", () => {
-    expect(getMoveForBufferedAction({
+    const fighter = createTestFighter();
+
+    expect(getMoveForBufferedAction(fighter, {
       button: "weak",
       direction: "up",
       grounded: true,
       framesRemaining: 6,
     }).id).toBe("groundUpWeak");
 
-    expect(getMoveForBufferedAction({
+    expect(getMoveForBufferedAction(fighter, {
       button: "weak",
       direction: "up",
       grounded: false,

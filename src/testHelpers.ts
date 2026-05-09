@@ -1,25 +1,31 @@
 import { FLOOR_Y } from "./config";
+import { getCharacter } from "./characters";
 import type { Fighter } from "./types";
 
 export function createTestFighter(overrides: Partial<Fighter> = {}): Fighter {
+  const characterId = overrides.characterId ?? "dreamer";
+  const character = getCharacter(characterId);
+
   return {
     id: "fighter",
+    characterId,
     name: "Fighter",
     state: "idle",
     x: 400,
     y: FLOOR_Y,
-    width: 52,
-    height: 104,
+    width: character.size.width,
+    height: character.size.height,
     color: "#ffffff",
     facing: 1,
     velocityX: 0,
     velocityY: 0,
     grounded: true,
-    health: 100,
-    maxHealth: 100,
-    shield: 100,
-    maxShield: 100,
+    health: character.maxHealth,
+    maxHealth: character.maxHealth,
+    shield: character.maxShield,
+    maxShield: character.maxShield,
     currentMoveId: null,
+    moveCooldowns: new Map(),
     moveFrame: 0,
     hitFighterIdsThisMove: new Set(),
     hitstopFrames: 0,
