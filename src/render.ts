@@ -311,7 +311,7 @@ function renderTuningReadout(ctx: CanvasRenderingContext2D): void {
   const width = 318;
   const height = padding * 2 + lines.length * lineHeight;
   const x = 18;
-  const y = 164;
+  const y = 72;
 
   ctx.fillStyle = "rgba(15, 23, 42, 0.72)";
   ctx.fillRect(x, y, width, height);
