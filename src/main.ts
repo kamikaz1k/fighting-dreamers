@@ -1,28 +1,19 @@
 import "./styles.css";
-import {
-  getCurrentMove,
-  getMoveTotalFrames,
-  resolveAttackCollision,
-} from "./combat";
+import { updateActions, updateHitstop, updateHitstun } from "./actions";
+import { resolveAttackCollision } from "./combat";
 import {
   FIXED_TIMESTEP_SECONDS,
   MAX_ACCUMULATED_SECONDS,
   WORLD_HEIGHT,
   WORLD_WIDTH,
   debugConfig,
-  inputConfig,
-  movementConfig,
-  shieldConfig,
 } from "./config";
 import { CpuController, KeyboardController, idleCommand } from "./controllers";
 import { getOpponents } from "./fighters";
 import { createInitialFighters, updateRoundFlow } from "./gameState";
-import { clamp, moveToward } from "./math";
-import { getMoveDirection, getMoveForBufferedAction } from "./moveLookup";
-import type { MoveDefinition } from "./moves";
 import { applyMovement, updateMovementState } from "./physics";
 import { renderGame } from "./render";
-import type { Controller, Fighter, FighterCommand } from "./types";
+import type { Controller, FighterCommand } from "./types";
 
 const fighters = createInitialFighters();
 const cpuController = new CpuController();
@@ -95,130 +86,6 @@ function update(): void {
   }));
   totalSimulatedSeconds += FIXED_TIMESTEP_SECONDS;
   simulationFrames += 1;
-}
-
-function updateHitstop(fighter: Fighter): boolean {
-  if (fighter.hitstopFrames <= 0) {
-    return false;
-  }
-
-  fighter.hitstopFrames -= 1;
-  return true;
-}
-
-function updateHitstun(fighter: Fighter): void {
-  if (fighter.hitstunFrames <= 0) {
-    return;
-  }
-
-  fighter.hitstunFrames -= 1;
-
-  if (fighter.hitstunFrames === 0) {
-    fighter.state = fighter.grounded ? "idle" : "fall";
-  }
-}
-
-function updateActions(fighter: Fighter, command: FighterCommand): void {
-  updateInputBuffer(fighter, command);
-
-  if (fighter.state === "hitstun" || fighter.state === "ko") {
-    return;
-  }
-
-  if (fighter.state === "attack") {
-    updateAttack(fighter);
-    return;
-  }
-
-  updateShield(fighter, command);
-
-  if (fighter.state === "shield") {
-    return;
-  }
-
-  const bufferedAction = fighter.bufferedAction;
-
-  if (bufferedAction) {
-    startAttack(fighter, getMoveForBufferedAction(bufferedAction));
-    fighter.bufferedAction = null;
-    return;
-  }
-}
-
-function updateShield(fighter: Fighter, command: FighterCommand): void {
-  if (command.shieldHeld && fighter.shield >= shieldConfig.minToActivate) {
-    fighter.state = "shield";
-    fighter.velocityX = moveToward(
-      fighter.velocityX,
-      0,
-      movementConfig.groundFriction * FIXED_TIMESTEP_SECONDS,
-    );
-    fighter.shield = clamp(
-      fighter.shield - shieldConfig.holdDrainPerSecond * FIXED_TIMESTEP_SECONDS,
-      0,
-      fighter.maxShield,
-    );
-    return;
-  }
-
-  if (fighter.state === "shield") {
-    fighter.state = fighter.grounded ? "idle" : "fall";
-  }
-
-  fighter.shield = clamp(
-    fighter.shield + shieldConfig.regenPerSecond * FIXED_TIMESTEP_SECONDS,
-    0,
-    fighter.maxShield,
-  );
-}
-
-function updateInputBuffer(fighter: Fighter, command: FighterCommand): void {
-  if (command.weakPressed || command.strongPressed) {
-    fighter.bufferedAction = {
-      button: command.weakPressed ? "weak" : "strong",
-      direction: getMoveDirection(fighter, command),
-      grounded: fighter.grounded,
-      framesRemaining: inputConfig.bufferFrames,
-    };
-    return;
-  }
-
-  if (!fighter.bufferedAction) {
-    return;
-  }
-
-  fighter.bufferedAction.framesRemaining -= 1;
-
-  if (fighter.bufferedAction.framesRemaining <= 0) {
-    fighter.bufferedAction = null;
-  }
-}
-
-function startAttack(fighter: Fighter, move: MoveDefinition): void {
-  fighter.state = "attack";
-  fighter.currentMoveId = move.id;
-  fighter.moveFrame = 0;
-  fighter.hitFighterIdsThisMove.clear();
-}
-
-function updateAttack(fighter: Fighter): void {
-  const move = getCurrentMove(fighter);
-
-  if (!move) {
-    fighter.state = "idle";
-    fighter.currentMoveId = null;
-    fighter.moveFrame = 0;
-    return;
-  }
-
-  fighter.moveFrame += 1;
-
-  if (fighter.moveFrame >= getMoveTotalFrames(move)) {
-    fighter.state = fighter.grounded ? "idle" : "fall";
-    fighter.currentMoveId = null;
-    fighter.moveFrame = 0;
-    fighter.hitFighterIdsThisMove.clear();
-  }
 }
 
 function resolveAttackCollisions(): void {

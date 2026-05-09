@@ -1,0 +1,134 @@
+import { getCurrentMove, getMoveTotalFrames } from "./combat";
+import {
+  FIXED_TIMESTEP_SECONDS,
+  inputConfig,
+  movementConfig,
+  shieldConfig,
+} from "./config";
+import { clamp, moveToward } from "./math";
+import { getMoveDirection, getMoveForBufferedAction } from "./moveLookup";
+import type { MoveDefinition } from "./moves";
+import type { Fighter, FighterCommand } from "./types";
+
+export function updateHitstop(fighter: Fighter): boolean {
+  if (fighter.hitstopFrames <= 0) {
+    return false;
+  }
+
+  fighter.hitstopFrames -= 1;
+  return true;
+}
+
+export function updateHitstun(fighter: Fighter): void {
+  if (fighter.hitstunFrames <= 0) {
+    return;
+  }
+
+  fighter.hitstunFrames -= 1;
+
+  if (fighter.hitstunFrames === 0) {
+    fighter.state = fighter.grounded ? "idle" : "fall";
+  }
+}
+
+export function updateActions(fighter: Fighter, command: FighterCommand): void {
+  updateInputBuffer(fighter, command);
+
+  if (fighter.state === "hitstun" || fighter.state === "ko") {
+    return;
+  }
+
+  if (fighter.state === "attack") {
+    updateAttack(fighter);
+    return;
+  }
+
+  updateShield(fighter, command);
+
+  if (fighter.state === "shield") {
+    return;
+  }
+
+  const bufferedAction = fighter.bufferedAction;
+
+  if (bufferedAction) {
+    startAttack(fighter, getMoveForBufferedAction(bufferedAction));
+    fighter.bufferedAction = null;
+  }
+}
+
+export function updateShield(fighter: Fighter, command: FighterCommand): void {
+  if (command.shieldHeld && fighter.shield >= shieldConfig.minToActivate) {
+    fighter.state = "shield";
+    fighter.velocityX = moveToward(
+      fighter.velocityX,
+      0,
+      movementConfig.groundFriction * FIXED_TIMESTEP_SECONDS,
+    );
+    fighter.shield = clamp(
+      fighter.shield - shieldConfig.holdDrainPerSecond * FIXED_TIMESTEP_SECONDS,
+      0,
+      fighter.maxShield,
+    );
+    return;
+  }
+
+  if (fighter.state === "shield") {
+    fighter.state = fighter.grounded ? "idle" : "fall";
+  }
+
+  fighter.shield = clamp(
+    fighter.shield + shieldConfig.regenPerSecond * FIXED_TIMESTEP_SECONDS,
+    0,
+    fighter.maxShield,
+  );
+}
+
+export function updateInputBuffer(fighter: Fighter, command: FighterCommand): void {
+  if (command.weakPressed || command.strongPressed) {
+    fighter.bufferedAction = {
+      button: command.weakPressed ? "weak" : "strong",
+      direction: getMoveDirection(fighter, command),
+      grounded: fighter.grounded,
+      framesRemaining: inputConfig.bufferFrames,
+    };
+    return;
+  }
+
+  if (!fighter.bufferedAction) {
+    return;
+  }
+
+  fighter.bufferedAction.framesRemaining -= 1;
+
+  if (fighter.bufferedAction.framesRemaining <= 0) {
+    fighter.bufferedAction = null;
+  }
+}
+
+export function startAttack(fighter: Fighter, move: MoveDefinition): void {
+  fighter.state = "attack";
+  fighter.currentMoveId = move.id;
+  fighter.moveFrame = 0;
+  fighter.hitFighterIdsThisMove.clear();
+}
+
+export function updateAttack(fighter: Fighter): void {
+  const move = getCurrentMove(fighter);
+
+  if (!move) {
+    fighter.state = "idle";
+    fighter.currentMoveId = null;
+    fighter.moveFrame = 0;
+    return;
+  }
+
+  fighter.moveFrame += 1;
+
+  if (fighter.moveFrame >= getMoveTotalFrames(move)) {
+    fighter.state = fighter.grounded ? "idle" : "fall";
+    fighter.currentMoveId = null;
+    fighter.moveFrame = 0;
+    fighter.hitFighterIdsThisMove.clear();
+  }
+}
