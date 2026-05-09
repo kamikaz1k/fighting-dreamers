@@ -1,4 +1,5 @@
 import { getCurrentMove, getMoveTotalFrames } from "./combat";
+import { getCharacter } from "./characters";
 import {
   FIXED_TIMESTEP_SECONDS,
   inputConfig,
@@ -32,6 +33,7 @@ export function updateHitstun(fighter: Fighter): void {
 }
 
 export function updateActions(fighter: Fighter, command: FighterCommand): void {
+  updateMoveCooldowns(fighter);
   updateInputBuffer(fighter, command);
 
   if (fighter.state === "hitstun" || fighter.state === "ko") {
@@ -52,8 +54,24 @@ export function updateActions(fighter: Fighter, command: FighterCommand): void {
   const bufferedAction = fighter.bufferedAction;
 
   if (bufferedAction) {
-    startAttack(fighter, getMoveForBufferedAction(fighter, bufferedAction));
+    const move = getMoveForBufferedAction(fighter, bufferedAction);
+
+    if (getMoveCooldown(fighter, move.id) > 0) {
+      return;
+    }
+
+    startAttack(fighter, move);
     fighter.bufferedAction = null;
+  }
+}
+
+export function updateMoveCooldowns(fighter: Fighter): void {
+  for (const [moveId, framesRemaining] of fighter.moveCooldowns) {
+    if (framesRemaining <= 1) {
+      fighter.moveCooldowns.delete(moveId);
+    } else {
+      fighter.moveCooldowns.set(moveId, framesRemaining - 1);
+    }
   }
 }
 
@@ -111,6 +129,12 @@ export function startAttack(fighter: Fighter, move: MoveDefinition): void {
   fighter.currentMoveId = move.id;
   fighter.moveFrame = 0;
   fighter.hitFighterIdsThisMove.clear();
+
+  const cooldownFrames = getCharacter(fighter.characterId).cooldowns[move.id] ?? 0;
+
+  if (cooldownFrames > 0) {
+    fighter.moveCooldowns.set(move.id, cooldownFrames);
+  }
 }
 
 export function updateAttack(fighter: Fighter): void {
@@ -131,4 +155,8 @@ export function updateAttack(fighter: Fighter): void {
     fighter.moveFrame = 0;
     fighter.hitFighterIdsThisMove.clear();
   }
+}
+
+export function getMoveCooldown(fighter: Fighter, moveId: string): number {
+  return fighter.moveCooldowns.get(moveId) ?? 0;
 }

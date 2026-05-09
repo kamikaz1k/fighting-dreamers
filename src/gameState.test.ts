@@ -34,6 +34,7 @@ describe("game state", () => {
       },
     });
     fighter.hitFighterIdsThisMove.add("target");
+    fighter.moveCooldowns.set("groundUpStrong", 12);
 
     resetFighter(fighter, 500, 1);
 
@@ -44,6 +45,7 @@ describe("game state", () => {
     expect(fighter.health).toBe(fighter.maxHealth);
     expect(fighter.shield).toBe(fighter.maxShield);
     expect(fighter.currentMoveId).toBeNull();
+    expect(fighter.moveCooldowns.size).toBe(0);
     expect(fighter.hitFighterIdsThisMove.size).toBe(0);
     expect(fighter.bufferedAction).toBeNull();
   });

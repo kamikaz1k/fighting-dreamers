@@ -5,6 +5,7 @@ import {
   updateActions,
   updateAttack,
   updateInputBuffer,
+  updateMoveCooldowns,
   updateShield,
 } from "./actions";
 import { moveDefinitions } from "./moves";
@@ -49,6 +50,37 @@ describe("actions", () => {
     expect(fighter.state).toBe("attack");
     expect(fighter.currentMoveId).toBe("groundUpStrong");
     expect(fighter.bufferedAction).toBeNull();
+  });
+
+  it("sets and ticks character move cooldowns", () => {
+    const fighter = createTestFighter();
+    const move = moveDefinitions.groundUpStrong;
+
+    startAttack(fighter, move);
+
+    expect(fighter.moveCooldowns.get(move.id)).toBe(20);
+
+    updateMoveCooldowns(fighter);
+
+    expect(fighter.moveCooldowns.get(move.id)).toBe(19);
+  });
+
+  it("does not consume buffered action while matching move is cooling down", () => {
+    const fighter = createTestFighter({
+      bufferedAction: {
+        button: "strong",
+        direction: "up",
+        grounded: true,
+        framesRemaining: 4,
+      },
+    });
+    fighter.moveCooldowns.set("groundUpStrong", 5);
+
+    updateActions(fighter, idleCommand);
+
+    expect(fighter.state).toBe("idle");
+    expect(fighter.currentMoveId).toBeNull();
+    expect(fighter.bufferedAction?.direction).toBe("up");
   });
 
   it("advances and ends attack recovery", () => {

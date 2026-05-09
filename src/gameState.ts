@@ -136,6 +136,7 @@ export function resetFighter(fighter: Fighter, x: number, facing: -1 | 1): void 
   fighter.shield = fighter.maxShield;
   fighter.currentMoveId = null;
   fighter.moveFrame = 0;
+  fighter.moveCooldowns.clear();
   fighter.hitFighterIdsThisMove.clear();
   fighter.hitstopFrames = 0;
   fighter.hitstunFrames = 0;

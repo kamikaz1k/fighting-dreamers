@@ -23,7 +23,15 @@ export const characterDefinitions: Record<string, CharacterDefinition> = {
     movement: movementConfig,
     shield: shieldConfig,
     moves: moveDefinitions,
-    cooldowns: {},
+    cooldowns: {
+      groundForwardStrong: 18,
+      groundBackStrong: 18,
+      groundUpStrong: 20,
+      airForwardStrong: 18,
+      airBackStrong: 18,
+      airUpStrong: 20,
+      airDownStrong: 22,
+    },
   },
 };
 

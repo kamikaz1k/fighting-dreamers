@@ -157,6 +157,9 @@ function renderShield(
 }
 
 function renderFighterDebug(ctx: CanvasRenderingContext2D, fighter: Fighter): void {
+  const cooldownSummary = Array.from(fighter.moveCooldowns)
+    .map(([moveId, frames]) => `${moveId}:${frames}`)
+    .join(" ");
   ctx.fillStyle = "#94a3b8";
   ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
   ctx.textAlign = "center";
@@ -165,6 +168,10 @@ function renderFighterDebug(ctx: CanvasRenderingContext2D, fighter: Fighter): vo
     fighter.x,
     fighter.y + 24,
   );
+
+  if (cooldownSummary) {
+    ctx.fillText(`cd ${cooldownSummary}`, fighter.x, fighter.y + 40);
+  }
 
   ctx.strokeStyle = "#a78bfa";
   ctx.beginPath();
