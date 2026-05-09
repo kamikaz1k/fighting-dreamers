@@ -2,6 +2,8 @@ import {
   FLOOR_Y,
   WORLD_HEIGHT,
   WORLD_WIDTH,
+  movementConfig,
+  shieldConfig,
 } from "./config";
 import { getCurrentMove, isMoveActive } from "./combat";
 import { getHurtbox, getMoveHitbox, getShieldBox } from "./geometry";
@@ -85,7 +87,7 @@ function renderFighters(
       ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
 
       ctx.fillStyle = "#fde68a";
-      ctx.fillText(`${move.id}:${fighter.moveFrame}`, fighter.x, fighter.y + 40);
+      ctx.fillText(`${move.id}:${fighter.moveFrame} ${getMovePhase(fighter, move)}`, fighter.x, fighter.y + 40);
       renderMoveDebug(ctx, fighter, move);
     }
 
@@ -109,10 +111,27 @@ function renderMoveDebug(
     fighter.y + 56,
   );
   ctx.fillText(
-    `s/a/r ${move.startupFrames}/${move.activeFrames}/${move.recoveryFrames} dmg ${move.damage} kb ${move.knockback.x},${move.knockback.y} sh ${move.shieldDamage}`,
+    `phase ${getMovePhase(fighter, move)} s/a/r ${move.startupFrames}/${move.activeFrames}/${move.recoveryFrames}`,
     fighter.x,
     fighter.y + 72,
   );
+  ctx.fillText(
+    `dmg ${move.damage} kb ${move.knockback.x},${move.knockback.y} sh ${move.shieldDamage} box ${move.hitbox.width}x${move.hitbox.height}`,
+    fighter.x,
+    fighter.y + 88,
+  );
+}
+
+function getMovePhase(fighter: Fighter, move: MoveDefinition): "startup" | "active" | "recovery" {
+  if (fighter.moveFrame < move.startupFrames) {
+    return "startup";
+  }
+
+  if (fighter.moveFrame < move.startupFrames + move.activeFrames) {
+    return "active";
+  }
+
+  return "recovery";
 }
 
 function renderShield(
@@ -183,6 +202,7 @@ function renderDebugHud(ctx: CanvasRenderingContext2D, state: RenderState): void
   ctx.fillText(`Render alpha: ${state.interpolationAlpha.toFixed(2)}`, WORLD_WIDTH / 2, 148);
 
   renderCommandReadout(ctx, state);
+  renderTuningReadout(ctx);
   renderControlsGuide(ctx);
 }
 
@@ -274,6 +294,37 @@ function renderCommandReadout(ctx: CanvasRenderingContext2D, state: RenderState)
   });
 
   ctx.fillText(`CPU intent: ${state.cpuIntent}`, 24, 540 - 10);
+}
+
+function renderTuningReadout(ctx: CanvasRenderingContext2D): void {
+  const lines = [
+    "Tuning",
+    `ground accel ${movementConfig.groundAcceleration} max ${movementConfig.maxGroundSpeed}`,
+    `air accel ${movementConfig.airAcceleration} max ${movementConfig.maxAirSpeed}`,
+    `gravity ${movementConfig.gravity} jump ${movementConfig.jumpVelocity}`,
+    `landing cd ${movementConfig.landingJumpCooldownFrames}`,
+    `shield box ${shieldConfig.box.width}x${shieldConfig.box.height}`,
+    `shield drain ${shieldConfig.holdDrainPerSecond}/s regen ${shieldConfig.regenPerSecond}/s`,
+  ];
+  const lineHeight = 16;
+  const padding = 12;
+  const width = 318;
+  const height = padding * 2 + lines.length * lineHeight;
+  const x = 18;
+  const y = 164;
+
+  ctx.fillStyle = "rgba(15, 23, 42, 0.72)";
+  ctx.fillRect(x, y, width, height);
+  ctx.strokeStyle = "#334155";
+  ctx.strokeRect(x, y, width, height);
+
+  ctx.textAlign = "left";
+  ctx.font = "13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+
+  lines.forEach((line, index) => {
+    ctx.fillStyle = index === 0 ? "#f8fafc" : "#cbd5e1";
+    ctx.fillText(line, x + padding, y + padding + lineHeight * (index + 0.8));
+  });
 }
 
 function renderControlsGuide(ctx: CanvasRenderingContext2D): void {
