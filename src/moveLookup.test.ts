@@ -41,4 +41,19 @@ describe("move lookup", () => {
       framesRemaining: 6,
     }).id).toBe("airUpWeak");
   });
+
+  it("selects moves from the fighter character moveset", () => {
+    const dreamer = createTestFighter({ characterId: "dreamer" });
+    const striker = createTestFighter({ characterId: "striker" });
+
+    const action = {
+      button: "strong" as const,
+      direction: "forward" as const,
+      grounded: true,
+      framesRemaining: 6,
+    };
+
+    expect(getMoveForBufferedAction(dreamer, action).damage).toBe(11);
+    expect(getMoveForBufferedAction(striker, action).damage).toBe(13);
+  });
 });

@@ -164,7 +164,7 @@ function renderFighterDebug(ctx: CanvasRenderingContext2D, fighter: Fighter): vo
   ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
   ctx.textAlign = "center";
   ctx.fillText(
-    `${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)} lcd:${fighter.landingJumpCooldownFrames}`,
+    `${fighter.characterId} ${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)} lcd:${fighter.landingJumpCooldownFrames}`,
     fighter.x,
     fighter.y + 24,
   );

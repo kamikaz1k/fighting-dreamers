@@ -65,6 +65,15 @@ describe("actions", () => {
     expect(fighter.moveCooldowns.get(move.id)).toBe(19);
   });
 
+  it("uses character-specific cooldowns", () => {
+    const fighter = createTestFighter({ characterId: "striker" });
+    const move = moveDefinitions.groundUpStrong;
+
+    startAttack(fighter, move);
+
+    expect(fighter.moveCooldowns.get(move.id)).toBe(28);
+  });
+
   it("does not consume buffered action while matching move is cooling down", () => {
     const fighter = createTestFighter({
       bufferedAction: {
