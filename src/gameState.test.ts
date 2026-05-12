@@ -55,12 +55,13 @@ describe("game state", () => {
 
     expect(player.characterId).toBe("dreamer");
     expect(player.width).toBe(52);
-    expect(player.height).toBe(104);
+    expect(player.height).toBe(83);
     expect(player.maxHealth).toBe(100);
     expect(player.maxShield).toBe(100);
     expect(player.airJumpsRemaining).toBe(1);
     expect(cpu.characterId).toBe("striker");
     expect(cpu.width).toBe(58);
+    expect(cpu.height).toBe(86);
     expect(cpu.maxHealth).toBe(110);
     expect(cpu.maxShield).toBe(90);
   });

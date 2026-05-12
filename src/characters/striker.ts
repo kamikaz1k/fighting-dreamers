@@ -44,7 +44,7 @@ export const strikerMoves: Record<string, MoveDefinition> = {
 export const strikerCharacter: CharacterDefinition = {
   id: "striker",
   name: "Striker",
-  size: { width: 58, height: 108 },
+  size: { width: 58, height: 86 },
   maxHealth: 110,
   maxShield: 90,
   movement: {
