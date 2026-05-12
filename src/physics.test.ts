@@ -65,6 +65,19 @@ describe("physics", () => {
     expect(shouldStartJump(fighter, { ...idleCommand, jumpPressed: true })).toBe(false);
   });
 
+  it("requires a fresh jump press for air jumps", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      airJumpsRemaining: 1,
+    });
+
+    expect(shouldStartJump(fighter, { ...idleCommand, moveY: -1 })).toBe(false);
+
+    applyMovement(fighter, { ...idleCommand, moveY: -1 });
+
+    expect(fighter.airJumpsRemaining).toBe(1);
+  });
+
   it("sets landing jump cooldown when touching down", () => {
     const fighter = createTestFighter({
       grounded: false,

@@ -78,7 +78,7 @@ export function updateShield(fighter: Fighter, command: FighterCommand): void {
   const shield = character.shield;
   const movement = character.movement;
 
-  if (command.shieldHeld && fighter.shield >= shield.minToActivate) {
+  if (command.shieldHeld && fighter.grounded && fighter.shield >= shield.minToActivate) {
     fighter.state = "shield";
     fighter.velocityX = moveToward(
       fighter.velocityX,

@@ -117,6 +117,19 @@ describe("actions", () => {
     expect(fighter.shield).toBeGreaterThan(49);
   });
 
+  it("only allows shield on the ground", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      state: "fall",
+      shield: 50,
+    });
+
+    updateShield(fighter, { ...idleCommand, shieldHeld: true });
+
+    expect(fighter.state).toBe("fall");
+    expect(fighter.shield).toBeGreaterThan(50);
+  });
+
   it("uses character-specific shield config", () => {
     const dreamer = createTestFighter({ characterId: "dreamer", shield: 50 });
     const striker = createTestFighter({ characterId: "striker", shield: 50 });

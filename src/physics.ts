@@ -105,17 +105,16 @@ export function canChangeFacing(fighter: Fighter): boolean {
 }
 
 export function shouldStartJump(fighter: Fighter, command: FighterCommand): boolean {
-  const wantsJump = command.jumpPressed || command.moveY === -1;
-
-  if (!wantsJump || fighter.state === "hitstun" || fighter.state === "ko") {
+  if (fighter.state === "hitstun" || fighter.state === "ko") {
     return false;
   }
 
   if (fighter.grounded) {
-    return fighter.landingJumpCooldownFrames === 0;
+    const wantsGroundJump = command.jumpPressed || command.moveY === -1;
+    return wantsGroundJump && fighter.landingJumpCooldownFrames === 0;
   }
 
-  return fighter.airJumpsRemaining > 0;
+  return command.jumpPressed && fighter.airJumpsRemaining > 0;
 }
 
 export function startJump(fighter: Fighter): void {
