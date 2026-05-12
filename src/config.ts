@@ -52,7 +52,7 @@ export const spawnPoints = [
 ] satisfies Array<{ x: number; facing: -1 | 1 }>;
 
 export const stagePlatforms = [
-  { id: "leftPlatform", x: 210, y: 330, width: 210, height: 12 },
-  { id: "topPlatform", x: 375, y: 245, width: 210, height: 12 },
-  { id: "rightPlatform", x: 540, y: 330, width: 210, height: 12 },
+  { id: "leftPlatform", x: 210, y: 306, width: 210, height: 12 },
+  { id: "topPlatform", x: 375, y: 204, width: 210, height: 12 },
+  { id: "rightPlatform", x: 540, y: 306, width: 210, height: 12 },
 ] satisfies StagePlatform[];
