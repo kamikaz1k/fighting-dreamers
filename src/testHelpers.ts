@@ -20,6 +20,7 @@ export function createTestFighter(overrides: Partial<Fighter> = {}): Fighter {
     velocityX: 0,
     velocityY: 0,
     grounded: true,
+    airJumpsRemaining: character.movement.maxAirJumps,
     health: character.maxHealth,
     maxHealth: character.maxHealth,
     shield: character.maxShield,

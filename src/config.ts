@@ -15,6 +15,7 @@ export const movementConfig = {
   gravity: 1850,
   jumpVelocity: -720,
   landingJumpCooldownFrames: 5,
+  maxAirJumps: 1,
 };
 
 export const inputConfig = {

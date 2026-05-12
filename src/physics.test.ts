@@ -36,17 +36,48 @@ describe("physics", () => {
     )).toBe(false);
   });
 
+  it("allows jumping out of shield", () => {
+    const fighter = createTestFighter({
+      state: "shield",
+      grounded: true,
+      landingJumpCooldownFrames: 0,
+    });
+
+    expect(shouldStartJump(fighter, { ...idleCommand, jumpPressed: true })).toBe(true);
+
+    applyMovement(fighter, { ...idleCommand, jumpPressed: true });
+
+    expect(fighter.state).toBe("jump");
+    expect(fighter.grounded).toBe(false);
+  });
+
+  it("consumes one air jump while airborne", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      airJumpsRemaining: 1,
+    });
+
+    expect(shouldStartJump(fighter, { ...idleCommand, jumpPressed: true })).toBe(true);
+
+    applyMovement(fighter, { ...idleCommand, jumpPressed: true });
+
+    expect(fighter.airJumpsRemaining).toBe(0);
+    expect(shouldStartJump(fighter, { ...idleCommand, jumpPressed: true })).toBe(false);
+  });
+
   it("sets landing jump cooldown when touching down", () => {
     const fighter = createTestFighter({
       grounded: false,
       y: 449,
       velocityY: 200,
+      airJumpsRemaining: 0,
     });
 
     applyMovement(fighter, idleCommand);
 
     expect(fighter.grounded).toBe(true);
     expect(fighter.landingJumpCooldownFrames).toBe(movementConfig.landingJumpCooldownFrames);
+    expect(fighter.airJumpsRemaining).toBe(movementConfig.maxAirJumps);
   });
 
   it("uses character-specific movement config", () => {

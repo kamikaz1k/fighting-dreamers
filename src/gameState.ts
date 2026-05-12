@@ -59,6 +59,7 @@ export function createFighter(config: {
     velocityX: 0,
     velocityY: 0,
     grounded: true,
+    airJumpsRemaining: character.movement.maxAirJumps,
     health: character.maxHealth,
     maxHealth: character.maxHealth,
     shield: character.maxShield,
@@ -132,6 +133,7 @@ export function resetFighter(fighter: Fighter, x: number, facing: -1 | 1): void 
   fighter.velocityX = 0;
   fighter.velocityY = 0;
   fighter.grounded = true;
+  fighter.airJumpsRemaining = getCharacter(fighter.characterId).movement.maxAirJumps;
   fighter.health = fighter.maxHealth;
   fighter.shield = fighter.maxShield;
   fighter.currentMoveId = null;

@@ -55,16 +55,16 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
     fighter.velocityX *= getCurrentMove(fighter)?.movementMultiplier ?? 1;
   }
 
-  if (fighter.state === "shield") {
-    fighter.velocityX = 0;
-  }
-
   if (fighter.grounded && fighter.landingJumpCooldownFrames > 0) {
     fighter.landingJumpCooldownFrames -= 1;
   }
 
   if (shouldStartJump(fighter, command)) {
     startJump(fighter);
+  }
+
+  if (fighter.state === "shield") {
+    fighter.velocityX = 0;
   }
 
   if (!fighter.grounded) {
@@ -90,6 +90,7 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
     fighter.y = FLOOR_Y;
     fighter.velocityY = 0;
     fighter.grounded = true;
+    fighter.airJumpsRemaining = movement.maxAirJumps;
 
     if (!wasGrounded) {
       fighter.landingJumpCooldownFrames = movement.landingJumpCooldownFrames;
@@ -104,14 +105,28 @@ export function canChangeFacing(fighter: Fighter): boolean {
 }
 
 export function shouldStartJump(fighter: Fighter, command: FighterCommand): boolean {
-  return fighter.grounded
-    && fighter.landingJumpCooldownFrames === 0
-    && fighter.state !== "hitstun"
-    && fighter.state !== "shield"
-    && (command.jumpPressed || command.moveY === -1);
+  const wantsJump = command.jumpPressed || command.moveY === -1;
+
+  if (!wantsJump || fighter.state === "hitstun" || fighter.state === "ko") {
+    return false;
+  }
+
+  if (fighter.grounded) {
+    return fighter.landingJumpCooldownFrames === 0;
+  }
+
+  return fighter.airJumpsRemaining > 0;
 }
 
 export function startJump(fighter: Fighter): void {
+  if (!fighter.grounded) {
+    fighter.airJumpsRemaining = Math.max(0, fighter.airJumpsRemaining - 1);
+  }
+
   fighter.velocityY = getCharacter(fighter.characterId).movement.jumpVelocity;
   fighter.grounded = false;
+
+  if (fighter.state === "shield") {
+    fighter.state = "jump";
+  }
 }

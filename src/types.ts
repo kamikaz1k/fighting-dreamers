@@ -23,6 +23,7 @@ export type Fighter = {
   velocityX: number;
   velocityY: number;
   grounded: boolean;
+  airJumpsRemaining: number;
   health: number;
   maxHealth: number;
   shield: number;

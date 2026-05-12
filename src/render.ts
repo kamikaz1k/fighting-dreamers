@@ -163,7 +163,7 @@ function renderFighterDebug(ctx: CanvasRenderingContext2D, fighter: Fighter): vo
   ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
   ctx.textAlign = "center";
   ctx.fillText(
-    `${fighter.characterId} ${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)} lcd:${fighter.landingJumpCooldownFrames}`,
+    `${fighter.characterId} ${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)} lcd:${fighter.landingJumpCooldownFrames} aj:${fighter.airJumpsRemaining}`,
     fighter.x,
     fighter.y + 24,
   );
@@ -310,7 +310,7 @@ function renderTuningReadout(ctx: CanvasRenderingContext2D, fighters: Fighter[])
 
       return [
         `${fighter.id}:${character.id} g ${character.movement.groundAcceleration}/${character.movement.maxGroundSpeed} a ${character.movement.airAcceleration}/${character.movement.maxAirSpeed}`,
-        `  grav ${character.movement.gravity} jump ${character.movement.jumpVelocity} cd ${character.movement.landingJumpCooldownFrames}`,
+        `  grav ${character.movement.gravity} jump ${character.movement.jumpVelocity} cd ${character.movement.landingJumpCooldownFrames} airj ${character.movement.maxAirJumps}`,
         `  shield ${character.shield.box.width}x${character.shield.box.height} drain ${character.shield.holdDrainPerSecond} regen ${character.shield.regenPerSecond}`,
       ];
     }),
