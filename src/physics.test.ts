@@ -145,7 +145,7 @@ describe("physics", () => {
     const platform = stagePlatforms[0];
     const fighter = createTestFighter({
       grounded: true,
-      x: platform.x - 60,
+      x: platform.x + platform.width + 60,
       y: platform.y,
     });
 
