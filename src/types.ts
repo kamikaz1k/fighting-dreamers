@@ -63,3 +63,7 @@ export type Rect = {
   width: number;
   height: number;
 };
+
+export type StagePlatform = Rect & {
+  id: string;
+};

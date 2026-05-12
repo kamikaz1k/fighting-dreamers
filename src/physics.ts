@@ -3,11 +3,12 @@ import {
   FLOOR_Y,
   STAGE_LEFT,
   STAGE_RIGHT,
+  stagePlatforms,
 } from "./config";
 import { getCharacter } from "./characters";
 import { getCurrentMove } from "./combat";
 import { clamp, moveToward } from "./math";
-import type { Fighter, FighterCommand } from "./types";
+import type { Fighter, FighterCommand, StagePlatform } from "./types";
 
 export function updateMovementState(fighter: Fighter): void {
   if (
@@ -29,11 +30,18 @@ export function updateMovementState(fighter: Fighter): void {
 
 export function applyMovement(fighter: Fighter, command: FighterCommand): void {
   const wasGrounded = fighter.grounded;
+  const previousY = fighter.y;
   const movement = getCharacter(fighter.characterId).movement;
   const acceleration = fighter.grounded
     ? movement.groundAcceleration
     : movement.airAcceleration;
   const maxSpeed = fighter.grounded ? movement.maxGroundSpeed : movement.maxAirSpeed;
+
+  if (fighter.grounded && command.moveY === 1 && isOnAnyPlatform(fighter)) {
+    fighter.grounded = false;
+  } else if (fighter.grounded && !isSupported(fighter)) {
+    fighter.grounded = false;
+  }
 
   if (command.moveX !== 0) {
     if (canChangeFacing(fighter)) {
@@ -86,16 +94,79 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
     fighter.velocityX = Math.min(0, fighter.velocityX);
   }
 
-  if (fighter.y >= FLOOR_Y) {
-    fighter.y = FLOOR_Y;
-    fighter.velocityY = 0;
-    fighter.grounded = true;
-    fighter.airJumpsRemaining = movement.maxAirJumps;
+  const platform = getLandingPlatform(fighter, previousY, command);
 
-    if (!wasGrounded) {
-      fighter.landingJumpCooldownFrames = movement.landingJumpCooldownFrames;
+  if (platform) {
+    landFighter(fighter, platform.y, wasGrounded, movement.maxAirJumps);
+    return;
+  }
+
+  if (fighter.y >= FLOOR_Y) {
+    landFighter(fighter, FLOOR_Y, wasGrounded, movement.maxAirJumps);
+  }
+}
+
+function landFighter(
+  fighter: Fighter,
+  y: number,
+  wasGrounded: boolean,
+  maxAirJumps: number,
+): void {
+  fighter.y = y;
+  fighter.velocityY = 0;
+  fighter.grounded = true;
+  fighter.airJumpsRemaining = maxAirJumps;
+
+  if (!wasGrounded) {
+    fighter.landingJumpCooldownFrames = getCharacter(
+      fighter.characterId,
+    ).movement.landingJumpCooldownFrames;
+  }
+}
+
+function isSupported(fighter: Fighter): boolean {
+  if (fighter.y >= FLOOR_Y) {
+    return true;
+  }
+
+  return stagePlatforms.some((platform) => isOnPlatform(fighter, platform));
+}
+
+function isOnAnyPlatform(fighter: Fighter): boolean {
+  return stagePlatforms.some((platform) => isOnPlatform(fighter, platform));
+}
+
+function getLandingPlatform(
+  fighter: Fighter,
+  previousY: number,
+  command: FighterCommand,
+): StagePlatform | null {
+  if (fighter.velocityY < 0 || command.moveY === 1) {
+    return null;
+  }
+
+  for (const platform of stagePlatforms) {
+    if (
+      previousY <= platform.y
+      && fighter.y >= platform.y
+      && isWithinPlatformWidth(fighter, platform)
+    ) {
+      return platform;
     }
   }
+
+  return null;
+}
+
+function isOnPlatform(fighter: Fighter, platform: StagePlatform): boolean {
+  return Math.abs(fighter.y - platform.y) < 0.5
+    && isWithinPlatformWidth(fighter, platform);
+}
+
+function isWithinPlatformWidth(fighter: Fighter, platform: StagePlatform): boolean {
+  const halfWidth = fighter.width / 2;
+  return fighter.x + halfWidth > platform.x
+    && fighter.x - halfWidth < platform.x + platform.width;
 }
 
 export function canChangeFacing(fighter: Fighter): boolean {

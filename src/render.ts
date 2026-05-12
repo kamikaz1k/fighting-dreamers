@@ -2,6 +2,7 @@ import {
   FLOOR_Y,
   WORLD_HEIGHT,
   WORLD_WIDTH,
+  stagePlatforms,
 } from "./config";
 import { getCharacter } from "./characters";
 import { getCurrentMove, isMoveActive } from "./combat";
@@ -44,6 +45,14 @@ function renderStage(ctx: CanvasRenderingContext2D): void {
   ctx.moveTo(40, FLOOR_Y + 1);
   ctx.lineTo(WORLD_WIDTH - 40, FLOOR_Y + 1);
   ctx.stroke();
+
+  for (const platform of stagePlatforms) {
+    ctx.fillStyle = "#334155";
+    ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+
+    ctx.fillStyle = "#64748b";
+    ctx.fillRect(platform.x, platform.y, platform.width, 3);
+  }
 }
 
 function renderFighters(

@@ -1,3 +1,5 @@
+import type { StagePlatform } from "./types";
+
 export const WORLD_WIDTH = 960;
 export const WORLD_HEIGHT = 540;
 export const FLOOR_Y = 450;
@@ -48,3 +50,9 @@ export const spawnPoints = [
   { x: 260, facing: 1 },
   { x: 700, facing: -1 },
 ] satisfies Array<{ x: number; facing: -1 | 1 }>;
+
+export const stagePlatforms = [
+  { id: "leftPlatform", x: 210, y: 330, width: 210, height: 12 },
+  { id: "topPlatform", x: 375, y: 245, width: 210, height: 12 },
+  { id: "rightPlatform", x: 540, y: 330, width: 210, height: 12 },
+] satisfies StagePlatform[];
