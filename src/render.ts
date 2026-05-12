@@ -2,9 +2,8 @@ import {
   FLOOR_Y,
   WORLD_HEIGHT,
   WORLD_WIDTH,
-  movementConfig,
-  shieldConfig,
 } from "./config";
+import { getCharacter } from "./characters";
 import { getCurrentMove, isMoveActive } from "./combat";
 import { getHurtbox, getMoveHitbox, getShieldBox } from "./geometry";
 import { clamp } from "./math";
@@ -209,7 +208,7 @@ function renderDebugHud(ctx: CanvasRenderingContext2D, state: RenderState): void
   ctx.fillText(`Render alpha: ${state.interpolationAlpha.toFixed(2)}`, WORLD_WIDTH / 2, 148);
 
   renderCommandReadout(ctx, state);
-  renderTuningReadout(ctx);
+  renderTuningReadout(ctx, state.fighters);
   renderControlsGuide(ctx);
 }
 
@@ -303,15 +302,18 @@ function renderCommandReadout(ctx: CanvasRenderingContext2D, state: RenderState)
   ctx.fillText(`CPU intent: ${state.cpuIntent}`, 24, 540 - 10);
 }
 
-function renderTuningReadout(ctx: CanvasRenderingContext2D): void {
+function renderTuningReadout(ctx: CanvasRenderingContext2D, fighters: Fighter[]): void {
   const lines = [
     "Tuning",
-    `ground accel ${movementConfig.groundAcceleration} max ${movementConfig.maxGroundSpeed}`,
-    `air accel ${movementConfig.airAcceleration} max ${movementConfig.maxAirSpeed}`,
-    `gravity ${movementConfig.gravity} jump ${movementConfig.jumpVelocity}`,
-    `landing cd ${movementConfig.landingJumpCooldownFrames}`,
-    `shield box ${shieldConfig.box.width}x${shieldConfig.box.height}`,
-    `shield drain ${shieldConfig.holdDrainPerSecond}/s regen ${shieldConfig.regenPerSecond}/s`,
+    ...fighters.flatMap((fighter) => {
+      const character = getCharacter(fighter.characterId);
+
+      return [
+        `${fighter.id}:${character.id} g ${character.movement.groundAcceleration}/${character.movement.maxGroundSpeed} a ${character.movement.airAcceleration}/${character.movement.maxAirSpeed}`,
+        `  grav ${character.movement.gravity} jump ${character.movement.jumpVelocity} cd ${character.movement.landingJumpCooldownFrames}`,
+        `  shield ${character.shield.box.width}x${character.shield.box.height} drain ${character.shield.holdDrainPerSecond} regen ${character.shield.regenPerSecond}`,
+      ];
+    }),
   ];
   const lineHeight = 16;
   const padding = 12;

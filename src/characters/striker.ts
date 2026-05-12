@@ -54,7 +54,16 @@ export const strikerCharacter: CharacterDefinition = {
     airAcceleration: 1320,
     maxAirSpeed: 230,
   },
-  shield: shieldConfig,
+  shield: {
+    ...shieldConfig,
+    holdDrainPerSecond: 14,
+    regenPerSecond: 17,
+    box: {
+      ...shieldConfig.box,
+      width: 104,
+      height: 128,
+    },
+  },
   moves: strikerMoves,
   cooldowns: {
     groundForwardStrong: 26,

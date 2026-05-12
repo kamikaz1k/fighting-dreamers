@@ -3,8 +3,6 @@ import { getCharacter } from "./characters";
 import {
   FIXED_TIMESTEP_SECONDS,
   inputConfig,
-  movementConfig,
-  shieldConfig,
 } from "./config";
 import { clamp, moveToward } from "./math";
 import { getMoveDirection, getMoveForBufferedAction } from "./moveLookup";
@@ -76,15 +74,19 @@ export function updateMoveCooldowns(fighter: Fighter): void {
 }
 
 export function updateShield(fighter: Fighter, command: FighterCommand): void {
-  if (command.shieldHeld && fighter.shield >= shieldConfig.minToActivate) {
+  const character = getCharacter(fighter.characterId);
+  const shield = character.shield;
+  const movement = character.movement;
+
+  if (command.shieldHeld && fighter.shield >= shield.minToActivate) {
     fighter.state = "shield";
     fighter.velocityX = moveToward(
       fighter.velocityX,
       0,
-      movementConfig.groundFriction * FIXED_TIMESTEP_SECONDS,
+      movement.groundFriction * FIXED_TIMESTEP_SECONDS,
     );
     fighter.shield = clamp(
-      fighter.shield - shieldConfig.holdDrainPerSecond * FIXED_TIMESTEP_SECONDS,
+      fighter.shield - shield.holdDrainPerSecond * FIXED_TIMESTEP_SECONDS,
       0,
       fighter.maxShield,
     );
@@ -96,7 +98,7 @@ export function updateShield(fighter: Fighter, command: FighterCommand): void {
   }
 
   fighter.shield = clamp(
-    fighter.shield + shieldConfig.regenPerSecond * FIXED_TIMESTEP_SECONDS,
+    fighter.shield + shield.regenPerSecond * FIXED_TIMESTEP_SECONDS,
     0,
     fighter.maxShield,
   );

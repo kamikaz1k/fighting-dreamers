@@ -3,8 +3,8 @@ import {
   FLOOR_Y,
   STAGE_LEFT,
   STAGE_RIGHT,
-  movementConfig,
 } from "./config";
+import { getCharacter } from "./characters";
 import { getCurrentMove } from "./combat";
 import { clamp, moveToward } from "./math";
 import type { Fighter, FighterCommand } from "./types";
@@ -29,10 +29,11 @@ export function updateMovementState(fighter: Fighter): void {
 
 export function applyMovement(fighter: Fighter, command: FighterCommand): void {
   const wasGrounded = fighter.grounded;
+  const movement = getCharacter(fighter.characterId).movement;
   const acceleration = fighter.grounded
-    ? movementConfig.groundAcceleration
-    : movementConfig.airAcceleration;
-  const maxSpeed = fighter.grounded ? movementConfig.maxGroundSpeed : movementConfig.maxAirSpeed;
+    ? movement.groundAcceleration
+    : movement.airAcceleration;
+  const maxSpeed = fighter.grounded ? movement.maxGroundSpeed : movement.maxAirSpeed;
 
   if (command.moveX !== 0) {
     if (canChangeFacing(fighter)) {
@@ -44,7 +45,7 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
     fighter.velocityX = moveToward(
       fighter.velocityX,
       0,
-      movementConfig.groundFriction * FIXED_TIMESTEP_SECONDS,
+      movement.groundFriction * FIXED_TIMESTEP_SECONDS,
     );
   }
 
@@ -67,7 +68,7 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
   }
 
   if (!fighter.grounded) {
-    fighter.velocityY += movementConfig.gravity * FIXED_TIMESTEP_SECONDS;
+    fighter.velocityY += movement.gravity * FIXED_TIMESTEP_SECONDS;
   }
 
   fighter.x += fighter.velocityX * FIXED_TIMESTEP_SECONDS;
@@ -91,7 +92,7 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
     fighter.grounded = true;
 
     if (!wasGrounded) {
-      fighter.landingJumpCooldownFrames = movementConfig.landingJumpCooldownFrames;
+      fighter.landingJumpCooldownFrames = movement.landingJumpCooldownFrames;
     }
   }
 }
@@ -111,6 +112,6 @@ export function shouldStartJump(fighter: Fighter, command: FighterCommand): bool
 }
 
 export function startJump(fighter: Fighter): void {
-  fighter.velocityY = movementConfig.jumpVelocity;
+  fighter.velocityY = getCharacter(fighter.characterId).movement.jumpVelocity;
   fighter.grounded = false;
 }

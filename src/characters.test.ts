@@ -8,6 +8,8 @@ describe("characters", () => {
 
     expect(dreamer.maxHealth).toBe(100);
     expect(striker.maxHealth).toBe(110);
+    expect(striker.movement.maxGroundSpeed).toBeLessThan(dreamer.movement.maxGroundSpeed);
+    expect(striker.shield.box.width).toBeGreaterThan(dreamer.shield.box.width);
     expect(dreamer.moves.groundForwardStrong.damage).toBe(11);
     expect(striker.moves.groundForwardStrong.damage).toBe(13);
     expect(dreamer.cooldowns.groundUpStrong).toBe(20);

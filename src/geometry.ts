@@ -1,4 +1,4 @@
-import { shieldConfig } from "./config";
+import { getCharacter } from "./characters";
 import type { Fighter, Rect } from "./types";
 import type { MoveDefinition } from "./moves";
 
@@ -25,11 +25,13 @@ export function getHurtbox(fighter: Fighter): Rect {
 }
 
 export function getShieldBox(fighter: Fighter): Rect {
+  const shieldBox = getCharacter(fighter.characterId).shield.box;
+
   return {
-    x: fighter.x + shieldConfig.box.offsetX - shieldConfig.box.width / 2,
-    y: fighter.y + shieldConfig.box.offsetY - shieldConfig.box.height / 2,
-    width: shieldConfig.box.width,
-    height: shieldConfig.box.height,
+    x: fighter.x + shieldBox.offsetX - shieldBox.width / 2,
+    y: fighter.y + shieldBox.offsetY - shieldBox.height / 2,
+    width: shieldBox.width,
+    height: shieldBox.height,
   };
 }
 

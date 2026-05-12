@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inputConfig, shieldConfig } from "./config";
+import { inputConfig } from "./config";
 import {
   startAttack,
   updateActions,
@@ -114,6 +114,16 @@ describe("actions", () => {
 
     updateShield(fighter, { ...idleCommand, shieldHeld: false });
     expect(fighter.state).toBe("idle");
-    expect(fighter.shield).toBeGreaterThan(50 - shieldConfig.holdDrainPerSecond);
+    expect(fighter.shield).toBeGreaterThan(49);
+  });
+
+  it("uses character-specific shield config", () => {
+    const dreamer = createTestFighter({ characterId: "dreamer", shield: 50 });
+    const striker = createTestFighter({ characterId: "striker", shield: 50 });
+
+    updateShield(dreamer, { ...idleCommand, shieldHeld: true });
+    updateShield(striker, { ...idleCommand, shieldHeld: true });
+
+    expect(striker.shield).toBeLessThan(dreamer.shield);
   });
 });

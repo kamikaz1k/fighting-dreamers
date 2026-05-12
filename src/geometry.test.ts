@@ -30,4 +30,9 @@ describe("geometry", () => {
     expect(getShieldBox(fighter).width).toBeGreaterThan(getHurtbox(fighter).width);
     expect(getShieldBox(fighter).height).toBeGreaterThan(getHurtbox(fighter).height);
   });
+
+  it("uses character-specific shield boxes", () => {
+    expect(getShieldBox(createTestFighter({ characterId: "dreamer" })).width).toBe(92);
+    expect(getShieldBox(createTestFighter({ characterId: "striker" })).width).toBe(104);
+  });
 });

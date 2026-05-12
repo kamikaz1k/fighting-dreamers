@@ -48,4 +48,14 @@ describe("physics", () => {
     expect(fighter.grounded).toBe(true);
     expect(fighter.landingJumpCooldownFrames).toBe(movementConfig.landingJumpCooldownFrames);
   });
+
+  it("uses character-specific movement config", () => {
+    const dreamer = createTestFighter({ characterId: "dreamer" });
+    const striker = createTestFighter({ characterId: "striker" });
+
+    applyMovement(dreamer, { ...idleCommand, moveX: 1 });
+    applyMovement(striker, { ...idleCommand, moveX: 1 });
+
+    expect(dreamer.velocityX).toBeGreaterThan(striker.velocityX);
+  });
 });
