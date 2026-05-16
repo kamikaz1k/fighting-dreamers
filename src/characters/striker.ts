@@ -66,10 +66,8 @@ export const strikerCharacter: CharacterDefinition = {
   moves: strikerMoves,
   cooldowns: {
     sideSpecial: 26,
-    backSpecial: 22,
     upSpecial: 28,
     airSideSpecial: 26,
-    airBackSpecial: 22,
     airUpSpecial: 24,
     airDownSpecial: 28,
   },

@@ -90,6 +90,18 @@ describe("move lookup", () => {
     }).id).toBe("upSmash");
   });
 
+  it("uses side special for back special input", () => {
+    const fighter = createTestFighter();
+
+    expect(getMoveForBufferedAction(fighter, {
+      button: "special",
+      direction: "back",
+      smash: false,
+      grounded: true,
+      framesRemaining: 6,
+    }).id).toBe("sideSpecial");
+  });
+
   it("selects moves from the fighter character moveset", () => {
     const dreamer = createTestFighter({ characterId: "dreamer" });
     const striker = createTestFighter({ characterId: "striker" });

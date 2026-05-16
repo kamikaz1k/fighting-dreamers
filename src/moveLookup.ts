@@ -25,6 +25,10 @@ function getLookupDirection(action: BufferedAction) {
     return "forward";
   }
 
+  if (action.button === "special" && action.direction === "back") {
+    return "forward";
+  }
+
   return action.direction;
 }
 

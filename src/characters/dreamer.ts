@@ -14,10 +14,8 @@ export const dreamerCharacter: CharacterDefinition = {
   moves: dreamerMoves,
   cooldowns: {
     sideSpecial: 18,
-    backSpecial: 18,
     upSpecial: 20,
     airSideSpecial: 18,
-    airBackSpecial: 18,
     airUpSpecial: 20,
     airDownSpecial: 22,
   },
