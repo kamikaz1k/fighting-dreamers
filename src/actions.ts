@@ -54,7 +54,7 @@ export function updateActions(fighter: Fighter, command: FighterCommand): void {
   if (bufferedAction) {
     const move = getMoveForBufferedAction(fighter, bufferedAction);
 
-    if (getMoveCooldown(fighter, move) > 0) {
+    if (getMoveCooldown(fighter, move) > 0 || !canUseMove(fighter, move)) {
       return;
     }
 
@@ -140,6 +140,11 @@ export function startAttack(fighter: Fighter, move: MoveDefinition): void {
   }
 
   const cooldownKey = getCooldownKey(move);
+
+  if (cooldownKey === "upSpecial") {
+    fighter.upSpecialAvailable = false;
+  }
+
   const cooldownFrames = getCharacter(fighter.characterId).cooldowns[cooldownKey] ?? 0;
 
   if (cooldownFrames > 0) {
@@ -173,4 +178,8 @@ export function getMoveCooldown(fighter: Fighter, move: MoveDefinition): number 
 
 function getCooldownKey(move: MoveDefinition): string {
   return move.cooldownKey ?? move.id;
+}
+
+function canUseMove(fighter: Fighter, move: MoveDefinition): boolean {
+  return getCooldownKey(move) !== "upSpecial" || fighter.upSpecialAvailable;
 }

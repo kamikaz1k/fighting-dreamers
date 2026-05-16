@@ -138,6 +138,7 @@ function landFighter(
   fighter.jumpCutApplied = false;
   fighter.fastFalling = false;
   fighter.ledgeSide = null;
+  fighter.upSpecialAvailable = true;
 
   if (!wasGrounded) {
     fighter.landingJumpCooldownFrames = getCharacter(
@@ -235,6 +236,7 @@ function updateLedgeState(fighter: Fighter, command: FighterCommand): void {
   fighter.ledgeSide = null;
   fighter.state = "idle";
   fighter.airJumpsRemaining = getCharacter(fighter.characterId).movement.maxAirJumps;
+  fighter.upSpecialAvailable = true;
 }
 
 function isOnAnyPlatform(fighter: Fighter): boolean {

@@ -101,12 +101,32 @@ describe("actions", () => {
     expect(getMoveCooldown(fighter, moveDefinitions.airUpSpecial)).toBe(20);
   });
 
+  it("does not allow another up special until landing", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      upSpecialAvailable: false,
+      bufferedAction: {
+        button: "special",
+        direction: "up",
+        smash: false,
+        grounded: false,
+        framesRemaining: 4,
+      },
+    });
+
+    updateActions(fighter, idleCommand);
+
+    expect(fighter.currentMoveId).toBeNull();
+    expect(fighter.state).toBe("idle");
+  });
+
   it("launches the fighter when starting up special", () => {
     const fighter = createTestFighter();
 
     startAttack(fighter, moveDefinitions.upSpecial);
 
     expect(fighter.grounded).toBe(false);
+    expect(fighter.upSpecialAvailable).toBe(false);
     expect(fighter.velocityY).toBe(moveDefinitions.upSpecial.selfVelocity?.y);
   });
 

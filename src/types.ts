@@ -29,6 +29,7 @@ export type Fighter = {
   jumpCutApplied: boolean;
   fastFalling: boolean;
   ledgeSide: -1 | 1 | null;
+  upSpecialAvailable: boolean;
   damagePercent: number;
   shield: number;
   maxShield: number;
