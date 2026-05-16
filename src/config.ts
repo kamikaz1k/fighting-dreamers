@@ -48,7 +48,7 @@ export const shieldConfig = {
 };
 
 export const knockbackConfig = {
-  damageScalePerPercent: 0.01,
+  damageScalePerPercent: 0.02,
 };
 
 export const roundConfig = {

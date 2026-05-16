@@ -52,6 +52,10 @@ describe("combat", () => {
   it("scales knockback with accumulated damage", () => {
     const move = moveDefinitions.forwardTilt;
 
+    expect(getScaledKnockback(move, 50)).toEqual({
+      x: move.knockback.x * 2,
+      y: move.knockback.y * 2,
+    });
     expect(getScaledKnockback(move, 100).x).toBeGreaterThan(getScaledKnockback(move, 0).x);
     expect(Math.abs(getScaledKnockback(move, 100).y)).toBeGreaterThan(
       Math.abs(getScaledKnockback(move, 0).y),
