@@ -21,6 +21,7 @@ export const movementConfig = {
   maxFallSpeed: 760,
   fastFallSpeed: 980,
   fastFallGravityMultiplier: 1.55,
+  crouchHeightMultiplier: 0.62,
   landingJumpCooldownFrames: 5,
   maxAirJumps: 1,
 };

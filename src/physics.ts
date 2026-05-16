@@ -25,6 +25,10 @@ export function updateMovementState(fighter: Fighter): void {
     return;
   }
 
+  if (fighter.state === "crouch") {
+    return;
+  }
+
   fighter.state = Math.abs(fighter.velocityX) > 5 ? "run" : "idle";
 }
 
@@ -42,6 +46,8 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
   } else if (fighter.grounded && !isSupported(fighter)) {
     fighter.grounded = false;
   }
+
+  updateCrouchState(fighter, command);
 
   if (command.moveX !== 0) {
     if (canChangeFacing(fighter)) {
@@ -182,6 +188,25 @@ export function canChangeFacing(fighter: Fighter): boolean {
   return fighter.state !== "attack"
     && fighter.state !== "hitstun"
     && fighter.state !== "ko";
+}
+
+function updateCrouchState(fighter: Fighter, command: FighterCommand): void {
+  if (!fighter.grounded || isOnAnyPlatform(fighter)) {
+    if (fighter.state === "crouch") {
+      fighter.state = "idle";
+    }
+    return;
+  }
+
+  if (command.moveY === 1 && fighter.state !== "attack" && fighter.state !== "shield") {
+    fighter.state = "crouch";
+    fighter.velocityX = 0;
+    return;
+  }
+
+  if (fighter.state === "crouch") {
+    fighter.state = "idle";
+  }
 }
 
 export function shouldStartJump(fighter: Fighter, command: FighterCommand): boolean {

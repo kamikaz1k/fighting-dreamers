@@ -1,6 +1,6 @@
 import type { MoveButton, MoveDirection } from "./moves";
 
-export type FighterState = "idle" | "run" | "jump" | "fall" | "attack" | "shield" | "hitstun" | "ko";
+export type FighterState = "idle" | "run" | "crouch" | "jump" | "fall" | "attack" | "shield" | "hitstun" | "ko";
 
 export type BufferedAction = {
   button: MoveButton;

@@ -16,11 +16,15 @@ export function getMoveHitbox(fighter: Fighter, move: MoveDefinition): Rect {
 }
 
 export function getHurtbox(fighter: Fighter): Rect {
+  const height = fighter.state === "crouch"
+    ? fighter.height * getCharacter(fighter.characterId).movement.crouchHeightMultiplier
+    : fighter.height;
+
   return {
     x: fighter.x - fighter.width / 2,
-    y: fighter.y - fighter.height,
+    y: fighter.y - height,
     width: fighter.width,
-    height: fighter.height,
+    height,
   };
 }
 

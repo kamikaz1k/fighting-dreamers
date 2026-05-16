@@ -31,6 +31,14 @@ describe("geometry", () => {
     expect(getShieldBox(fighter).height).toBeGreaterThan(getHurtbox(fighter).height);
   });
 
+  it("shrinks the hurtbox while crouching", () => {
+    const standing = getHurtbox(createTestFighter());
+    const crouching = getHurtbox(createTestFighter({ state: "crouch" }));
+
+    expect(crouching.height).toBeLessThan(standing.height);
+    expect(crouching.y).toBeGreaterThan(standing.y);
+  });
+
   it("uses character-specific shield boxes", () => {
     expect(getShieldBox(createTestFighter({ characterId: "dreamer" })).width).toBe(92);
     expect(getShieldBox(createTestFighter({ characterId: "striker" })).width).toBe(104);

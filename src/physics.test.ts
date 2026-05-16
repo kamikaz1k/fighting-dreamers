@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { movementConfig, stagePlatforms } from "./config";
-import { applyMovement, canChangeFacing, shouldStartJump } from "./physics";
+import {
+  applyMovement,
+  canChangeFacing,
+  shouldStartJump,
+  updateMovementState,
+} from "./physics";
 import { createTestFighter } from "./testHelpers";
 import type { FighterCommand } from "./types";
 
@@ -125,6 +130,25 @@ describe("physics", () => {
     expect(rising.fastFalling).toBe(false);
     expect(falling.fastFalling).toBe(true);
     expect(falling.velocityY).toBeGreaterThan(rising.velocityY);
+  });
+
+  it("enters crouch while holding down on the floor", () => {
+    const fighter = createTestFighter();
+
+    applyMovement(fighter, { ...idleCommand, moveY: 1 });
+    updateMovementState(fighter);
+
+    expect(fighter.state).toBe("crouch");
+    expect(fighter.grounded).toBe(true);
+  });
+
+  it("exits crouch after releasing down", () => {
+    const fighter = createTestFighter({ state: "crouch" });
+
+    applyMovement(fighter, idleCommand);
+    updateMovementState(fighter);
+
+    expect(fighter.state).toBe("idle");
   });
 
   it("sets landing jump cooldown when touching down", () => {
