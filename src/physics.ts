@@ -93,6 +93,11 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
   fighter.x += fighter.velocityX * FIXED_TIMESTEP_SECONDS;
   fighter.y += fighter.velocityY * FIXED_TIMESTEP_SECONDS;
 
+  if (hitsMainPlatformUnderside(fighter, previousY)) {
+    fighter.y = mainPlatform.y + mainPlatform.height + fighter.height;
+    fighter.velocityY = 0;
+  }
+
   const platform = getLandingPlatform(fighter, previousY, command);
 
   if (platform) {
@@ -138,6 +143,17 @@ function canLandOnMainPlatform(fighter: Fighter, previousY: number): boolean {
   return fighter.velocityY >= 0
     && previousY <= mainPlatform.y
     && fighter.y >= mainPlatform.y
+    && isWithinPlatformWidth(fighter, mainPlatform);
+}
+
+function hitsMainPlatformUnderside(fighter: Fighter, previousY: number): boolean {
+  const undersideY = mainPlatform.y + mainPlatform.height;
+  const previousTop = previousY - fighter.height;
+  const currentTop = fighter.y - fighter.height;
+
+  return fighter.velocityY < 0
+    && previousTop >= undersideY
+    && currentTop <= undersideY
     && isWithinPlatformWidth(fighter, mainPlatform);
 }
 

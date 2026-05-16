@@ -194,6 +194,21 @@ describe("physics", () => {
     expect(fighter.y).toBeGreaterThan(mainPlatform.y);
   });
 
+  it("blocks jumps into the underside of the main platform", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      x: mainPlatform.x + mainPlatform.width / 2,
+      y: mainPlatform.y + mainPlatform.height + 84,
+      velocityY: -220,
+    });
+
+    applyMovement(fighter, idleCommand);
+
+    expect(fighter.y).toBe(mainPlatform.y + mainPlatform.height + fighter.height);
+    expect(fighter.velocityY).toBe(0);
+    expect(fighter.grounded).toBe(false);
+  });
+
   it("lands on a platform from above", () => {
     const platform = stagePlatforms[0];
     const fighter = createTestFighter({
