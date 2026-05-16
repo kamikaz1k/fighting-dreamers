@@ -24,6 +24,9 @@ export type Fighter = {
   velocityY: number;
   grounded: boolean;
   airJumpsRemaining: number;
+  jumpHoldFrames: number;
+  jumpCutApplied: boolean;
+  fastFalling: boolean;
   health: number;
   maxHealth: number;
   shield: number;
@@ -42,6 +45,8 @@ export type FighterCommand = {
   moveX: -1 | 0 | 1;
   moveY: -1 | 0 | 1;
   jumpPressed: boolean;
+  jumpHeld: boolean;
+  jumpReleased: boolean;
   weakPressed: boolean;
   strongPressed: boolean;
   shieldHeld: boolean;

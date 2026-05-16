@@ -8,6 +8,8 @@ const idleCommand: FighterCommand = {
   moveX: 0,
   moveY: 0,
   jumpPressed: false,
+  jumpHeld: false,
+  jumpReleased: false,
   weakPressed: false,
   strongPressed: false,
   shieldHeld: false,
@@ -78,6 +80,53 @@ describe("physics", () => {
     expect(fighter.airJumpsRemaining).toBe(1);
   });
 
+  it("cuts upward velocity for an early jump release", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      velocityY: movementConfig.jumpVelocity,
+      jumpHoldFrames: 2,
+    });
+
+    applyMovement(fighter, { ...idleCommand, jumpReleased: true });
+
+    expect(fighter.jumpCutApplied).toBe(true);
+    expect(fighter.velocityY).toBeGreaterThan(movementConfig.jumpVelocity);
+    expect(fighter.velocityY).toBeGreaterThan(movementConfig.shortHopVelocity);
+  });
+
+  it("keeps full-hop velocity after the short-hop window", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      velocityY: movementConfig.jumpVelocity,
+      jumpHoldFrames: movementConfig.shortHopReleaseFrames,
+    });
+
+    applyMovement(fighter, { ...idleCommand, jumpReleased: true });
+
+    expect(fighter.jumpCutApplied).toBe(false);
+    expect(fighter.velocityY).toBeLessThan(movementConfig.shortHopVelocity);
+  });
+
+  it("starts fast-fall only while descending", () => {
+    const rising = createTestFighter({
+      grounded: false,
+      y: 300,
+      velocityY: -50,
+    });
+    const falling = createTestFighter({
+      grounded: false,
+      y: 300,
+      velocityY: 50,
+    });
+
+    applyMovement(rising, { ...idleCommand, moveY: 1 });
+    applyMovement(falling, { ...idleCommand, moveY: 1 });
+
+    expect(rising.fastFalling).toBe(false);
+    expect(falling.fastFalling).toBe(true);
+    expect(falling.velocityY).toBeGreaterThan(rising.velocityY);
+  });
+
   it("sets landing jump cooldown when touching down", () => {
     const fighter = createTestFighter({
       grounded: false,
@@ -91,6 +140,7 @@ describe("physics", () => {
     expect(fighter.grounded).toBe(true);
     expect(fighter.landingJumpCooldownFrames).toBe(movementConfig.landingJumpCooldownFrames);
     expect(fighter.airJumpsRemaining).toBe(movementConfig.maxAirJumps);
+    expect(fighter.fastFalling).toBe(false);
   });
 
   it("lands on a platform from above", () => {

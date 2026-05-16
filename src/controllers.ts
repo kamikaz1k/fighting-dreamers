@@ -5,6 +5,8 @@ export const idleCommand: FighterCommand = {
   moveX: 0,
   moveY: 0,
   jumpPressed: false,
+  jumpHeld: false,
+  jumpReleased: false,
   weakPressed: false,
   strongPressed: false,
   shieldHeld: false,
@@ -86,6 +88,7 @@ export class CpuController implements Controller {
 export class KeyboardController implements Controller {
   private readonly heldKeys = new Set<string>();
   private readonly pressedKeys = new Set<string>();
+  private readonly releasedKeys = new Set<string>();
 
   constructor() {
     window.addEventListener("keydown", (event) => {
@@ -98,6 +101,7 @@ export class KeyboardController implements Controller {
 
     window.addEventListener("keyup", (event) => {
       this.heldKeys.delete(event.code);
+      this.releasedKeys.add(event.code);
     });
   }
 
@@ -106,12 +110,15 @@ export class KeyboardController implements Controller {
       moveX: this.readHorizontal(),
       moveY: this.readVertical(),
       jumpPressed: this.consumePressed("KeyW"),
+      jumpHeld: this.heldKeys.has("KeyW"),
+      jumpReleased: this.consumeReleased("KeyW"),
       weakPressed: this.consumePressed("KeyJ"),
       strongPressed: this.consumePressed("KeyK"),
       shieldHeld: this.heldKeys.has("KeyL"),
     };
 
     this.pressedKeys.clear();
+    this.releasedKeys.clear();
     return command;
   }
 
@@ -139,5 +146,9 @@ export class KeyboardController implements Controller {
 
   private consumePressed(code: string): boolean {
     return this.pressedKeys.has(code);
+  }
+
+  private consumeReleased(code: string): boolean {
+    return this.releasedKeys.has(code);
   }
 }

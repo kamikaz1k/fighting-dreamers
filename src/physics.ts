@@ -76,7 +76,13 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
   }
 
   if (!fighter.grounded) {
-    fighter.velocityY += movement.gravity * FIXED_TIMESTEP_SECONDS;
+    updateAirborneJumpState(fighter, command);
+    const gravityMultiplier = fighter.fastFalling ? movement.fastFallGravityMultiplier : 1;
+    const maxFallSpeed = fighter.fastFalling ? movement.fastFallSpeed : movement.maxFallSpeed;
+    fighter.velocityY = Math.min(
+      fighter.velocityY + movement.gravity * gravityMultiplier * FIXED_TIMESTEP_SECONDS,
+      maxFallSpeed,
+    );
   }
 
   fighter.x += fighter.velocityX * FIXED_TIMESTEP_SECONDS;
@@ -116,6 +122,9 @@ function landFighter(
   fighter.velocityY = 0;
   fighter.grounded = true;
   fighter.airJumpsRemaining = maxAirJumps;
+  fighter.jumpHoldFrames = 0;
+  fighter.jumpCutApplied = false;
+  fighter.fastFalling = false;
 
   if (!wasGrounded) {
     fighter.landingJumpCooldownFrames = getCharacter(
@@ -195,8 +204,31 @@ export function startJump(fighter: Fighter): void {
 
   fighter.velocityY = getCharacter(fighter.characterId).movement.jumpVelocity;
   fighter.grounded = false;
+  fighter.jumpHoldFrames = 0;
+  fighter.jumpCutApplied = false;
+  fighter.fastFalling = false;
 
   if (fighter.state === "shield") {
     fighter.state = "jump";
+  }
+}
+
+function updateAirborneJumpState(fighter: Fighter, command: FighterCommand): void {
+  const movement = getCharacter(fighter.characterId).movement;
+
+  fighter.jumpHoldFrames += 1;
+
+  if (
+    command.jumpReleased
+    && !fighter.jumpCutApplied
+    && fighter.velocityY < movement.shortHopVelocity
+    && fighter.jumpHoldFrames <= movement.shortHopReleaseFrames
+  ) {
+    fighter.velocityY = movement.shortHopVelocity;
+    fighter.jumpCutApplied = true;
+  }
+
+  if (fighter.velocityY > 0 && command.moveY === 1) {
+    fighter.fastFalling = true;
   }
 }

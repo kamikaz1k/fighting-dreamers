@@ -16,6 +16,11 @@ export const movementConfig = {
   groundFriction: 2100,
   gravity: 1850,
   jumpVelocity: -720,
+  shortHopReleaseFrames: 6,
+  shortHopVelocity: -420,
+  maxFallSpeed: 760,
+  fastFallSpeed: 980,
+  fastFallGravityMultiplier: 1.55,
   landingJumpCooldownFrames: 5,
   maxAirJumps: 1,
 };
