@@ -32,6 +32,7 @@ export const movementConfig = {
 
 export const inputConfig = {
   bufferFrames: 6,
+  smashDirectionWindowFrames: 4,
 };
 
 export const shieldConfig = {

@@ -1,4 +1,5 @@
 import { getNearestOpponent } from "./fighters";
+import { inputConfig } from "./config";
 import type { Controller, ControllerContext, FighterCommand } from "./types";
 
 export const idleCommand: FighterCommand = {
@@ -90,6 +91,7 @@ export class KeyboardController implements Controller {
   private readonly heldKeys = new Set<string>();
   private readonly pressedKeys = new Set<string>();
   private readonly releasedKeys = new Set<string>();
+  private smashDirectionFramesRemaining = 0;
 
   constructor() {
     window.addEventListener("keydown", (event) => {
@@ -107,6 +109,10 @@ export class KeyboardController implements Controller {
   }
 
   update(): FighterCommand {
+    if (this.hasPressedDirection()) {
+      this.smashDirectionFramesRemaining = inputConfig.smashDirectionWindowFrames;
+    }
+
     const command: FighterCommand = {
       moveX: this.readHorizontal(),
       moveY: this.readVertical(),
@@ -114,13 +120,14 @@ export class KeyboardController implements Controller {
       jumpHeld: this.heldKeys.has("Space"),
       jumpReleased: this.consumeReleased("Space"),
       attackPressed: this.consumePressed("KeyJ"),
-      smashPressed: this.consumePressed("KeyJ") && this.hasPressedDirection(),
+      smashPressed: this.consumePressed("KeyJ") && this.smashDirectionFramesRemaining > 0,
       specialPressed: this.consumePressed("KeyK"),
       shieldHeld: this.heldKeys.has("KeyL"),
     };
 
     this.pressedKeys.clear();
     this.releasedKeys.clear();
+    this.smashDirectionFramesRemaining = Math.max(0, this.smashDirectionFramesRemaining - 1);
     return command;
   }
 
