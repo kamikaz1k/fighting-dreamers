@@ -15,7 +15,7 @@ export const movementConfig = {
   maxAirSpeed: 245,
   groundFriction: 2100,
   gravity: 1850,
-  jumpVelocity: -720,
+  jumpVelocity: -789,
   shortHopReleaseFrames: 6,
   shortHopVelocity: -420,
   maxFallSpeed: 760,
