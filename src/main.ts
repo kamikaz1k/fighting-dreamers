@@ -4,8 +4,8 @@ import { resolveAttackCollision } from "./combat";
 import {
   FIXED_TIMESTEP_SECONDS,
   MAX_ACCUMULATED_SECONDS,
-  WORLD_HEIGHT,
-  WORLD_WIDTH,
+  VIEW_HEIGHT,
+  VIEW_WIDTH,
   debugConfig,
 } from "./config";
 import { CpuController, KeyboardController, idleCommand } from "./controllers";
@@ -24,8 +24,8 @@ const controllersByFighterId = new Map<string, Controller>([
 const latestCommandsByFighterId = new Map<string, FighterCommand>();
 
 const canvas = document.createElement("canvas");
-canvas.width = WORLD_WIDTH;
-canvas.height = WORLD_HEIGHT;
+canvas.width = VIEW_WIDTH;
+canvas.height = VIEW_HEIGHT;
 
 const app = document.querySelector<HTMLDivElement>("#app");
 

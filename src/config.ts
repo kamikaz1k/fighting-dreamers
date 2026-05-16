@@ -2,6 +2,10 @@ import type { StagePlatform } from "./types";
 
 export const WORLD_WIDTH = 960;
 export const WORLD_HEIGHT = 540;
+export const VIEW_MARGIN_X = 120;
+export const VIEW_MARGIN_Y = 80;
+export const VIEW_WIDTH = WORLD_WIDTH + VIEW_MARGIN_X * 2;
+export const VIEW_HEIGHT = WORLD_HEIGHT + VIEW_MARGIN_Y * 2;
 export const FLOOR_Y = 450;
 export const STAGE_LEFT = 40;
 export const STAGE_RIGHT = 920;

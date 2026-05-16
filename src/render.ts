@@ -1,7 +1,9 @@
 import {
   FLOOR_Y,
-  WORLD_HEIGHT,
-  WORLD_WIDTH,
+  VIEW_HEIGHT,
+  VIEW_MARGIN_X,
+  VIEW_MARGIN_Y,
+  VIEW_WIDTH,
   mainPlatform,
   stagePlatforms,
 } from "./config";
@@ -25,10 +27,14 @@ export type RenderState = {
 
 export function renderGame(ctx: CanvasRenderingContext2D, state: RenderState): void {
   ctx.fillStyle = "#14181f";
-  ctx.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+  ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
+  ctx.save();
+  ctx.translate(VIEW_MARGIN_X, VIEW_MARGIN_Y);
   renderStage(ctx);
   renderFighters(ctx, state.fighters, state.debugEnabled);
+  ctx.restore();
+
   renderHud(ctx, state);
   renderRoundOverlay(ctx, state.winnerName);
 }
@@ -195,11 +201,11 @@ function renderHud(ctx: CanvasRenderingContext2D, state: RenderState): void {
   ctx.fillStyle = "#f1f5f9";
   ctx.font = "24px system-ui, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("Fighting Dreamers", WORLD_WIDTH / 2, 52);
+  ctx.fillText("Fighting Dreamers", VIEW_WIDTH / 2, 52);
 
   ctx.fillStyle = "#94a3b8";
   ctx.font = "14px system-ui, sans-serif";
-  ctx.fillText(`Debug: ${state.debugEnabled ? "on" : "off"}`, WORLD_WIDTH / 2, 82);
+  ctx.fillText(`Debug: ${state.debugEnabled ? "on" : "off"}`, VIEW_WIDTH / 2, 82);
 
   if (state.debugEnabled) {
     renderDebugHud(ctx, state);
@@ -210,9 +216,9 @@ function renderDebugHud(ctx: CanvasRenderingContext2D, state: RenderState): void
   ctx.fillStyle = "#94a3b8";
   ctx.font = "14px system-ui, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText(`Fixed timestep: ${state.simulationFrames} frames`, WORLD_WIDTH / 2, 104);
-  ctx.fillText(`Sim time: ${state.totalSimulatedSeconds.toFixed(2)}s`, WORLD_WIDTH / 2, 126);
-  ctx.fillText(`Render alpha: ${state.interpolationAlpha.toFixed(2)}`, WORLD_WIDTH / 2, 148);
+  ctx.fillText(`Fixed timestep: ${state.simulationFrames} frames`, VIEW_WIDTH / 2, 104);
+  ctx.fillText(`Sim time: ${state.totalSimulatedSeconds.toFixed(2)}s`, VIEW_WIDTH / 2, 126);
+  ctx.fillText(`Render alpha: ${state.interpolationAlpha.toFixed(2)}`, VIEW_WIDTH / 2, 148);
 
   renderCommandReadout(ctx, state);
   renderTuningReadout(ctx, state.fighters);
@@ -225,16 +231,16 @@ function renderRoundOverlay(ctx: CanvasRenderingContext2D, winnerName: string | 
   }
 
   ctx.fillStyle = "rgba(15, 17, 23, 0.52)";
-  ctx.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+  ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
   ctx.fillStyle = "#f8fafc";
   ctx.font = "34px system-ui, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText(`${winnerName} wins`, WORLD_WIDTH / 2, WORLD_HEIGHT / 2 - 12);
+  ctx.fillText(`${winnerName} wins`, VIEW_WIDTH / 2, VIEW_HEIGHT / 2 - 12);
 
   ctx.fillStyle = "#cbd5e1";
   ctx.font = "16px system-ui, sans-serif";
-  ctx.fillText("Resetting round...", WORLD_WIDTH / 2, WORLD_HEIGHT / 2 + 22);
+  ctx.fillText("Resetting round...", VIEW_WIDTH / 2, VIEW_HEIGHT / 2 + 22);
 }
 
 function renderResourceBars(ctx: CanvasRenderingContext2D, fighters: Fighter[]): void {
@@ -242,7 +248,7 @@ function renderResourceBars(ctx: CanvasRenderingContext2D, fighters: Fighter[]):
     const isLeftSide = index % 2 === 0;
     const row = Math.floor(index / 2);
     const width = 330;
-    const x = isLeftSide ? 28 : WORLD_WIDTH - 28 - width;
+    const x = isLeftSide ? 28 : VIEW_WIDTH - 28 - width;
     const y = 28 + row * 58;
 
     renderFighterBars(ctx, fighter, x, y, width, isLeftSide ? "left" : "right");
@@ -297,7 +303,7 @@ function renderCommandReadout(ctx: CanvasRenderingContext2D, state: RenderState)
 
   state.fighters.forEach((fighter, index) => {
     const command = state.latestCommandsByFighterId.get(fighter.id);
-    const y = 500 + index * 20;
+    const y = VIEW_HEIGHT - 40 + index * 20;
 
     if (!command) {
       return;
@@ -310,7 +316,7 @@ function renderCommandReadout(ctx: CanvasRenderingContext2D, state: RenderState)
     );
   });
 
-  ctx.fillText(`CPU intent: ${state.cpuIntent}`, 24, 540 - 10);
+  ctx.fillText(`CPU intent: ${state.cpuIntent}`, 24, VIEW_HEIGHT - 10);
 }
 
 function renderTuningReadout(ctx: CanvasRenderingContext2D, fighters: Fighter[]): void {
@@ -362,8 +368,8 @@ function renderControlsGuide(ctx: CanvasRenderingContext2D): void {
   const padding = 12;
   const width = 166;
   const height = padding * 2 + lines.length * lineHeight;
-  const x = WORLD_WIDTH - width - 18;
-  const y = WORLD_HEIGHT - height - 18;
+  const x = VIEW_WIDTH - width - 18;
+  const y = VIEW_HEIGHT - height - 18;
 
   ctx.fillStyle = "rgba(15, 23, 42, 0.78)";
   ctx.fillRect(x, y, width, height);

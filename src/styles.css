@@ -29,8 +29,8 @@ body {
 }
 
 canvas {
-  width: min(100vw, 177.7778vh);
-  height: min(56.25vw, 100vh);
+  width: min(100vw, 171.4286vh);
+  height: min(58.3333vw, 100vh);
   display: block;
   image-rendering: pixelated;
 }
