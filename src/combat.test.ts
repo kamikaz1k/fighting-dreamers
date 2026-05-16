@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getScaledKnockback, resolveAttackCollision } from "./combat";
+import { getLaunchSpeed, getScaledKnockback, resolveAttackCollision } from "./combat";
 import { moveDefinitions } from "./moves";
 import { createTestFighter } from "./testHelpers";
 
@@ -46,16 +46,15 @@ describe("combat", () => {
     expect(defender.damagePercent).toBe(0);
     expect(defender.shield).toBe(100 - move.shieldDamage);
     expect(defender.state).toBe("shield");
-    expect(defender.velocityX).toBe(move.knockback.x * 0.35);
+    expect(defender.velocityX).toBe(getLaunchSpeed(move, 0) * 0.35);
   });
 
   it("scales knockback with accumulated damage", () => {
     const move = moveDefinitions.forwardTilt;
 
-    expect(getScaledKnockback(move, 50)).toEqual({
-      x: move.knockback.x * 2,
-      y: move.knockback.y * 2,
-    });
+    expect(getLaunchSpeed(move, 50)).toBe(
+      move.knockback.base + move.knockback.growth * 50 + move.damage * move.knockback.damageFactor,
+    );
     expect(getScaledKnockback(move, 100).x).toBeGreaterThan(getScaledKnockback(move, 0).x);
     expect(Math.abs(getScaledKnockback(move, 100).y)).toBeGreaterThan(
       Math.abs(getScaledKnockback(move, 0).y),

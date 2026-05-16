@@ -8,7 +8,7 @@ import {
   stagePlatforms,
 } from "./config";
 import { getCharacter } from "./characters";
-import { getCurrentMove, isMoveActive } from "./combat";
+import { getCurrentMove, getLaunchSpeed, isMoveActive } from "./combat";
 import { getHurtbox, getMoveHitbox, getShieldBox } from "./geometry";
 import { clamp } from "./math";
 import type { MoveDefinition } from "./moves";
@@ -128,9 +128,14 @@ function renderMoveDebug(
     fighter.y + 72,
   );
   ctx.fillText(
-    `dmg ${move.damage} kb ${move.knockback.x},${move.knockback.y} sh ${move.shieldDamage} box ${move.hitbox.width}x${move.hitbox.height}`,
+    `dmg ${move.damage} kb b${move.knockback.base} g${move.knockback.growth} a${move.knockback.angleDeg} sh ${move.shieldDamage}`,
     fighter.x,
     fighter.y + 88,
+  );
+  ctx.fillText(
+    `launch 0/50/100 ${getLaunchSpeed(move, 0).toFixed(0)}/${getLaunchSpeed(move, 50).toFixed(0)}/${getLaunchSpeed(move, 100).toFixed(0)} box ${move.hitbox.width}x${move.hitbox.height}`,
+    fighter.x,
+    fighter.y + 104,
   );
 }
 

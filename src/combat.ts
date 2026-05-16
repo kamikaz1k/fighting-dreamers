@@ -1,6 +1,5 @@
 import { getHurtbox, getMoveHitbox, getShieldBox, rectsOverlap } from "./geometry";
 import { getCharacter } from "./characters";
-import { knockbackConfig } from "./config";
 import type { MoveDefinition } from "./moves";
 import type { Fighter } from "./types";
 
@@ -22,7 +21,7 @@ export function resolveAttackCollision(attacker: Fighter, defender: Fighter): vo
 
   if (blockedByShield) {
     defender.shield = clamp(defender.shield - move.shieldDamage, 0, defender.maxShield);
-    defender.velocityX = attacker.facing * move.knockback.x * 0.35;
+    defender.velocityX = attacker.facing * getLaunchSpeed(move, defender.damagePercent) * 0.35;
   } else {
     defender.damagePercent += move.damage;
     const knockback = getScaledKnockback(move, defender.damagePercent);
@@ -56,12 +55,19 @@ export function getScaledKnockback(
   move: MoveDefinition,
   damagePercent: number,
 ): { x: number; y: number } {
-  const scale = 1 + damagePercent * knockbackConfig.damageScalePerPercent;
+  const launchSpeed = getLaunchSpeed(move, damagePercent);
+  const angleRad = move.knockback.angleDeg * Math.PI / 180;
 
   return {
-    x: move.knockback.x * scale,
-    y: move.knockback.y * scale,
+    x: Math.cos(angleRad) * launchSpeed,
+    y: -Math.sin(angleRad) * launchSpeed,
   };
+}
+
+export function getLaunchSpeed(move: MoveDefinition, damagePercent: number): number {
+  return move.knockback.base
+    + damagePercent * move.knockback.growth
+    + move.damage * move.knockback.damageFactor;
 }
 
 export function getHitstunFrames(knockback: { x: number; y: number }): number {

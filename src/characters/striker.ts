@@ -16,27 +16,27 @@ export const strikerMoves: Record<string, MoveDefinition> = {
   forwardTilt: tuneMove(moveDefinitions.forwardTilt, {
     startupFrames: 6,
     damage: 7,
-    knockback: { x: 430, y: -60 },
+    knockback: { base: 374, growth: 8, damageFactor: 8, angleDeg: 8 },
     hitbox: { x: 30, y: -76, width: 56, height: 22 },
   }),
   sideSpecial: tuneMove(moveDefinitions.sideSpecial, {
     startupFrames: 12,
     recoveryFrames: 24,
     damage: 13,
-    knockback: { x: 660, y: -120 },
+    knockback: { base: 567, growth: 10, damageFactor: 8, angleDeg: 10 },
     hitbox: { x: 34, y: -64, width: 76, height: 30 },
   }),
   upSpecial: tuneMove(moveDefinitions.upSpecial, {
     startupFrames: 12,
     recoveryFrames: 25,
     damage: 12,
-    knockback: { x: 110, y: -690 },
+    knockback: { base: 605, growth: 10, damageFactor: 8, angleDeg: 81 },
   }),
   airSideSpecial: tuneMove(moveDefinitions.airSideSpecial, {
     startupFrames: 12,
     recoveryFrames: 27,
     damage: 12,
-    knockback: { x: 610, y: -130 },
+    knockback: { base: 528, growth: 10, damageFactor: 8, angleDeg: 12 },
     hitbox: { x: 32, y: -66, width: 76, height: 34 },
   }),
 };
