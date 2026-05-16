@@ -185,14 +185,22 @@ function getGrabbableLedgeSide(fighter: Fighter): -1 | 1 | null {
 
   const leftLedgeDistance = Math.abs(fighter.x - mainPlatform.x);
 
-  if (leftLedgeDistance <= ledgeConfig.grabWidth && fighter.x < mainPlatform.x) {
+  if (
+    leftLedgeDistance <= ledgeConfig.grabWidth
+    && fighter.x < mainPlatform.x
+    && fighter.facing === 1
+  ) {
     return -1;
   }
 
   const rightEdgeX = mainPlatform.x + mainPlatform.width;
   const rightLedgeDistance = Math.abs(fighter.x - rightEdgeX);
 
-  if (rightLedgeDistance <= ledgeConfig.grabWidth && fighter.x > rightEdgeX) {
+  if (
+    rightLedgeDistance <= ledgeConfig.grabWidth
+    && fighter.x > rightEdgeX
+    && fighter.facing === -1
+  ) {
     return 1;
   }
 
@@ -267,7 +275,8 @@ function isWithinPlatformWidth(fighter: Fighter, platform: StagePlatform): boole
 }
 
 export function canChangeFacing(fighter: Fighter): boolean {
-  return fighter.state !== "attack"
+  return fighter.grounded
+    && fighter.state !== "attack"
     && fighter.state !== "hitstun"
     && fighter.state !== "ko";
 }

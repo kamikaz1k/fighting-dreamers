@@ -31,6 +31,20 @@ describe("physics", () => {
     expect(fighter.facing).toBe(1);
   });
 
+  it("locks facing while airborne", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      y: 300,
+      facing: 1,
+    });
+
+    expect(canChangeFacing(fighter)).toBe(false);
+
+    applyMovement(fighter, { ...idleCommand, moveX: -1 });
+
+    expect(fighter.facing).toBe(1);
+  });
+
   it("allows held up to start a grounded jump after landing cooldown", () => {
     expect(shouldStartJump(
       createTestFighter({ grounded: true, landingJumpCooldownFrames: 0 }),
@@ -214,6 +228,7 @@ describe("physics", () => {
       grounded: false,
       x: mainPlatform.x - 10,
       y: mainPlatform.y + 20,
+      facing: 1,
       velocityY: 120,
     });
 
@@ -222,6 +237,21 @@ describe("physics", () => {
     expect(fighter.state).toBe("ledge");
     expect(fighter.ledgeSide).toBe(-1);
     expect(fighter.velocityY).toBe(0);
+  });
+
+  it("does not grab a ledge while facing away from it", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      x: mainPlatform.x - 10,
+      y: mainPlatform.y + 20,
+      facing: -1,
+      velocityY: 120,
+    });
+
+    applyMovement(fighter, idleCommand);
+
+    expect(fighter.state).not.toBe("ledge");
+    expect(fighter.ledgeSide).toBeNull();
   });
 
   it("recovers from ledge onto the stage with jump", () => {
