@@ -22,7 +22,7 @@ describe("game state", () => {
       grounded: false,
       damagePercent: 75,
       shield: 12,
-      currentMoveId: "groundForwardWeak",
+      currentMoveId: "forwardTilt",
       moveFrame: 8,
       hitstopFrames: 4,
       hitstunFrames: 11,
@@ -35,7 +35,7 @@ describe("game state", () => {
       },
     });
     fighter.hitFighterIdsThisMove.add("target");
-    fighter.moveCooldowns.set("groundUpStrong", 12);
+    fighter.moveCooldowns.set("upSpecial", 12);
 
     resetFighter(fighter, 500, 1);
 

@@ -5,7 +5,7 @@ import { createTestFighter } from "./testHelpers";
 
 describe("combat", () => {
   it("applies damage percent, scaled knockback, hitstun, hitstop, and hit-once tracking", () => {
-    const move = moveDefinitions.groundForwardWeak;
+    const move = moveDefinitions.forwardTilt;
     const attacker = createTestFighter({
       id: "attacker",
       x: 400,
@@ -28,7 +28,7 @@ describe("combat", () => {
   });
 
   it("uses the shield box before the hurtbox and blocks damage", () => {
-    const move = moveDefinitions.groundForwardWeak;
+    const move = moveDefinitions.forwardTilt;
     const attacker = createTestFighter({
       id: "attacker",
       x: 400,
@@ -50,7 +50,7 @@ describe("combat", () => {
   });
 
   it("scales knockback with accumulated damage", () => {
-    const move = moveDefinitions.groundForwardWeak;
+    const move = moveDefinitions.forwardTilt;
 
     expect(getScaledKnockback(move, 100).x).toBeGreaterThan(getScaledKnockback(move, 0).x);
     expect(Math.abs(getScaledKnockback(move, 100).y)).toBeGreaterThan(

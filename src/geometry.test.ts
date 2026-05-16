@@ -16,7 +16,7 @@ describe("geometry", () => {
   });
 
   it("mirrors move hitboxes around fighter facing", () => {
-    const move = moveDefinitions.groundForwardWeak;
+    const move = moveDefinitions.forwardTilt;
     const right = getMoveHitbox(createTestFighter({ x: 400, facing: 1 }), move);
     const left = getMoveHitbox(createTestFighter({ x: 400, facing: -1 }), move);
 
@@ -26,7 +26,7 @@ describe("geometry", () => {
 
   it("centers neutral aerial hitboxes on the fighter", () => {
     const fighter = createTestFighter({ x: 400, facing: 1 });
-    const hitbox = getMoveHitbox(fighter, moveDefinitions.airNeutralWeak);
+    const hitbox = getMoveHitbox(fighter, moveDefinitions.neutralAir);
 
     expect(hitbox.x).toBe(377);
     expect(hitbox.x + hitbox.width / 2).toBe(fighter.x);
@@ -36,8 +36,8 @@ describe("geometry", () => {
     const rightFacing = createTestFighter({ x: 400, facing: 1 });
     const leftFacing = createTestFighter({ x: 400, facing: -1 });
 
-    expect(getMoveHitbox(rightFacing, moveDefinitions.airBackWeak).x).toBeLessThan(rightFacing.x);
-    expect(getMoveHitbox(leftFacing, moveDefinitions.airBackWeak).x).toBeGreaterThan(leftFacing.x);
+    expect(getMoveHitbox(rightFacing, moveDefinitions.backAir).x).toBeLessThan(rightFacing.x);
+    expect(getMoveHitbox(leftFacing, moveDefinitions.backAir).x).toBeGreaterThan(leftFacing.x);
   });
 
   it("keeps shield collision separate from the body hurtbox", () => {

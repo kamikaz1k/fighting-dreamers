@@ -13,26 +13,26 @@ function tuneMove(move: MoveDefinition, overrides: Partial<MoveDefinition>): Mov
 
 export const strikerMoves: Record<string, MoveDefinition> = {
   ...moveDefinitions,
-  groundForwardWeak: tuneMove(moveDefinitions.groundForwardWeak, {
+  forwardTilt: tuneMove(moveDefinitions.forwardTilt, {
     startupFrames: 6,
     damage: 7,
     knockback: { x: 430, y: -60 },
     hitbox: { x: 30, y: -76, width: 56, height: 22 },
   }),
-  groundForwardStrong: tuneMove(moveDefinitions.groundForwardStrong, {
+  sideSpecial: tuneMove(moveDefinitions.sideSpecial, {
     startupFrames: 12,
     recoveryFrames: 24,
     damage: 13,
     knockback: { x: 660, y: -120 },
     hitbox: { x: 34, y: -64, width: 76, height: 30 },
   }),
-  groundUpStrong: tuneMove(moveDefinitions.groundUpStrong, {
+  upSpecial: tuneMove(moveDefinitions.upSpecial, {
     startupFrames: 12,
     recoveryFrames: 25,
     damage: 12,
     knockback: { x: 110, y: -690 },
   }),
-  airForwardStrong: tuneMove(moveDefinitions.airForwardStrong, {
+  airSideSpecial: tuneMove(moveDefinitions.airSideSpecial, {
     startupFrames: 12,
     recoveryFrames: 27,
     damage: 12,
@@ -65,12 +65,12 @@ export const strikerCharacter: CharacterDefinition = {
   },
   moves: strikerMoves,
   cooldowns: {
-    groundForwardStrong: 26,
-    groundBackStrong: 22,
-    groundUpStrong: 28,
-    airForwardStrong: 26,
-    airBackStrong: 22,
-    airUpStrong: 24,
-    airDownStrong: 28,
+    sideSpecial: 26,
+    backSpecial: 22,
+    upSpecial: 28,
+    airSideSpecial: 26,
+    airBackSpecial: 22,
+    airUpSpecial: 24,
+    airDownSpecial: 28,
   },
 };

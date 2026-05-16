@@ -8,9 +8,9 @@ describe("characters", () => {
 
     expect(striker.movement.maxGroundSpeed).toBeLessThan(dreamer.movement.maxGroundSpeed);
     expect(striker.shield.box.width).toBeGreaterThan(dreamer.shield.box.width);
-    expect(dreamer.moves.groundForwardStrong.damage).toBe(11);
-    expect(striker.moves.groundForwardStrong.damage).toBe(13);
-    expect(dreamer.cooldowns.groundUpStrong).toBe(20);
-    expect(striker.cooldowns.groundUpStrong).toBe(28);
+    expect(dreamer.moves.sideSpecial.damage).toBe(11);
+    expect(striker.moves.sideSpecial.damage).toBe(13);
+    expect(dreamer.cooldowns.upSpecial).toBe(20);
+    expect(striker.cooldowns.upSpecial).toBe(28);
   });
 });

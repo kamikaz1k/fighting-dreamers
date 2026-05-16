@@ -34,14 +34,14 @@ describe("move lookup", () => {
       direction: "up",
       grounded: true,
       framesRemaining: 6,
-    }).id).toBe("groundUpWeak");
+    }).id).toBe("upTilt");
 
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "up",
       grounded: false,
       framesRemaining: 6,
-    }).id).toBe("airUpWeak");
+    }).id).toBe("upAir");
   });
 
   it("selects every aerial direction", () => {
@@ -52,13 +52,13 @@ describe("move lookup", () => {
       direction: "neutral",
       grounded: false,
       framesRemaining: 6,
-    }).id).toBe("airNeutralWeak");
+    }).id).toBe("neutralAir");
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "back",
       grounded: false,
       framesRemaining: 6,
-    }).id).toBe("airBackWeak");
+    }).id).toBe("backAir");
   });
 
   it("selects moves from the fighter character moveset", () => {

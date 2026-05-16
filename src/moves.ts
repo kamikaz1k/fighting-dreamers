@@ -29,8 +29,8 @@ export type MoveDefinition = {
 };
 
 export const moveDefinitions: Record<string, MoveDefinition> = {
-  groundNeutralWeak: {
-    id: "groundNeutralWeak",
+  jab: {
+    id: "jab",
     button: "attack",
     direction: "neutral",
     context: "ground",
@@ -45,8 +45,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 4,
     movementMultiplier: 0.45,
   },
-  groundForwardWeak: {
-    id: "groundForwardWeak",
+  forwardTilt: {
+    id: "forwardTilt",
     button: "attack",
     direction: "forward",
     context: "ground",
@@ -61,8 +61,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 5,
     movementMultiplier: 0.4,
   },
-  groundBackWeak: {
-    id: "groundBackWeak",
+  backTilt: {
+    id: "backTilt",
     button: "attack",
     direction: "back",
     context: "ground",
@@ -77,8 +77,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 5,
     movementMultiplier: 0.4,
   },
-  groundUpWeak: {
-    id: "groundUpWeak",
+  upTilt: {
+    id: "upTilt",
     button: "attack",
     direction: "up",
     context: "ground",
@@ -93,8 +93,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 5,
     movementMultiplier: 0.5,
   },
-  groundDownWeak: {
-    id: "groundDownWeak",
+  downTilt: {
+    id: "downTilt",
     button: "attack",
     direction: "down",
     context: "ground",
@@ -109,8 +109,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 4,
     movementMultiplier: 0.45,
   },
-  groundNeutralStrong: {
-    id: "groundNeutralStrong",
+  neutralSpecial: {
+    id: "neutralSpecial",
     button: "special",
     direction: "neutral",
     context: "ground",
@@ -125,8 +125,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 6,
     movementMultiplier: 0.35,
   },
-  groundForwardStrong: {
-    id: "groundForwardStrong",
+  sideSpecial: {
+    id: "sideSpecial",
     button: "special",
     direction: "forward",
     context: "ground",
@@ -141,8 +141,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 7,
     movementMultiplier: 0.28,
   },
-  groundBackStrong: {
-    id: "groundBackStrong",
+  backSpecial: {
+    id: "backSpecial",
     button: "special",
     direction: "back",
     context: "ground",
@@ -157,8 +157,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 7,
     movementMultiplier: 0.28,
   },
-  groundUpStrong: {
-    id: "groundUpStrong",
+  upSpecial: {
+    id: "upSpecial",
     button: "special",
     direction: "up",
     context: "ground",
@@ -173,8 +173,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 7,
     movementMultiplier: 0.3,
   },
-  groundDownStrong: {
-    id: "groundDownStrong",
+  downSpecial: {
+    id: "downSpecial",
     button: "special",
     direction: "down",
     context: "ground",
@@ -189,8 +189,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 6,
     movementMultiplier: 0.35,
   },
-  airNeutralWeak: {
-    id: "airNeutralWeak",
+  neutralAir: {
+    id: "neutralAir",
     button: "attack",
     direction: "neutral",
     context: "air",
@@ -205,8 +205,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 4,
     movementMultiplier: 0.72,
   },
-  airForwardWeak: {
-    id: "airForwardWeak",
+  forwardAir: {
+    id: "forwardAir",
     button: "attack",
     direction: "forward",
     context: "air",
@@ -221,8 +221,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 5,
     movementMultiplier: 0.65,
   },
-  airBackWeak: {
-    id: "airBackWeak",
+  backAir: {
+    id: "backAir",
     button: "attack",
     direction: "back",
     context: "air",
@@ -237,8 +237,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 5,
     movementMultiplier: 0.65,
   },
-  airUpWeak: {
-    id: "airUpWeak",
+  upAir: {
+    id: "upAir",
     button: "attack",
     direction: "up",
     context: "air",
@@ -253,8 +253,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 5,
     movementMultiplier: 0.7,
   },
-  airDownWeak: {
-    id: "airDownWeak",
+  downAir: {
+    id: "downAir",
     button: "attack",
     direction: "down",
     context: "air",
@@ -269,8 +269,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 5,
     movementMultiplier: 0.62,
   },
-  airNeutralStrong: {
-    id: "airNeutralStrong",
+  airNeutralSpecial: {
+    id: "airNeutralSpecial",
     button: "special",
     direction: "neutral",
     context: "air",
@@ -285,8 +285,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 6,
     movementMultiplier: 0.5,
   },
-  airForwardStrong: {
-    id: "airForwardStrong",
+  airSideSpecial: {
+    id: "airSideSpecial",
     button: "special",
     direction: "forward",
     context: "air",
@@ -301,8 +301,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 7,
     movementMultiplier: 0.45,
   },
-  airBackStrong: {
-    id: "airBackStrong",
+  airBackSpecial: {
+    id: "airBackSpecial",
     button: "special",
     direction: "back",
     context: "air",
@@ -317,8 +317,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 7,
     movementMultiplier: 0.45,
   },
-  airUpStrong: {
-    id: "airUpStrong",
+  airUpSpecial: {
+    id: "airUpSpecial",
     button: "special",
     direction: "up",
     context: "air",
@@ -333,8 +333,8 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 7,
     movementMultiplier: 0.48,
   },
-  airDownStrong: {
-    id: "airDownStrong",
+  airDownSpecial: {
+    id: "airDownSpecial",
     button: "special",
     direction: "down",
     context: "air",

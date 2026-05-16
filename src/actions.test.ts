@@ -50,13 +50,13 @@ describe("actions", () => {
     updateActions(fighter, idleCommand);
 
     expect(fighter.state).toBe("attack");
-    expect(fighter.currentMoveId).toBe("groundUpStrong");
+    expect(fighter.currentMoveId).toBe("upSpecial");
     expect(fighter.bufferedAction).toBeNull();
   });
 
   it("sets and ticks character move cooldowns", () => {
     const fighter = createTestFighter();
-    const move = moveDefinitions.groundUpStrong;
+    const move = moveDefinitions.upSpecial;
 
     startAttack(fighter, move);
 
@@ -69,7 +69,7 @@ describe("actions", () => {
 
   it("uses character-specific cooldowns", () => {
     const fighter = createTestFighter({ characterId: "striker" });
-    const move = moveDefinitions.groundUpStrong;
+    const move = moveDefinitions.upSpecial;
 
     startAttack(fighter, move);
 
@@ -85,7 +85,7 @@ describe("actions", () => {
         framesRemaining: 4,
       },
     });
-    fighter.moveCooldowns.set("groundUpStrong", 5);
+    fighter.moveCooldowns.set("upSpecial", 5);
 
     updateActions(fighter, idleCommand);
 
@@ -96,7 +96,7 @@ describe("actions", () => {
 
   it("advances and ends attack recovery", () => {
     const fighter = createTestFighter();
-    const move = moveDefinitions.groundNeutralWeak;
+    const move = moveDefinitions.jab;
 
     startAttack(fighter, move);
     fighter.moveFrame = move.startupFrames + move.activeFrames + move.recoveryFrames - 1;
