@@ -28,6 +28,7 @@ export type MoveDefinition = {
   hitstopFrames: number;
   movementMultiplier?: number;
   selfVelocity?: { x: number; y: number };
+  cooldownKey?: string;
 };
 
 export const moveDefinitions: Record<string, MoveDefinition> = {
@@ -194,6 +195,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 7,
     movementMultiplier: 0.3,
     selfVelocity: { x: 0, y: -860 },
+    cooldownKey: "upSpecial",
   },
   downSpecial: {
     id: "downSpecial",
@@ -339,6 +341,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitstopFrames: 7,
     movementMultiplier: 0.48,
     selfVelocity: { x: 0, y: -860 },
+    cooldownKey: "upSpecial",
   },
   airDownSpecial: {
     id: "airDownSpecial",

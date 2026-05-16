@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { inputConfig } from "./config";
 import {
+  getMoveCooldown,
   startAttack,
   updateActions,
   updateAttack,
@@ -90,6 +91,14 @@ describe("actions", () => {
     startAttack(fighter, move);
 
     expect(fighter.moveCooldowns.get(move.id)).toBe(28);
+  });
+
+  it("shares cooldown between grounded and aerial up special", () => {
+    const fighter = createTestFighter();
+
+    startAttack(fighter, moveDefinitions.upSpecial);
+
+    expect(getMoveCooldown(fighter, moveDefinitions.airUpSpecial)).toBe(20);
   });
 
   it("launches the fighter when starting up special", () => {
