@@ -46,14 +46,19 @@ describe("physics", () => {
     expect(fighter.facing).toBe(1);
   });
 
-  it("allows held up to start a grounded jump after landing cooldown", () => {
+  it("requires jump press to start a grounded jump after landing cooldown", () => {
     expect(shouldStartJump(
       createTestFighter({ grounded: true, landingJumpCooldownFrames: 0 }),
-      { ...idleCommand, moveY: -1 },
+      { ...idleCommand, jumpPressed: true },
     )).toBe(true);
 
     expect(shouldStartJump(
       createTestFighter({ grounded: true, landingJumpCooldownFrames: 1 }),
+      { ...idleCommand, jumpPressed: true },
+    )).toBe(false);
+
+    expect(shouldStartJump(
+      createTestFighter({ grounded: true, landingJumpCooldownFrames: 0 }),
       { ...idleCommand, moveY: -1 },
     )).toBe(false);
   });

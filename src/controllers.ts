@@ -110,9 +110,9 @@ export class KeyboardController implements Controller {
     const command: FighterCommand = {
       moveX: this.readHorizontal(),
       moveY: this.readVertical(),
-      jumpPressed: this.consumePressed("KeyW"),
-      jumpHeld: this.heldKeys.has("KeyW"),
-      jumpReleased: this.consumeReleased("KeyW"),
+      jumpPressed: this.consumePressed("Space"),
+      jumpHeld: this.heldKeys.has("Space"),
+      jumpReleased: this.consumeReleased("Space"),
       attackPressed: this.consumePressed("KeyJ"),
       smashPressed: this.consumePressed("KeyJ") && this.hasPressedDirection(),
       specialPressed: this.consumePressed("KeyK"),

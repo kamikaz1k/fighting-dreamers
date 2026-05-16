@@ -357,7 +357,8 @@ function renderControlsGuide(ctx: CanvasRenderingContext2D): void {
   const lines = [
     "Controls",
     "A/D: move + face",
-    "W: jump / up",
+    "W: up",
+    "Space: jump",
     "S: down",
     "J: attack",
     "K: special",
