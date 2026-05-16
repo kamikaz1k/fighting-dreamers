@@ -69,3 +69,11 @@ export const stagePlatforms = [
   { id: "topPlatform", x: 375, y: 204, width: 210, height: 12 },
   { id: "rightPlatform", x: 660, y: 306, width: 210, height: 12 },
 ] satisfies StagePlatform[];
+
+export const mainPlatform = {
+  id: "mainPlatform",
+  x: STAGE_LEFT,
+  y: FLOOR_Y,
+  width: STAGE_RIGHT - STAGE_LEFT,
+  height: 24,
+} satisfies StagePlatform;

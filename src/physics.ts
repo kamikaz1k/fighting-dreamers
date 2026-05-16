@@ -1,6 +1,7 @@
 import {
   FIXED_TIMESTEP_SECONDS,
   FLOOR_Y,
+  mainPlatform,
   stagePlatforms,
 } from "./config";
 import { getCharacter } from "./characters";
@@ -99,7 +100,7 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
     return;
   }
 
-  if (fighter.y >= FLOOR_Y) {
+  if (canLandOnMainPlatform(fighter, previousY)) {
     landFighter(fighter, FLOOR_Y, wasGrounded, movement.maxAirJumps);
   }
 }
@@ -126,11 +127,18 @@ function landFighter(
 }
 
 function isSupported(fighter: Fighter): boolean {
-  if (fighter.y >= FLOOR_Y) {
+  if (isOnPlatform(fighter, mainPlatform)) {
     return true;
   }
 
   return stagePlatforms.some((platform) => isOnPlatform(fighter, platform));
+}
+
+function canLandOnMainPlatform(fighter: Fighter, previousY: number): boolean {
+  return fighter.velocityY >= 0
+    && previousY <= mainPlatform.y
+    && fighter.y >= mainPlatform.y
+    && isWithinPlatformWidth(fighter, mainPlatform);
 }
 
 function isOnAnyPlatform(fighter: Fighter): boolean {

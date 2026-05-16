@@ -2,6 +2,7 @@ import {
   FLOOR_Y,
   WORLD_HEIGHT,
   WORLD_WIDTH,
+  mainPlatform,
   stagePlatforms,
 } from "./config";
 import { getCharacter } from "./characters";
@@ -34,17 +35,14 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: RenderState): v
 
 function renderStage(ctx: CanvasRenderingContext2D): void {
   ctx.fillStyle = "#1f2937";
-  ctx.fillRect(0, FLOOR_Y, WORLD_WIDTH, WORLD_HEIGHT - FLOOR_Y);
+  ctx.fillRect(mainPlatform.x, mainPlatform.y, mainPlatform.width, mainPlatform.height);
 
   ctx.fillStyle = "#252c38";
-  ctx.fillRect(0, FLOOR_Y, WORLD_WIDTH, 8);
+  ctx.fillRect(mainPlatform.x, FLOOR_Y, mainPlatform.width, 8);
 
   ctx.strokeStyle = "#475569";
   ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(40, FLOOR_Y + 1);
-  ctx.lineTo(WORLD_WIDTH - 40, FLOOR_Y + 1);
-  ctx.stroke();
+  ctx.strokeRect(mainPlatform.x, mainPlatform.y, mainPlatform.width, mainPlatform.height);
 
   for (const platform of stagePlatforms) {
     ctx.fillStyle = "#334155";

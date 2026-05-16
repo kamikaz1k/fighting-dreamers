@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { movementConfig, stagePlatforms } from "./config";
+import { mainPlatform, movementConfig, stagePlatforms } from "./config";
 import {
   applyMovement,
   canChangeFacing,
@@ -165,6 +165,33 @@ describe("physics", () => {
     expect(fighter.landingJumpCooldownFrames).toBe(movementConfig.landingJumpCooldownFrames);
     expect(fighter.airJumpsRemaining).toBe(movementConfig.maxAirJumps);
     expect(fighter.fastFalling).toBe(false);
+  });
+
+  it("falls after walking off the main platform", () => {
+    const fighter = createTestFighter({
+      x: mainPlatform.x + mainPlatform.width + 60,
+      y: mainPlatform.y,
+      grounded: true,
+    });
+
+    applyMovement(fighter, idleCommand);
+
+    expect(fighter.grounded).toBe(false);
+    expect(fighter.y).toBeGreaterThan(mainPlatform.y);
+  });
+
+  it("does not land on empty space beside the main platform", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      x: mainPlatform.x - 60,
+      y: mainPlatform.y - 2,
+      velocityY: 180,
+    });
+
+    applyMovement(fighter, idleCommand);
+
+    expect(fighter.grounded).toBe(false);
+    expect(fighter.y).toBeGreaterThan(mainPlatform.y);
   });
 
   it("lands on a platform from above", () => {
