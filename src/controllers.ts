@@ -8,6 +8,7 @@ export const idleCommand: FighterCommand = {
   jumpHeld: false,
   jumpReleased: false,
   attackPressed: false,
+  smashPressed: false,
   specialPressed: false,
   shieldHeld: false,
 };
@@ -113,6 +114,7 @@ export class KeyboardController implements Controller {
       jumpHeld: this.heldKeys.has("KeyW"),
       jumpReleased: this.consumeReleased("KeyW"),
       attackPressed: this.consumePressed("KeyJ"),
+      smashPressed: this.consumePressed("KeyJ") && this.hasPressedDirection(),
       specialPressed: this.consumePressed("KeyK"),
       shieldHeld: this.heldKeys.has("KeyL"),
     };
@@ -150,5 +152,12 @@ export class KeyboardController implements Controller {
 
   private consumeReleased(code: string): boolean {
     return this.releasedKeys.has(code);
+  }
+
+  private hasPressedDirection(): boolean {
+    return this.pressedKeys.has("KeyA")
+      || this.pressedKeys.has("KeyD")
+      || this.pressedKeys.has("KeyW")
+      || this.pressedKeys.has("KeyS");
   }
 }

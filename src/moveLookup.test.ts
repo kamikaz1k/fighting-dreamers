@@ -10,6 +10,7 @@ const idleCommand: FighterCommand = {
   jumpHeld: false,
   jumpReleased: false,
   attackPressed: false,
+  smashPressed: false,
   specialPressed: false,
   shieldHeld: false,
 };
@@ -32,6 +33,7 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "up",
+      smash: false,
       grounded: true,
       framesRemaining: 6,
     }).id).toBe("upTilt");
@@ -39,6 +41,7 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "up",
+      smash: false,
       grounded: false,
       framesRemaining: 6,
     }).id).toBe("upAir");
@@ -50,12 +53,14 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "neutral",
+      smash: false,
       grounded: false,
       framesRemaining: 6,
     }).id).toBe("neutralAir");
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "back",
+      smash: false,
       grounded: false,
       framesRemaining: 6,
     }).id).toBe("backAir");
@@ -67,9 +72,22 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "back",
+      smash: false,
       grounded: true,
       framesRemaining: 6,
     }).id).toBe("forwardTilt");
+  });
+
+  it("selects smash attacks from grounded smash input", () => {
+    const fighter = createTestFighter();
+
+    expect(getMoveForBufferedAction(fighter, {
+      button: "attack",
+      direction: "up",
+      smash: true,
+      grounded: true,
+      framesRemaining: 6,
+    }).id).toBe("upSmash");
   });
 
   it("selects moves from the fighter character moveset", () => {
@@ -79,6 +97,7 @@ describe("move lookup", () => {
     const action = {
       button: "special" as const,
       direction: "forward" as const,
+      smash: false,
       grounded: true,
       framesRemaining: 6,
     };

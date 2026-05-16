@@ -30,6 +30,7 @@ describe("game state", () => {
       bufferedAction: {
         button: "attack",
         direction: "forward",
+        smash: false,
         grounded: true,
         framesRemaining: 2,
       },

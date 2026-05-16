@@ -8,6 +8,7 @@ export function getMoveForBufferedAction(fighter: Fighter, action: BufferedActio
   const move = Object.values(character.moves).find((definition) => {
     return definition.button === action.button
       && definition.direction === direction
+      && Boolean(definition.smash) === action.smash
       && definition.context === (action.grounded ? "ground" : "air");
   });
 

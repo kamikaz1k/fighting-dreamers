@@ -16,6 +16,7 @@ export type MoveDefinition = {
   button: MoveButton;
   direction: MoveDirection;
   context: MoveContext;
+  smash?: boolean;
   role: MoveRole;
   startupFrames: number;
   activeFrames: number;
@@ -92,6 +93,57 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     shieldDamage: 13,
     hitstopFrames: 4,
     movementMultiplier: 0.45,
+  },
+  forwardSmash: {
+    id: "forwardSmash",
+    button: "attack",
+    direction: "forward",
+    context: "ground",
+    smash: true,
+    role: "long-poke",
+    startupFrames: 12,
+    activeFrames: 5,
+    recoveryFrames: 24,
+    damage: 14,
+    knockback: { x: 640, y: -130 },
+    hitbox: { x: 30, y: -64, width: 72, height: 32 },
+    shieldDamage: 24,
+    hitstopFrames: 8,
+    movementMultiplier: 0.25,
+  },
+  upSmash: {
+    id: "upSmash",
+    button: "attack",
+    direction: "up",
+    context: "ground",
+    smash: true,
+    role: "heavy-pop-up",
+    startupFrames: 11,
+    activeFrames: 6,
+    recoveryFrames: 25,
+    damage: 13,
+    knockback: { x: 120, y: -700 },
+    hitbox: { x: -18, y: -136, width: 56, height: 62 },
+    shieldDamage: 22,
+    hitstopFrames: 8,
+    movementMultiplier: 0.25,
+  },
+  downSmash: {
+    id: "downSmash",
+    button: "attack",
+    direction: "down",
+    context: "ground",
+    smash: true,
+    role: "close-low",
+    startupFrames: 10,
+    activeFrames: 6,
+    recoveryFrames: 23,
+    damage: 12,
+    knockback: { x: 520, y: 240 },
+    hitbox: { x: -38, y: -34, width: 96, height: 32 },
+    shieldDamage: 22,
+    hitstopFrames: 8,
+    movementMultiplier: 0.25,
   },
   neutralSpecial: {
     id: "neutralSpecial",

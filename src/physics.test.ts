@@ -16,6 +16,7 @@ const idleCommand: FighterCommand = {
   jumpHeld: false,
   jumpReleased: false,
   attackPressed: false,
+  smashPressed: false,
   specialPressed: false,
   shieldHeld: false,
 };
@@ -70,6 +71,15 @@ describe("physics", () => {
 
     expect(fighter.state).toBe("jump");
     expect(fighter.grounded).toBe(false);
+  });
+
+  it("does not start a grounded jump while attacking", () => {
+    const fighter = createTestFighter({
+      state: "attack",
+      grounded: true,
+    });
+
+    expect(shouldStartJump(fighter, { ...idleCommand, jumpPressed: true })).toBe(false);
   });
 
   it("consumes one air jump while airborne", () => {

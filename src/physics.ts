@@ -305,6 +305,10 @@ export function shouldStartJump(fighter: Fighter, command: FighterCommand): bool
     return false;
   }
 
+  if (fighter.state === "attack") {
+    return false;
+  }
+
   if (fighter.grounded) {
     const wantsGroundJump = command.jumpPressed || command.moveY === -1;
     return wantsGroundJump && fighter.landingJumpCooldownFrames === 0;

@@ -109,6 +109,7 @@ export function updateInputBuffer(fighter: Fighter, command: FighterCommand): vo
     fighter.bufferedAction = {
       button: command.attackPressed ? "attack" : "special",
       direction: getMoveDirection(fighter, command),
+      smash: fighter.grounded && command.attackPressed && command.smashPressed,
       grounded: fighter.grounded,
       framesRemaining: inputConfig.bufferFrames,
     };

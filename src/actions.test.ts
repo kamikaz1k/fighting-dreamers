@@ -19,6 +19,7 @@ const idleCommand: FighterCommand = {
   jumpHeld: false,
   jumpReleased: false,
   attackPressed: false,
+  smashPressed: false,
   specialPressed: false,
   shieldHeld: false,
 };
@@ -32,9 +33,23 @@ describe("actions", () => {
     expect(fighter.bufferedAction).toEqual({
       button: "attack",
       direction: "forward",
+      smash: false,
       grounded: true,
       framesRemaining: inputConfig.bufferFrames,
     });
+  });
+
+  it("buffers grounded smash attacks separately from tilts", () => {
+    const fighter = createTestFighter({ facing: 1, grounded: true });
+
+    updateInputBuffer(fighter, {
+      ...idleCommand,
+      moveX: 1,
+      attackPressed: true,
+      smashPressed: true,
+    });
+
+    expect(fighter.bufferedAction?.smash).toBe(true);
   });
 
   it("starts a buffered attack when actionable", () => {
@@ -42,6 +57,7 @@ describe("actions", () => {
       bufferedAction: {
         button: "special",
         direction: "up",
+        smash: false,
         grounded: true,
         framesRemaining: 4,
       },
@@ -81,6 +97,7 @@ describe("actions", () => {
       bufferedAction: {
         button: "special",
         direction: "up",
+        smash: false,
         grounded: true,
         framesRemaining: 4,
       },

@@ -5,6 +5,7 @@ export type FighterState = "idle" | "run" | "crouch" | "jump" | "fall" | "ledge"
 export type BufferedAction = {
   button: MoveButton;
   direction: MoveDirection;
+  smash: boolean;
   grounded: boolean;
   framesRemaining: number;
 };
@@ -48,6 +49,7 @@ export type FighterCommand = {
   jumpHeld: boolean;
   jumpReleased: boolean;
   attackPressed: boolean;
+  smashPressed: boolean;
   specialPressed: boolean;
   shieldHeld: boolean;
 };
