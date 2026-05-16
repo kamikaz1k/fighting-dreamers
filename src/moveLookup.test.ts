@@ -44,6 +44,23 @@ describe("move lookup", () => {
     }).id).toBe("airUpWeak");
   });
 
+  it("selects every aerial direction", () => {
+    const fighter = createTestFighter();
+
+    expect(getMoveForBufferedAction(fighter, {
+      button: "weak",
+      direction: "neutral",
+      grounded: false,
+      framesRemaining: 6,
+    }).id).toBe("airNeutralWeak");
+    expect(getMoveForBufferedAction(fighter, {
+      button: "weak",
+      direction: "back",
+      grounded: false,
+      framesRemaining: 6,
+    }).id).toBe("airBackWeak");
+  });
+
   it("selects moves from the fighter character moveset", () => {
     const dreamer = createTestFighter({ characterId: "dreamer" });
     const striker = createTestFighter({ characterId: "striker" });

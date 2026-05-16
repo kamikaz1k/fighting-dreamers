@@ -24,6 +24,22 @@ describe("geometry", () => {
     expect(left.x).toBe(324);
   });
 
+  it("centers neutral aerial hitboxes on the fighter", () => {
+    const fighter = createTestFighter({ x: 400, facing: 1 });
+    const hitbox = getMoveHitbox(fighter, moveDefinitions.airNeutralWeak);
+
+    expect(hitbox.x).toBe(377);
+    expect(hitbox.x + hitbox.width / 2).toBe(fighter.x);
+  });
+
+  it("places back aerial hitboxes behind the fighter", () => {
+    const rightFacing = createTestFighter({ x: 400, facing: 1 });
+    const leftFacing = createTestFighter({ x: 400, facing: -1 });
+
+    expect(getMoveHitbox(rightFacing, moveDefinitions.airBackWeak).x).toBeLessThan(rightFacing.x);
+    expect(getMoveHitbox(leftFacing, moveDefinitions.airBackWeak).x).toBeGreaterThan(leftFacing.x);
+  });
+
   it("keeps shield collision separate from the body hurtbox", () => {
     const fighter = createTestFighter();
 
