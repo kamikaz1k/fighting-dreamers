@@ -34,7 +34,7 @@ export function updateActions(fighter: Fighter, command: FighterCommand): void {
   updateMoveCooldowns(fighter);
   updateInputBuffer(fighter, command);
 
-  if (fighter.state === "hitstun" || fighter.state === "ko") {
+  if (fighter.state === "hitstun" || fighter.state === "ledge" || fighter.state === "ko") {
     return;
   }
 

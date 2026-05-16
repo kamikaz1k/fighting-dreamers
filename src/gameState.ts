@@ -64,6 +64,7 @@ export function createFighter(config: {
     jumpHoldFrames: 0,
     jumpCutApplied: false,
     fastFalling: false,
+    ledgeSide: null,
     damagePercent: 0,
     shield: character.maxShield,
     maxShield: character.maxShield,
@@ -151,6 +152,7 @@ export function resetFighter(fighter: Fighter, x: number, facing: -1 | 1): void 
   fighter.jumpHoldFrames = 0;
   fighter.jumpCutApplied = false;
   fighter.fastFalling = false;
+  fighter.ledgeSide = null;
   fighter.damagePercent = 0;
   fighter.shield = fighter.maxShield;
   fighter.currentMoveId = null;

@@ -24,6 +24,7 @@ export function createTestFighter(overrides: Partial<Fighter> = {}): Fighter {
     jumpHoldFrames: 0,
     jumpCutApplied: false,
     fastFalling: false,
+    ledgeSide: null,
     damagePercent: 0,
     shield: character.maxShield,
     maxShield: character.maxShield,

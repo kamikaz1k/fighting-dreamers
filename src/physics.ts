@@ -1,6 +1,7 @@
 import {
   FIXED_TIMESTEP_SECONDS,
   FLOOR_Y,
+  ledgeConfig,
   mainPlatform,
   stagePlatforms,
 } from "./config";
@@ -13,6 +14,7 @@ export function updateMovementState(fighter: Fighter): void {
   if (
     fighter.state === "attack"
     || fighter.state === "shield"
+    || fighter.state === "ledge"
     || fighter.state === "hitstun"
     || fighter.state === "ko"
   ) {
@@ -32,6 +34,11 @@ export function updateMovementState(fighter: Fighter): void {
 }
 
 export function applyMovement(fighter: Fighter, command: FighterCommand): void {
+  if (fighter.state === "ledge") {
+    updateLedgeState(fighter, command);
+    return;
+  }
+
   const wasGrounded = fighter.grounded;
   const previousY = fighter.y;
   const movement = getCharacter(fighter.characterId).movement;
@@ -98,6 +105,13 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
     fighter.velocityY = 0;
   }
 
+  const ledgeSide = getGrabbableLedgeSide(fighter);
+
+  if (ledgeSide) {
+    grabLedge(fighter, ledgeSide);
+    return;
+  }
+
   const platform = getLandingPlatform(fighter, previousY, command);
 
   if (platform) {
@@ -123,6 +137,7 @@ function landFighter(
   fighter.jumpHoldFrames = 0;
   fighter.jumpCutApplied = false;
   fighter.fastFalling = false;
+  fighter.ledgeSide = null;
 
   if (!wasGrounded) {
     fighter.landingJumpCooldownFrames = getCharacter(
@@ -155,6 +170,63 @@ function hitsMainPlatformUnderside(fighter: Fighter, previousY: number): boolean
     && previousTop >= undersideY
     && currentTop <= undersideY
     && isWithinPlatformWidth(fighter, mainPlatform);
+}
+
+function getGrabbableLedgeSide(fighter: Fighter): -1 | 1 | null {
+  if (fighter.grounded || fighter.velocityY < 0 || fighter.state === "hitstun") {
+    return null;
+  }
+
+  const verticalDistance = fighter.y - mainPlatform.y;
+
+  if (verticalDistance < 0 || verticalDistance > ledgeConfig.grabHeight) {
+    return null;
+  }
+
+  const leftLedgeDistance = Math.abs(fighter.x - mainPlatform.x);
+
+  if (leftLedgeDistance <= ledgeConfig.grabWidth && fighter.x < mainPlatform.x) {
+    return -1;
+  }
+
+  const rightEdgeX = mainPlatform.x + mainPlatform.width;
+  const rightLedgeDistance = Math.abs(fighter.x - rightEdgeX);
+
+  if (rightLedgeDistance <= ledgeConfig.grabWidth && fighter.x > rightEdgeX) {
+    return 1;
+  }
+
+  return null;
+}
+
+function grabLedge(fighter: Fighter, side: -1 | 1): void {
+  const edgeX = side === -1 ? mainPlatform.x : mainPlatform.x + mainPlatform.width;
+
+  fighter.state = "ledge";
+  fighter.ledgeSide = side;
+  fighter.x = edgeX + side * ledgeConfig.hangInset;
+  fighter.y = mainPlatform.y + fighter.height;
+  fighter.velocityX = 0;
+  fighter.velocityY = 0;
+  fighter.grounded = false;
+  fighter.fastFalling = false;
+}
+
+function updateLedgeState(fighter: Fighter, command: FighterCommand): void {
+  if (!command.jumpPressed || !fighter.ledgeSide) {
+    return;
+  }
+
+  const edgeX = fighter.ledgeSide === -1
+    ? mainPlatform.x
+    : mainPlatform.x + mainPlatform.width;
+
+  fighter.x = edgeX - fighter.ledgeSide * (fighter.width / 2 + ledgeConfig.climbInset);
+  fighter.y = mainPlatform.y;
+  fighter.grounded = true;
+  fighter.ledgeSide = null;
+  fighter.state = "idle";
+  fighter.airJumpsRemaining = getCharacter(fighter.characterId).movement.maxAirJumps;
 }
 
 function isOnAnyPlatform(fighter: Fighter): boolean {
@@ -242,6 +314,7 @@ export function startJump(fighter: Fighter): void {
   fighter.jumpHoldFrames = 0;
   fighter.jumpCutApplied = false;
   fighter.fastFalling = false;
+  fighter.ledgeSide = null;
 
   if (fighter.state === "shield") {
     fighter.state = "jump";

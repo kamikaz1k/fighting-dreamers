@@ -81,3 +81,10 @@ export const mainPlatform = {
   width: STAGE_RIGHT - STAGE_LEFT,
   height: 24,
 } satisfies StagePlatform;
+
+export const ledgeConfig = {
+  grabWidth: 42,
+  grabHeight: 92,
+  hangInset: 12,
+  climbInset: 18,
+};

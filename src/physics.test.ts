@@ -209,6 +209,41 @@ describe("physics", () => {
     expect(fighter.grounded).toBe(false);
   });
 
+  it("grabs a ledge while falling near the main platform edge", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      x: mainPlatform.x - 10,
+      y: mainPlatform.y + 20,
+      velocityY: 120,
+    });
+
+    applyMovement(fighter, idleCommand);
+
+    expect(fighter.state).toBe("ledge");
+    expect(fighter.ledgeSide).toBe(-1);
+    expect(fighter.velocityY).toBe(0);
+  });
+
+  it("recovers from ledge onto the stage with jump", () => {
+    const fighter = createTestFighter({
+      grounded: false,
+      state: "ledge",
+      ledgeSide: 1,
+      x: mainPlatform.x + mainPlatform.width + 12,
+      y: mainPlatform.y + 83,
+      airJumpsRemaining: 0,
+    });
+
+    applyMovement(fighter, { ...idleCommand, jumpPressed: true });
+
+    expect(fighter.state).toBe("idle");
+    expect(fighter.grounded).toBe(true);
+    expect(fighter.ledgeSide).toBeNull();
+    expect(fighter.x).toBeLessThan(mainPlatform.x + mainPlatform.width);
+    expect(fighter.y).toBe(mainPlatform.y);
+    expect(fighter.airJumpsRemaining).toBe(movementConfig.maxAirJumps);
+  });
+
   it("lands on a platform from above", () => {
     const platform = stagePlatforms[0];
     const fighter = createTestFighter({
