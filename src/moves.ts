@@ -141,7 +141,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     activeFrames: 6,
     recoveryFrames: 29,
     damage: 12,
-    knockback: { x: 650, y: 300 },
+    knockback: { x: 650, y: -180 },
     hitbox: { x: -38, y: -34, width: 96, height: 32 },
     shieldDamage: 22,
     hitstopFrames: 8,
