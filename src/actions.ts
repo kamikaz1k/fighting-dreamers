@@ -7,7 +7,7 @@ import {
 import { clamp, moveToward } from "./math";
 import { getMoveDirection, getMoveForBufferedAction } from "./moveLookup";
 import type { MoveDefinition } from "./moves";
-import type { Fighter, FighterCommand } from "./types";
+import type { BufferedAction, Fighter, FighterCommand } from "./types";
 
 export function updateHitstop(fighter: Fighter): boolean {
   if (fighter.hitstopFrames <= 0) {
@@ -58,7 +58,7 @@ export function updateActions(fighter: Fighter, command: FighterCommand): void {
       return;
     }
 
-    startAttack(fighter, move);
+    startAttack(fighter, move, bufferedAction);
     fighter.bufferedAction = null;
   }
 }
@@ -109,6 +109,7 @@ export function updateInputBuffer(fighter: Fighter, command: FighterCommand): vo
     fighter.bufferedAction = {
       button: command.attackPressed ? "attack" : "special",
       direction: getMoveDirection(fighter, command),
+      moveX: command.moveX,
       smash: fighter.grounded && command.attackPressed && command.smashPressed,
       grounded: fighter.grounded,
       framesRemaining: inputConfig.bufferFrames,
@@ -127,14 +128,19 @@ export function updateInputBuffer(fighter: Fighter, command: FighterCommand): vo
   }
 }
 
-export function startAttack(fighter: Fighter, move: MoveDefinition): void {
+export function startAttack(
+  fighter: Fighter,
+  move: MoveDefinition,
+  action?: BufferedAction,
+): void {
   fighter.state = "attack";
   fighter.currentMoveId = move.id;
   fighter.moveFrame = 0;
   fighter.hitFighterIdsThisMove.clear();
 
   if (move.selfVelocity) {
-    fighter.velocityX = fighter.facing * move.selfVelocity.x;
+    const direction = getSelfVelocityDirection(fighter, move, action);
+    fighter.velocityX = direction * move.selfVelocity.x;
     fighter.velocityY = move.selfVelocity.y;
     fighter.grounded = false;
   }
@@ -182,4 +188,17 @@ function getCooldownKey(move: MoveDefinition): string {
 
 function canUseMove(fighter: Fighter, move: MoveDefinition): boolean {
   return getCooldownKey(move) !== "upSpecial" || fighter.upSpecialAvailable;
+}
+
+function getSelfVelocityDirection(
+  fighter: Fighter,
+  move: MoveDefinition,
+  action?: BufferedAction,
+): -1 | 0 | 1 {
+  if (getCooldownKey(move) === "upSpecial" && action?.moveX) {
+    fighter.facing = action.moveX;
+    return action.moveX;
+  }
+
+  return move.selfVelocity?.x === 0 ? 0 : fighter.facing;
 }

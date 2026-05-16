@@ -194,7 +194,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     shieldDamage: 20,
     hitstopFrames: 7,
     movementMultiplier: 0.3,
-    selfVelocity: { x: 0, y: -860 },
+    selfVelocity: { x: 260, y: -860 },
     cooldownKey: "upSpecial",
   },
   downSpecial: {
@@ -340,7 +340,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     shieldDamage: 20,
     hitstopFrames: 7,
     movementMultiplier: 0.48,
-    selfVelocity: { x: 0, y: -860 },
+    selfVelocity: { x: 260, y: -860 },
     cooldownKey: "upSpecial",
   },
   airDownSpecial: {

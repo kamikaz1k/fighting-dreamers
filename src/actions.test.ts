@@ -34,6 +34,7 @@ describe("actions", () => {
     expect(fighter.bufferedAction).toEqual({
       button: "attack",
       direction: "forward",
+      moveX: 1,
       smash: false,
       grounded: true,
       framesRemaining: inputConfig.bufferFrames,
@@ -58,6 +59,7 @@ describe("actions", () => {
       bufferedAction: {
         button: "special",
         direction: "up",
+        moveX: 0,
         smash: false,
         grounded: true,
         framesRemaining: 4,
@@ -108,6 +110,7 @@ describe("actions", () => {
       bufferedAction: {
         button: "special",
         direction: "up",
+        moveX: 0,
         smash: false,
         grounded: false,
         framesRemaining: 4,
@@ -130,11 +133,28 @@ describe("actions", () => {
     expect(fighter.velocityY).toBe(moveDefinitions.upSpecial.selfVelocity?.y);
   });
 
+  it("aims up special from buffered horizontal input", () => {
+    const fighter = createTestFighter({ facing: 1 });
+
+    startAttack(fighter, moveDefinitions.upSpecial, {
+      button: "special",
+      direction: "up",
+      moveX: -1,
+      smash: false,
+      grounded: false,
+      framesRemaining: 4,
+    });
+
+    expect(fighter.facing).toBe(-1);
+    expect(fighter.velocityX).toBe(-(moveDefinitions.upSpecial.selfVelocity?.x ?? 0));
+  });
+
   it("does not consume buffered action while matching move is cooling down", () => {
     const fighter = createTestFighter({
       bufferedAction: {
         button: "special",
         direction: "up",
+        moveX: 0,
         smash: false,
         grounded: true,
         framesRemaining: 4,

@@ -33,6 +33,7 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "up",
+        moveX: 0,
       smash: false,
       grounded: true,
       framesRemaining: 6,
@@ -41,6 +42,7 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "up",
+        moveX: 0,
       smash: false,
       grounded: false,
       framesRemaining: 6,
@@ -53,6 +55,7 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "neutral",
+        moveX: 0,
       smash: false,
       grounded: false,
       framesRemaining: 6,
@@ -60,6 +63,7 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "back",
+        moveX: 0,
       smash: false,
       grounded: false,
       framesRemaining: 6,
@@ -72,6 +76,7 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "back",
+        moveX: 0,
       smash: false,
       grounded: true,
       framesRemaining: 6,
@@ -84,6 +89,7 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "attack",
       direction: "up",
+        moveX: 0,
       smash: true,
       grounded: true,
       framesRemaining: 6,
@@ -96,6 +102,7 @@ describe("move lookup", () => {
     expect(getMoveForBufferedAction(fighter, {
       button: "special",
       direction: "back",
+        moveX: 0,
       smash: false,
       grounded: true,
       framesRemaining: 6,
@@ -109,6 +116,7 @@ describe("move lookup", () => {
     const action = {
       button: "special" as const,
       direction: "forward" as const,
+      moveX: 0 as const,
       smash: false,
       grounded: true,
       framesRemaining: 6,
