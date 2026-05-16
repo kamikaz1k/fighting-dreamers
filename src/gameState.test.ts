@@ -28,7 +28,7 @@ describe("game state", () => {
       hitstunFrames: 11,
       landingJumpCooldownFrames: 3,
       bufferedAction: {
-        button: "weak",
+        button: "attack",
         direction: "forward",
         grounded: true,
         framesRemaining: 2,

@@ -9,8 +9,8 @@ const idleCommand: FighterCommand = {
   jumpPressed: false,
   jumpHeld: false,
   jumpReleased: false,
-  weakPressed: false,
-  strongPressed: false,
+  attackPressed: false,
+  specialPressed: false,
   shieldHeld: false,
 };
 
@@ -30,14 +30,14 @@ describe("move lookup", () => {
     const fighter = createTestFighter();
 
     expect(getMoveForBufferedAction(fighter, {
-      button: "weak",
+      button: "attack",
       direction: "up",
       grounded: true,
       framesRemaining: 6,
     }).id).toBe("groundUpWeak");
 
     expect(getMoveForBufferedAction(fighter, {
-      button: "weak",
+      button: "attack",
       direction: "up",
       grounded: false,
       framesRemaining: 6,
@@ -48,13 +48,13 @@ describe("move lookup", () => {
     const fighter = createTestFighter();
 
     expect(getMoveForBufferedAction(fighter, {
-      button: "weak",
+      button: "attack",
       direction: "neutral",
       grounded: false,
       framesRemaining: 6,
     }).id).toBe("airNeutralWeak");
     expect(getMoveForBufferedAction(fighter, {
-      button: "weak",
+      button: "attack",
       direction: "back",
       grounded: false,
       framesRemaining: 6,
@@ -66,7 +66,7 @@ describe("move lookup", () => {
     const striker = createTestFighter({ characterId: "striker" });
 
     const action = {
-      button: "strong" as const,
+      button: "special" as const,
       direction: "forward" as const,
       grounded: true,
       framesRemaining: 6,

@@ -18,8 +18,8 @@ const idleCommand: FighterCommand = {
   jumpPressed: false,
   jumpHeld: false,
   jumpReleased: false,
-  weakPressed: false,
-  strongPressed: false,
+  attackPressed: false,
+  specialPressed: false,
   shieldHeld: false,
 };
 
@@ -27,10 +27,10 @@ describe("actions", () => {
   it("buffers weak and strong attacks with directional context", () => {
     const fighter = createTestFighter({ facing: 1, grounded: true });
 
-    updateInputBuffer(fighter, { ...idleCommand, moveX: 1, weakPressed: true });
+    updateInputBuffer(fighter, { ...idleCommand, moveX: 1, attackPressed: true });
 
     expect(fighter.bufferedAction).toEqual({
-      button: "weak",
+      button: "attack",
       direction: "forward",
       grounded: true,
       framesRemaining: inputConfig.bufferFrames,
@@ -40,7 +40,7 @@ describe("actions", () => {
   it("starts a buffered attack when actionable", () => {
     const fighter = createTestFighter({
       bufferedAction: {
-        button: "strong",
+        button: "special",
         direction: "up",
         grounded: true,
         framesRemaining: 4,
@@ -79,7 +79,7 @@ describe("actions", () => {
   it("does not consume buffered action while matching move is cooling down", () => {
     const fighter = createTestFighter({
       bufferedAction: {
-        button: "strong",
+        button: "special",
         direction: "up",
         grounded: true,
         framesRemaining: 4,

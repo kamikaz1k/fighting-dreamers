@@ -1,4 +1,4 @@
-export type MoveButton = "weak" | "strong";
+export type MoveButton = "attack" | "special";
 export type MoveDirection = "neutral" | "forward" | "back" | "up" | "down";
 export type MoveContext = "ground" | "air";
 export type MoveRole =
@@ -31,7 +31,7 @@ export type MoveDefinition = {
 export const moveDefinitions: Record<string, MoveDefinition> = {
   groundNeutralWeak: {
     id: "groundNeutralWeak",
-    button: "weak",
+    button: "attack",
     direction: "neutral",
     context: "ground",
     role: "quick-poke",
@@ -47,7 +47,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   groundForwardWeak: {
     id: "groundForwardWeak",
-    button: "weak",
+    button: "attack",
     direction: "forward",
     context: "ground",
     role: "long-poke",
@@ -63,7 +63,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   groundBackWeak: {
     id: "groundBackWeak",
-    button: "weak",
+    button: "attack",
     direction: "back",
     context: "ground",
     role: "long-poke",
@@ -79,7 +79,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   groundUpWeak: {
     id: "groundUpWeak",
-    button: "weak",
+    button: "attack",
     direction: "up",
     context: "ground",
     role: "quick-pop-up",
@@ -95,7 +95,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   groundDownWeak: {
     id: "groundDownWeak",
-    button: "weak",
+    button: "attack",
     direction: "down",
     context: "ground",
     role: "close-low",
@@ -111,7 +111,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   groundNeutralStrong: {
     id: "groundNeutralStrong",
-    button: "strong",
+    button: "special",
     direction: "neutral",
     context: "ground",
     role: "long-poke",
@@ -127,7 +127,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   groundForwardStrong: {
     id: "groundForwardStrong",
-    button: "strong",
+    button: "special",
     direction: "forward",
     context: "ground",
     role: "long-poke",
@@ -143,7 +143,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   groundBackStrong: {
     id: "groundBackStrong",
-    button: "strong",
+    button: "special",
     direction: "back",
     context: "ground",
     role: "long-poke",
@@ -159,7 +159,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   groundUpStrong: {
     id: "groundUpStrong",
-    button: "strong",
+    button: "special",
     direction: "up",
     context: "ground",
     role: "heavy-pop-up",
@@ -175,7 +175,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   groundDownStrong: {
     id: "groundDownStrong",
-    button: "strong",
+    button: "special",
     direction: "down",
     context: "ground",
     role: "close-low",
@@ -191,7 +191,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   airNeutralWeak: {
     id: "airNeutralWeak",
-    button: "weak",
+    button: "attack",
     direction: "neutral",
     context: "air",
     role: "air-poke",
@@ -207,7 +207,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   airForwardWeak: {
     id: "airForwardWeak",
-    button: "weak",
+    button: "attack",
     direction: "forward",
     context: "air",
     role: "air-control",
@@ -223,7 +223,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   airBackWeak: {
     id: "airBackWeak",
-    button: "weak",
+    button: "attack",
     direction: "back",
     context: "air",
     role: "air-control",
@@ -239,7 +239,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   airUpWeak: {
     id: "airUpWeak",
-    button: "weak",
+    button: "attack",
     direction: "up",
     context: "air",
     role: "quick-pop-up",
@@ -255,7 +255,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   airDownWeak: {
     id: "airDownWeak",
-    button: "weak",
+    button: "attack",
     direction: "down",
     context: "air",
     role: "air-control",
@@ -271,7 +271,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   airNeutralStrong: {
     id: "airNeutralStrong",
-    button: "strong",
+    button: "special",
     direction: "neutral",
     context: "air",
     role: "air-poke",
@@ -287,7 +287,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   airForwardStrong: {
     id: "airForwardStrong",
-    button: "strong",
+    button: "special",
     direction: "forward",
     context: "air",
     role: "air-control",
@@ -303,7 +303,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   airBackStrong: {
     id: "airBackStrong",
-    button: "strong",
+    button: "special",
     direction: "back",
     context: "air",
     role: "air-control",
@@ -319,7 +319,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   airUpStrong: {
     id: "airUpStrong",
-    button: "strong",
+    button: "special",
     direction: "up",
     context: "air",
     role: "heavy-pop-up",
@@ -335,7 +335,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
   },
   airDownStrong: {
     id: "airDownStrong",
-    button: "strong",
+    button: "special",
     direction: "down",
     context: "air",
     role: "air-control",

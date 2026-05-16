@@ -47,8 +47,8 @@ export type FighterCommand = {
   jumpPressed: boolean;
   jumpHeld: boolean;
   jumpReleased: boolean;
-  weakPressed: boolean;
-  strongPressed: boolean;
+  attackPressed: boolean;
+  specialPressed: boolean;
   shieldHeld: boolean;
 };
 

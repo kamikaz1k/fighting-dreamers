@@ -105,9 +105,9 @@ export function updateShield(fighter: Fighter, command: FighterCommand): void {
 }
 
 export function updateInputBuffer(fighter: Fighter, command: FighterCommand): void {
-  if (command.weakPressed || command.strongPressed) {
+  if (command.attackPressed || command.specialPressed) {
     fighter.bufferedAction = {
-      button: command.weakPressed ? "weak" : "strong",
+      button: command.attackPressed ? "attack" : "special",
       direction: getMoveDirection(fighter, command),
       grounded: fighter.grounded,
       framesRemaining: inputConfig.bufferFrames,

@@ -310,7 +310,7 @@ function renderCommandReadout(ctx: CanvasRenderingContext2D, state: RenderState)
     }
 
     ctx.fillText(
-      `${fighter.id} x:${command.moveX} y:${command.moveY} jump:${Number(command.jumpPressed)} weak:${Number(command.weakPressed)} strong:${Number(command.strongPressed)} shield:${Number(command.shieldHeld)}`,
+      `${fighter.id} x:${command.moveX} y:${command.moveY} jump:${Number(command.jumpPressed)} atk:${Number(command.attackPressed)} sp:${Number(command.specialPressed)} shield:${Number(command.shieldHeld)}`,
       24,
       y,
     );
@@ -359,8 +359,8 @@ function renderControlsGuide(ctx: CanvasRenderingContext2D): void {
     "A/D: move + face",
     "W: jump / up",
     "S: down",
-    "J: weak",
-    "K: strong",
+    "J: attack",
+    "K: special",
     "L: shield",
     "`: debug",
   ];

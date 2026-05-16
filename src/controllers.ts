@@ -7,8 +7,8 @@ export const idleCommand: FighterCommand = {
   jumpPressed: false,
   jumpHeld: false,
   jumpReleased: false,
-  weakPressed: false,
-  strongPressed: false,
+  attackPressed: false,
+  specialPressed: false,
   shieldHeld: false,
 };
 
@@ -74,10 +74,10 @@ export class CpuController implements Controller {
       this.attackCooldownFrames = 42;
 
       if (verticalDelta < -24) {
-        return { ...idleCommand, moveY: -1, weakPressed: true };
+        return { ...idleCommand, moveY: -1, attackPressed: true };
       }
 
-      return { ...idleCommand, moveX: directionToOpponent, strongPressed: true };
+      return { ...idleCommand, moveX: directionToOpponent, specialPressed: true };
     }
 
     this.intent = "approach";
@@ -112,8 +112,8 @@ export class KeyboardController implements Controller {
       jumpPressed: this.consumePressed("KeyW"),
       jumpHeld: this.heldKeys.has("KeyW"),
       jumpReleased: this.consumeReleased("KeyW"),
-      weakPressed: this.consumePressed("KeyJ"),
-      strongPressed: this.consumePressed("KeyK"),
+      attackPressed: this.consumePressed("KeyJ"),
+      specialPressed: this.consumePressed("KeyK"),
       shieldHeld: this.heldKeys.has("KeyL"),
     };
 

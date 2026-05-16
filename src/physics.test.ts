@@ -15,8 +15,8 @@ const idleCommand: FighterCommand = {
   jumpPressed: false,
   jumpHeld: false,
   jumpReleased: false,
-  weakPressed: false,
-  strongPressed: false,
+  attackPressed: false,
+  specialPressed: false,
   shieldHeld: false,
 };
 
