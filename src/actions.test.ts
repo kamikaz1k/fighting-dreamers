@@ -92,6 +92,15 @@ describe("actions", () => {
     expect(fighter.moveCooldowns.get(move.id)).toBe(28);
   });
 
+  it("launches the fighter when starting up special", () => {
+    const fighter = createTestFighter();
+
+    startAttack(fighter, moveDefinitions.upSpecial);
+
+    expect(fighter.grounded).toBe(false);
+    expect(fighter.velocityY).toBe(moveDefinitions.upSpecial.selfVelocity?.y);
+  });
+
   it("does not consume buffered action while matching move is cooling down", () => {
     const fighter = createTestFighter({
       bufferedAction: {

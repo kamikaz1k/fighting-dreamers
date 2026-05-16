@@ -133,6 +133,12 @@ export function startAttack(fighter: Fighter, move: MoveDefinition): void {
   fighter.moveFrame = 0;
   fighter.hitFighterIdsThisMove.clear();
 
+  if (move.selfVelocity) {
+    fighter.velocityX = fighter.facing * move.selfVelocity.x;
+    fighter.velocityY = move.selfVelocity.y;
+    fighter.grounded = false;
+  }
+
   const cooldownFrames = getCharacter(fighter.characterId).cooldowns[move.id] ?? 0;
 
   if (cooldownFrames > 0) {

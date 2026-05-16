@@ -27,6 +27,7 @@ export type MoveDefinition = {
   shieldDamage: number;
   hitstopFrames: number;
   movementMultiplier?: number;
+  selfVelocity?: { x: number; y: number };
 };
 
 export const moveDefinitions: Record<string, MoveDefinition> = {
@@ -192,6 +193,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     shieldDamage: 20,
     hitstopFrames: 7,
     movementMultiplier: 0.3,
+    selfVelocity: { x: 0, y: -860 },
   },
   downSpecial: {
     id: "downSpecial",
@@ -336,6 +338,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     shieldDamage: 20,
     hitstopFrames: 7,
     movementMultiplier: 0.48,
+    selfVelocity: { x: 0, y: -860 },
   },
   airDownSpecial: {
     id: "airDownSpecial",
