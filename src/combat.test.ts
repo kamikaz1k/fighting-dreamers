@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { resolveAttackCollision } from "./combat";
+import { getScaledKnockback, resolveAttackCollision } from "./combat";
 import { moveDefinitions } from "./moves";
 import { createTestFighter } from "./testHelpers";
 
 describe("combat", () => {
-  it("applies health damage, hitstun, hitstop, and hit-once tracking", () => {
+  it("applies damage percent, scaled knockback, hitstun, hitstop, and hit-once tracking", () => {
     const move = moveDefinitions.groundForwardWeak;
     const attacker = createTestFighter({
       id: "attacker",
@@ -17,15 +17,17 @@ describe("combat", () => {
     resolveAttackCollision(attacker, defender);
     resolveAttackCollision(attacker, defender);
 
-    expect(defender.health).toBe(100 - move.damage);
+    const knockback = getScaledKnockback(move, move.damage);
+
+    expect(defender.damagePercent).toBe(move.damage);
     expect(defender.state).toBe("hitstun");
-    expect(defender.velocityX).toBe(move.knockback.x);
+    expect(defender.velocityX).toBe(knockback.x);
     expect(defender.hitstopFrames).toBe(move.hitstopFrames);
     expect(attacker.hitstopFrames).toBe(move.hitstopFrames);
     expect(attacker.hitFighterIdsThisMove.has(defender.id)).toBe(true);
   });
 
-  it("uses the shield box before the hurtbox and blocks health damage", () => {
+  it("uses the shield box before the hurtbox and blocks damage", () => {
     const move = moveDefinitions.groundForwardWeak;
     const attacker = createTestFighter({
       id: "attacker",
@@ -41,9 +43,18 @@ describe("combat", () => {
 
     resolveAttackCollision(attacker, defender);
 
-    expect(defender.health).toBe(100);
+    expect(defender.damagePercent).toBe(0);
     expect(defender.shield).toBe(100 - move.shieldDamage);
     expect(defender.state).toBe("shield");
     expect(defender.velocityX).toBe(move.knockback.x * 0.35);
+  });
+
+  it("scales knockback with accumulated damage", () => {
+    const move = moveDefinitions.groundForwardWeak;
+
+    expect(getScaledKnockback(move, 100).x).toBeGreaterThan(getScaledKnockback(move, 0).x);
+    expect(Math.abs(getScaledKnockback(move, 100).y)).toBeGreaterThan(
+      Math.abs(getScaledKnockback(move, 0).y),
+    );
   });
 });

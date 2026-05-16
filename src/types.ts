@@ -27,8 +27,7 @@ export type Fighter = {
   jumpHoldFrames: number;
   jumpCutApplied: boolean;
   fastFalling: boolean;
-  health: number;
-  maxHealth: number;
+  damagePercent: number;
   shield: number;
   maxShield: number;
   currentMoveId: string | null;

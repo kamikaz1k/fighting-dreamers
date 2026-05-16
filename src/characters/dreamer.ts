@@ -8,7 +8,6 @@ export const dreamerCharacter: CharacterDefinition = {
   id: "dreamer",
   name: "Dreamer",
   size: { width: 52, height: 83 },
-  maxHealth: 100,
   maxShield: 100,
   movement: movementConfig,
   shield: shieldConfig,

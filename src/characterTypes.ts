@@ -5,7 +5,6 @@ export type CharacterDefinition = {
   id: string;
   name: string;
   size: { width: number; height: number };
-  maxHealth: number;
   maxShield: number;
   movement: typeof movementConfig;
   shield: typeof shieldConfig;

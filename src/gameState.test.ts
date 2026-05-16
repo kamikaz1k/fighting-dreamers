@@ -20,7 +20,7 @@ describe("game state", () => {
       velocityX: 400,
       velocityY: -200,
       grounded: false,
-      health: 25,
+      damagePercent: 75,
       shield: 12,
       currentMoveId: "groundForwardWeak",
       moveFrame: 8,
@@ -43,7 +43,7 @@ describe("game state", () => {
     expect(fighter.x).toBe(500);
     expect(fighter.y).toBe(FLOOR_Y);
     expect(fighter.facing).toBe(1);
-    expect(fighter.health).toBe(fighter.maxHealth);
+    expect(fighter.damagePercent).toBe(0);
     expect(fighter.shield).toBe(fighter.maxShield);
     expect(fighter.currentMoveId).toBeNull();
     expect(fighter.moveCooldowns.size).toBe(0);
@@ -57,13 +57,11 @@ describe("game state", () => {
     expect(player.characterId).toBe("dreamer");
     expect(player.width).toBe(52);
     expect(player.height).toBe(83);
-    expect(player.maxHealth).toBe(100);
     expect(player.maxShield).toBe(100);
     expect(player.airJumpsRemaining).toBe(1);
     expect(cpu.characterId).toBe("striker");
     expect(cpu.width).toBe(58);
     expect(cpu.height).toBe(86);
-    expect(cpu.maxHealth).toBe(110);
     expect(cpu.maxShield).toBe(90);
   });
 
@@ -75,18 +73,18 @@ describe("game state", () => {
     expect(spawn.facing).toBe(-1);
   });
 
-  it("starts KO pause when only one fighter remains active", () => {
+  it("does not start KO pause from accumulated damage alone", () => {
     const fighters = createInitialFighters();
-    fighters[1].health = 0;
+    fighters[1].damagePercent = 999;
 
     const nextRoundState = updateRoundFlow(fighters, {
       roundPauseFrames: 0,
       winnerName: null,
     });
 
-    expect(nextRoundState.winnerName).toBe("Player 1");
-    expect(nextRoundState.roundPauseFrames).toBe(roundConfig.koPauseFrames);
-    expect(fighters[1].state).toBe("ko");
+    expect(nextRoundState.winnerName).toBeNull();
+    expect(nextRoundState.roundPauseFrames).toBe(0);
+    expect(fighters[1].state).toBe("idle");
   });
 
   it("starts KO pause when a fighter crosses a blast zone", () => {
@@ -114,7 +112,7 @@ describe("game state", () => {
 
   it("resets the round when KO pause expires", () => {
     const fighters = createInitialFighters();
-    fighters[0].health = 0;
+    fighters[0].x = blastZoneConfig.left - 1;
     fighters[0].state = "ko";
 
     const nextRoundState = updateRoundFlow(fighters, {
@@ -124,7 +122,7 @@ describe("game state", () => {
 
     expect(nextRoundState.winnerName).toBeNull();
     expect(nextRoundState.roundPauseFrames).toBe(0);
-    expect(fighters[0].health).toBe(100);
+    expect(fighters[0].damagePercent).toBe(0);
     expect(fighters[0].state).toBe("idle");
   });
 

@@ -262,8 +262,12 @@ function renderFighterBars(
   ctx.textAlign = align;
   ctx.fillText(fighter.name, align === "left" ? x : x + width, y - 8);
 
-  renderBar(ctx, x, y, width, 16, fighter.health / fighter.maxHealth, "#22c55e");
-  renderBar(ctx, x, y + 22, width, 8, fighter.shield / fighter.maxShield, "#60a5fa");
+  ctx.fillStyle = "#f8fafc";
+  ctx.font = "22px system-ui, sans-serif";
+  ctx.textAlign = align;
+  ctx.fillText(`${Math.round(fighter.damagePercent)}%`, align === "left" ? x : x + width, y + 18);
+
+  renderBar(ctx, x, y + 28, width, 8, fighter.shield / fighter.maxShield, "#60a5fa");
 }
 
 function renderBar(

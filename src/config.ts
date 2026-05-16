@@ -42,6 +42,10 @@ export const shieldConfig = {
   },
 };
 
+export const knockbackConfig = {
+  damageScalePerPercent: 0.01,
+};
+
 export const roundConfig = {
   koPauseFrames: 90,
 };

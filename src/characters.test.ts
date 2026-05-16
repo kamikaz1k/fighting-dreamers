@@ -6,8 +6,6 @@ describe("characters", () => {
     const dreamer = getCharacter("dreamer");
     const striker = getCharacter("striker");
 
-    expect(dreamer.maxHealth).toBe(100);
-    expect(striker.maxHealth).toBe(110);
     expect(striker.movement.maxGroundSpeed).toBeLessThan(dreamer.movement.maxGroundSpeed);
     expect(striker.shield.box.width).toBeGreaterThan(dreamer.shield.box.width);
     expect(dreamer.moves.groundForwardStrong.damage).toBe(11);
