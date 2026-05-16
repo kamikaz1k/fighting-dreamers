@@ -1,8 +1,6 @@
 import {
   FIXED_TIMESTEP_SECONDS,
   FLOOR_Y,
-  STAGE_LEFT,
-  STAGE_RIGHT,
   stagePlatforms,
 } from "./config";
 import { getCharacter } from "./characters";
@@ -93,18 +91,6 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
 
   fighter.x += fighter.velocityX * FIXED_TIMESTEP_SECONDS;
   fighter.y += fighter.velocityY * FIXED_TIMESTEP_SECONDS;
-
-  const halfWidth = fighter.width / 2;
-  const minX = STAGE_LEFT + halfWidth;
-  const maxX = STAGE_RIGHT - halfWidth;
-
-  if (fighter.x < minX) {
-    fighter.x = minX;
-    fighter.velocityX = Math.max(0, fighter.velocityX);
-  } else if (fighter.x > maxX) {
-    fighter.x = maxX;
-    fighter.velocityX = Math.min(0, fighter.velocityX);
-  }
 
   const platform = getLandingPlatform(fighter, previousY, command);
 

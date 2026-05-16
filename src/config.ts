@@ -46,6 +46,13 @@ export const roundConfig = {
   koPauseFrames: 90,
 };
 
+export const blastZoneConfig = {
+  left: -140,
+  right: WORLD_WIDTH + 140,
+  top: -180,
+  bottom: WORLD_HEIGHT + 180,
+};
+
 export const debugConfig = {
   enabled: import.meta.env.DEV,
 };

@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { FLOOR_Y, roundConfig } from "./config";
+import { FLOOR_Y, blastZoneConfig, roundConfig } from "./config";
 import {
   createInitialFighters,
   getFallbackSpawnPoint,
+  isOutsideBlastZone,
   resetFighter,
   resetRound,
   updateRoundFlow,
@@ -86,6 +87,29 @@ describe("game state", () => {
     expect(nextRoundState.winnerName).toBe("Player 1");
     expect(nextRoundState.roundPauseFrames).toBe(roundConfig.koPauseFrames);
     expect(fighters[1].state).toBe("ko");
+  });
+
+  it("starts KO pause when a fighter crosses a blast zone", () => {
+    const fighters = createInitialFighters();
+    fighters[1].x = blastZoneConfig.right + 1;
+
+    const nextRoundState = updateRoundFlow(fighters, {
+      roundPauseFrames: 0,
+      winnerName: null,
+    });
+
+    expect(nextRoundState.winnerName).toBe("Player 1");
+    expect(nextRoundState.roundPauseFrames).toBe(roundConfig.koPauseFrames);
+    expect(fighters[1].state).toBe("ko");
+  });
+
+  it("detects blast zones on every side", () => {
+    expect(isOutsideBlastZone(createTestFighter({ x: blastZoneConfig.left - 1 }))).toBe(true);
+    expect(isOutsideBlastZone(createTestFighter({ x: blastZoneConfig.right + 1 }))).toBe(true);
+    expect(isOutsideBlastZone(createTestFighter({
+      y: blastZoneConfig.top + createTestFighter().height - 1,
+    }))).toBe(true);
+    expect(isOutsideBlastZone(createTestFighter({ y: blastZoneConfig.bottom + 1 }))).toBe(true);
   });
 
   it("resets the round when KO pause expires", () => {

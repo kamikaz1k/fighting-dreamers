@@ -3,6 +3,7 @@ import {
   STAGE_LEFT,
   STAGE_RIGHT,
   WORLD_WIDTH,
+  blastZoneConfig,
   roundConfig,
   spawnPoints,
 } from "./config";
@@ -90,14 +91,14 @@ export function updateRoundFlow(fighters: Fighter[], roundState: RoundState): Ro
     return { ...roundState, roundPauseFrames };
   }
 
-  const activeFighters = fighters.filter((fighter) => fighter.health > 0);
+  const activeFighters = fighters.filter((fighter) => !isFighterKo(fighter));
 
   if (activeFighters.length > 1) {
     return roundState;
   }
 
   for (const fighter of fighters) {
-    if (fighter.health <= 0) {
+    if (isFighterKo(fighter)) {
       fighter.state = "ko";
       fighter.velocityX = 0;
       fighter.velocityY = 0;
@@ -108,6 +109,17 @@ export function updateRoundFlow(fighters: Fighter[], roundState: RoundState): Ro
     winnerName: activeFighters[0]?.name ?? null,
     roundPauseFrames: roundConfig.koPauseFrames,
   };
+}
+
+export function isOutsideBlastZone(fighter: Fighter): boolean {
+  return fighter.x < blastZoneConfig.left
+    || fighter.x > blastZoneConfig.right
+    || fighter.y - fighter.height < blastZoneConfig.top
+    || fighter.y > blastZoneConfig.bottom;
+}
+
+function isFighterKo(fighter: Fighter): boolean {
+  return fighter.health <= 0 || isOutsideBlastZone(fighter);
 }
 
 export function resetRound(fighters: Fighter[]): void {
