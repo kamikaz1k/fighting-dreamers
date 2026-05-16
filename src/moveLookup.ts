@@ -4,9 +4,10 @@ import type { BufferedAction, Fighter, FighterCommand } from "./types";
 
 export function getMoveForBufferedAction(fighter: Fighter, action: BufferedAction): MoveDefinition {
   const character = getCharacter(fighter.characterId);
+  const direction = getLookupDirection(action);
   const move = Object.values(character.moves).find((definition) => {
     return definition.button === action.button
-      && definition.direction === action.direction
+      && definition.direction === direction
       && definition.context === (action.grounded ? "ground" : "air");
   });
 
@@ -16,6 +17,14 @@ export function getMoveForBufferedAction(fighter: Fighter, action: BufferedActio
   }
 
   return move;
+}
+
+function getLookupDirection(action: BufferedAction) {
+  if (action.grounded && action.button === "attack" && action.direction === "back") {
+    return "forward";
+  }
+
+  return action.direction;
 }
 
 export function getMoveDirection(fighter: Fighter, command: FighterCommand) {

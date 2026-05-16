@@ -61,6 +61,17 @@ describe("move lookup", () => {
     }).id).toBe("backAir");
   });
 
+  it("uses side tilt for grounded back attack input", () => {
+    const fighter = createTestFighter();
+
+    expect(getMoveForBufferedAction(fighter, {
+      button: "attack",
+      direction: "back",
+      grounded: true,
+      framesRemaining: 6,
+    }).id).toBe("forwardTilt");
+  });
+
   it("selects moves from the fighter character moveset", () => {
     const dreamer = createTestFighter({ characterId: "dreamer" });
     const striker = createTestFighter({ characterId: "striker" });
