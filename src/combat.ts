@@ -1,21 +1,23 @@
 import { getHurtbox, getMoveHitboxes, getShieldBox, rectsOverlap } from "./geometry";
 import { getCharacter } from "./characters";
-import type { MoveDefinition, MoveHitboxDefinition } from "./moves";
+import type { MoveDefinition, MoveHitboxDefinition, MoveHitWindowDefinition } from "./moves";
 import type { Fighter } from "./types";
 
 export function resolveAttackCollision(attacker: Fighter, defender: Fighter): void {
   const move = getCurrentMove(attacker);
 
-  if (!move || !isMoveActive(attacker, move) || attacker.hitFighterIdsThisMove.has(defender.id)) {
+  const hitWindow = move ? getActiveHitWindow(attacker, move) : null;
+
+  if (!move || !hitWindow || attacker.hitFighterIdsThisMove.has(getHitTrackingKey(hitWindow, defender))) {
     return;
   }
 
   const shieldHitbox = defender.state === "shield" && defender.shield > 0
-    ? findCollidingMoveHitbox(attacker, move, getShieldBox(defender))
+    ? findCollidingMoveHitbox(attacker, move, hitWindow, getShieldBox(defender))
     : null;
   const hurtboxHitbox = shieldHitbox
     ? null
-    : findCollidingMoveHitbox(attacker, move, getHurtbox(defender));
+    : findCollidingMoveHitbox(attacker, move, hitWindow, getHurtbox(defender));
   const matchedHitbox = shieldHitbox ?? hurtboxHitbox;
 
   if (!matchedHitbox) {
@@ -41,7 +43,7 @@ export function resolveAttackCollision(attacker: Fighter, defender: Fighter): vo
 
   defender.hitstopFrames = hit.hitstopFrames;
   attacker.hitstopFrames = hit.hitstopFrames;
-  attacker.hitFighterIdsThisMove.add(defender.id);
+  attacker.hitFighterIdsThisMove.add(getHitTrackingKey(hitWindow, defender));
 }
 
 export function getCurrentMove(fighter: Fighter): MoveDefinition | null {
@@ -53,7 +55,7 @@ export function getCurrentMove(fighter: Fighter): MoveDefinition | null {
 }
 
 export function getMoveTotalFrames(move: MoveDefinition): number {
-  return move.startupFrames + move.activeFrames + move.recoveryFrames;
+  return getMoveRecoveryStartFrame(move) + move.recoveryFrames;
 }
 
 export function getScaledKnockback(
@@ -94,8 +96,24 @@ export function getHitstunFrames(knockback: { x: number; y: number }): number {
 }
 
 export function isMoveActive(fighter: Fighter, move: MoveDefinition): boolean {
-  return fighter.moveFrame >= move.startupFrames
-    && fighter.moveFrame < move.startupFrames + move.activeFrames;
+  return getActiveHitWindow(fighter, move) !== null;
+}
+
+export function getActiveHitWindow(
+  fighter: Fighter,
+  move: MoveDefinition,
+): MoveHitWindowDefinition | null {
+  for (const hitWindow of getMoveHitWindows(move)) {
+    if (fighter.moveFrame >= hitWindow.startFrame && fighter.moveFrame < hitWindow.endFrame) {
+      return hitWindow;
+    }
+  }
+
+  return null;
+}
+
+export function getMoveRecoveryStartFrame(move: MoveDefinition): number {
+  return Math.max(...getMoveHitWindows(move).map((hitWindow) => hitWindow.endFrame));
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -105,13 +123,26 @@ function clamp(value: number, min: number, max: number): number {
 function findCollidingMoveHitbox(
   fighter: Fighter,
   move: MoveDefinition,
+  hitWindow: MoveHitWindowDefinition,
   target: { x: number; y: number; width: number; height: number },
 ): MoveHitboxDefinition | null {
-  for (const hitbox of getMoveHitboxes(fighter, move)) {
+  for (const hitbox of getMoveHitboxes(fighter, move, hitWindow)) {
     if (rectsOverlap(hitbox.rect, target)) {
       return hitbox.definition;
     }
   }
 
   return null;
+}
+
+function getMoveHitWindows(move: MoveDefinition): MoveHitWindowDefinition[] {
+  return move.hitWindows ?? [{
+    id: "default",
+    startFrame: move.startupFrames,
+    endFrame: move.startupFrames + move.activeFrames,
+  }];
+}
+
+function getHitTrackingKey(hitWindow: MoveHitWindowDefinition, defender: Fighter): string {
+  return `${hitWindow.id}:${defender.id}`;
 }

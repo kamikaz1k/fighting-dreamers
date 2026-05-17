@@ -8,7 +8,13 @@ import {
   stagePlatforms,
 } from "./config";
 import { getCharacter } from "./characters";
-import { getCurrentMove, getLaunchSpeed, isMoveActive } from "./combat";
+import {
+  getActiveHitWindow,
+  getCurrentMove,
+  getLaunchSpeed,
+  getMoveRecoveryStartFrame,
+  isMoveActive,
+} from "./combat";
 import { getHurtbox, getMoveHitboxes, getShieldBox } from "./geometry";
 import { clamp } from "./math";
 import type { MoveDefinition } from "./moves";
@@ -91,7 +97,8 @@ function renderFighters(
 
     if (move && debugEnabled) {
       const active = isMoveActive(fighter, move);
-      for (const { definition, rect } of getMoveHitboxes(fighter, move)) {
+      const activeHitWindow = getActiveHitWindow(fighter, move);
+      for (const { definition, rect } of getMoveHitboxes(fighter, move, activeHitWindow ?? undefined)) {
         const isSweetspot = definition.id.includes("sweetspot");
         ctx.fillStyle = active
           ? isSweetspot
@@ -130,7 +137,7 @@ function renderMoveDebug(
     fighter.y + 56,
   );
   ctx.fillText(
-    `phase ${getMovePhase(fighter, move)} s/a/r ${move.startupFrames}/${move.activeFrames}/${move.recoveryFrames}`,
+    `phase ${getMovePhase(fighter, move)} s/a/r ${move.startupFrames}/${getMoveRecoveryStartFrame(move) - move.startupFrames}/${move.recoveryFrames}`,
     fighter.x,
     fighter.y + 72,
   );
@@ -151,7 +158,7 @@ function getMovePhase(fighter: Fighter, move: MoveDefinition): "startup" | "acti
     return "startup";
   }
 
-  if (fighter.moveFrame < move.startupFrames + move.activeFrames) {
+  if (fighter.moveFrame < getMoveRecoveryStartFrame(move)) {
     return "active";
   }
 

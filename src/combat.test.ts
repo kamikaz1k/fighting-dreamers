@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { getCharacter } from "./characters";
-import { getLaunchSpeed, getResolvedHit, getScaledKnockback, resolveAttackCollision } from "./combat";
+import {
+  getActiveHitWindow,
+  getLaunchSpeed,
+  getMoveRecoveryStartFrame,
+  getResolvedHit,
+  getScaledKnockback,
+  resolveAttackCollision,
+} from "./combat";
 import { createTestFighter } from "./testHelpers";
 
 describe("combat", () => {
@@ -24,7 +31,7 @@ describe("combat", () => {
     expect(defender.velocityX).toBe(knockback.x);
     expect(defender.hitstopFrames).toBe(move.hitstopFrames);
     expect(attacker.hitstopFrames).toBe(move.hitstopFrames);
-    expect(attacker.hitFighterIdsThisMove.has(defender.id)).toBe(true);
+    expect(attacker.hitFighterIdsThisMove.has(`default:${defender.id}`)).toBe(true);
   });
 
   it("uses the shield box before the hurtbox and blocks damage", () => {
@@ -85,5 +92,39 @@ describe("combat", () => {
     expect(Math.abs(getScaledKnockback(move, 100).y)).toBeGreaterThan(
       Math.abs(getScaledKnockback(move, 0).y),
     );
+  });
+
+  it("lets separate hit windows hit the same defender once each", () => {
+    const move = getCharacter("captainFalcon").moves.neutralAir;
+    const attacker = createTestFighter({
+      id: "attacker",
+      characterId: "captainFalcon",
+      x: 400,
+      currentMoveId: move.id,
+      moveFrame: 5,
+    });
+    const defender = createTestFighter({ id: "defender", x: 448 });
+
+    resolveAttackCollision(attacker, defender);
+    resolveAttackCollision(attacker, defender);
+    attacker.moveFrame = 12;
+    resolveAttackCollision(attacker, defender);
+
+    expect(defender.damagePercent).toBe(10);
+    expect(attacker.hitFighterIdsThisMove).toEqual(new Set([
+      "kick1:defender",
+      "kick2:defender",
+    ]));
+  });
+
+  it("finds explicit hit windows and starts recovery after the last one", () => {
+    const move = getCharacter("captainFalcon").moves.neutralAir;
+    const fighter = createTestFighter({
+      characterId: "captainFalcon",
+      moveFrame: 12,
+    });
+
+    expect(getActiveHitWindow(fighter, move)?.id).toBe("kick2");
+    expect(getMoveRecoveryStartFrame(move)).toBe(16);
   });
 });

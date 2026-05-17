@@ -1,6 +1,6 @@
 import { getCharacter } from "./characters";
 import type { Fighter, Rect } from "./types";
-import type { MoveDefinition, MoveHitboxDefinition } from "./moves";
+import type { MoveDefinition, MoveHitboxDefinition, MoveHitWindowDefinition } from "./moves";
 
 export function getMoveHitbox(fighter: Fighter, move: MoveDefinition): Rect {
   return getMoveHitboxes(fighter, move)[0].rect;
@@ -9,8 +9,9 @@ export function getMoveHitbox(fighter: Fighter, move: MoveDefinition): Rect {
 export function getMoveHitboxes(
   fighter: Fighter,
   move: MoveDefinition,
+  hitWindow?: MoveHitWindowDefinition,
 ): Array<{ definition: MoveHitboxDefinition; rect: Rect }> {
-  const hitboxDefinitions = move.hitboxes ?? [{
+  const hitboxDefinitions = hitWindow?.hitboxes ?? move.hitboxes ?? [{
     id: "default",
     ...move.hitbox,
   }];

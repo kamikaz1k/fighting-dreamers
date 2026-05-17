@@ -30,6 +30,13 @@ export type MoveHitboxDefinition = {
   hitstopFrames?: number;
 };
 
+export type MoveHitWindowDefinition = {
+  id: string;
+  startFrame: number;
+  endFrame: number;
+  hitboxes?: MoveHitboxDefinition[];
+};
+
 export type MoveDefinition = {
   id: string;
   button: MoveButton;
@@ -44,6 +51,7 @@ export type MoveDefinition = {
   knockback: KnockbackDefinition;
   hitbox: { x: number; y: number; width: number; height: number };
   hitboxes?: MoveHitboxDefinition[];
+  hitWindows?: MoveHitWindowDefinition[];
   shieldDamage: number;
   hitstopFrames: number;
   movementMultiplier?: number;

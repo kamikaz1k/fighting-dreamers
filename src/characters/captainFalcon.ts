@@ -9,6 +9,7 @@ function tuneMove(move: MoveDefinition, overrides: Partial<MoveDefinition>): Mov
     knockback: overrides.knockback ?? move.knockback,
     hitbox: overrides.hitbox ?? move.hitbox,
     hitboxes: overrides.hitboxes ?? move.hitboxes,
+    hitWindows: overrides.hitWindows ?? move.hitWindows,
   };
 }
 
@@ -51,9 +52,49 @@ export const captainFalconMoves: Record<string, MoveDefinition> = {
   }),
   neutralAir: tuneMove(moveDefinitions.neutralAir, {
     startupFrames: 5,
+    activeFrames: 11,
+    recoveryFrames: 16,
     damage: 5,
     knockback: { base: 220, growth: 4, damageFactor: 7, angleDeg: 18 },
     hitbox: { x: -20, y: -76, width: 42, height: 32 },
+    hitWindows: [
+      {
+        id: "kick1",
+        startFrame: 5,
+        endFrame: 8,
+        hitboxes: [
+          {
+            id: "kick1",
+            x: 18,
+            y: -78,
+            width: 36,
+            height: 24,
+            damage: 4,
+            knockback: { base: 180, growth: 3, damageFactor: 6, angleDeg: 24 },
+            shieldDamage: 8,
+            hitstopFrames: 3,
+          },
+        ],
+      },
+      {
+        id: "kick2",
+        startFrame: 12,
+        endFrame: 16,
+        hitboxes: [
+          {
+            id: "kick2",
+            x: 20,
+            y: -72,
+            width: 42,
+            height: 28,
+            damage: 6,
+            knockback: { base: 260, growth: 6, damageFactor: 7, angleDeg: 18 },
+            shieldDamage: 12,
+            hitstopFrames: 5,
+          },
+        ],
+      },
+    ],
   }),
   forwardAir: tuneMove(moveDefinitions.forwardAir, {
     startupFrames: 12,
