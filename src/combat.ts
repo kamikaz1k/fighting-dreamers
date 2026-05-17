@@ -1,6 +1,6 @@
-import { getHurtbox, getMoveHitbox, getShieldBox, rectsOverlap } from "./geometry";
+import { getHurtbox, getMoveHitboxes, getShieldBox, rectsOverlap } from "./geometry";
 import { getCharacter } from "./characters";
-import type { MoveDefinition } from "./moves";
+import type { MoveDefinition, MoveHitboxDefinition } from "./moves";
 import type { Fighter } from "./types";
 
 export function resolveAttackCollision(attacker: Fighter, defender: Fighter): void {
@@ -10,21 +10,26 @@ export function resolveAttackCollision(attacker: Fighter, defender: Fighter): vo
     return;
   }
 
-  const moveHitbox = getMoveHitbox(attacker, move);
-  const blockedByShield = defender.state === "shield"
-    && defender.shield > 0
-    && rectsOverlap(moveHitbox, getShieldBox(defender));
+  const shieldHitbox = defender.state === "shield" && defender.shield > 0
+    ? findCollidingMoveHitbox(attacker, move, getShieldBox(defender))
+    : null;
+  const hurtboxHitbox = shieldHitbox
+    ? null
+    : findCollidingMoveHitbox(attacker, move, getHurtbox(defender));
+  const matchedHitbox = shieldHitbox ?? hurtboxHitbox;
 
-  if (!blockedByShield && !rectsOverlap(moveHitbox, getHurtbox(defender))) {
+  if (!matchedHitbox) {
     return;
   }
 
-  if (blockedByShield) {
-    defender.shield = clamp(defender.shield - move.shieldDamage, 0, defender.maxShield);
-    defender.velocityX = attacker.facing * getLaunchSpeed(move, defender.damagePercent) * 0.35;
+  const hit = getResolvedHit(move, matchedHitbox);
+
+  if (shieldHitbox) {
+    defender.shield = clamp(defender.shield - hit.shieldDamage, 0, defender.maxShield);
+    defender.velocityX = attacker.facing * getLaunchSpeed(hit, defender.damagePercent) * 0.35;
   } else {
-    defender.damagePercent += move.damage;
-    const knockback = getScaledKnockback(move, defender.damagePercent);
+    defender.damagePercent += hit.damage;
+    const knockback = getScaledKnockback(hit, defender.damagePercent);
     defender.velocityX = attacker.facing * knockback.x;
     defender.velocityY = knockback.y;
     defender.grounded = false;
@@ -34,8 +39,8 @@ export function resolveAttackCollision(attacker: Fighter, defender: Fighter): vo
     defender.hitstunFrames = getHitstunFrames(knockback);
   }
 
-  defender.hitstopFrames = move.hitstopFrames;
-  attacker.hitstopFrames = move.hitstopFrames;
+  defender.hitstopFrames = hit.hitstopFrames;
+  attacker.hitstopFrames = hit.hitstopFrames;
   attacker.hitFighterIdsThisMove.add(defender.id);
 }
 
@@ -70,6 +75,19 @@ export function getLaunchSpeed(move: MoveDefinition, damagePercent: number): num
     + move.damage * move.knockback.damageFactor;
 }
 
+export function getResolvedHit(
+  move: MoveDefinition,
+  hitbox: MoveHitboxDefinition,
+): MoveDefinition {
+  return {
+    ...move,
+    damage: hitbox.damage ?? move.damage,
+    knockback: hitbox.knockback ?? move.knockback,
+    shieldDamage: hitbox.shieldDamage ?? move.shieldDamage,
+    hitstopFrames: hitbox.hitstopFrames ?? move.hitstopFrames,
+  };
+}
+
 export function getHitstunFrames(knockback: { x: number; y: number }): number {
   const knockbackMagnitude = Math.hypot(knockback.x, knockback.y);
   return Math.round(10 + knockbackMagnitude / 42);
@@ -82,4 +100,18 @@ export function isMoveActive(fighter: Fighter, move: MoveDefinition): boolean {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
+}
+
+function findCollidingMoveHitbox(
+  fighter: Fighter,
+  move: MoveDefinition,
+  target: { x: number; y: number; width: number; height: number },
+): MoveHitboxDefinition | null {
+  for (const hitbox of getMoveHitboxes(fighter, move)) {
+    if (rectsOverlap(hitbox.rect, target)) {
+      return hitbox.definition;
+    }
+  }
+
+  return null;
 }

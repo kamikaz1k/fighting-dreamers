@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { getHurtbox, getMoveHitbox, getShieldBox, rectsOverlap } from "./geometry";
+import { getHurtbox, getMoveHitbox, getMoveHitboxes, getShieldBox, rectsOverlap } from "./geometry";
+import { getCharacter } from "./characters";
 import { moveDefinitions } from "./moves";
 import { createTestFighter } from "./testHelpers";
 
@@ -38,6 +39,16 @@ describe("geometry", () => {
 
     expect(getMoveHitbox(rightFacing, moveDefinitions.backAir).x).toBeLessThan(rightFacing.x);
     expect(getMoveHitbox(leftFacing, moveDefinitions.backAir).x).toBeGreaterThan(leftFacing.x);
+  });
+
+  it("returns ordered move hitboxes for sweetspot moves", () => {
+    const move = getCharacter("marth").moves.forwardTilt;
+    const [sweetspot, sourspot] = getMoveHitboxes(createTestFighter({ x: 400 }), move);
+
+    expect(sweetspot.definition.id).toBe("sweetspot");
+    expect(sweetspot.rect.x).toBe(482);
+    expect(sourspot.definition.id).toBe("sourspot");
+    expect(sourspot.rect.x).toBe(430);
   });
 
   it("keeps shield collision separate from the body hurtbox", () => {

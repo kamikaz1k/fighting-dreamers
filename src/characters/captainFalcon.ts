@@ -8,6 +8,7 @@ function tuneMove(move: MoveDefinition, overrides: Partial<MoveDefinition>): Mov
     ...overrides,
     knockback: overrides.knockback ?? move.knockback,
     hitbox: overrides.hitbox ?? move.hitbox,
+    hitboxes: overrides.hitboxes ?? move.hitboxes,
   };
 }
 

@@ -9,7 +9,7 @@ import {
 } from "./config";
 import { getCharacter } from "./characters";
 import { getCurrentMove, getLaunchSpeed, isMoveActive } from "./combat";
-import { getHurtbox, getMoveHitbox, getShieldBox } from "./geometry";
+import { getHurtbox, getMoveHitboxes, getShieldBox } from "./geometry";
 import { clamp } from "./math";
 import type { MoveDefinition } from "./moves";
 import type { Fighter, FighterCommand } from "./types";
@@ -90,13 +90,20 @@ function renderFighters(
     const move = getCurrentMove(fighter);
 
     if (move && debugEnabled) {
-      const hitbox = getMoveHitbox(fighter, move);
       const active = isMoveActive(fighter, move);
-
-      ctx.fillStyle = active ? "rgba(250, 204, 21, 0.45)" : "rgba(148, 163, 184, 0.22)";
-      ctx.fillRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
-      ctx.strokeStyle = active ? "#facc15" : "#94a3b8";
-      ctx.strokeRect(hitbox.x, hitbox.y, hitbox.width, hitbox.height);
+      for (const { definition, rect } of getMoveHitboxes(fighter, move)) {
+        const isSweetspot = definition.id.includes("sweetspot");
+        ctx.fillStyle = active
+          ? isSweetspot
+            ? "rgba(251, 146, 60, 0.5)"
+            : "rgba(250, 204, 21, 0.45)"
+          : "rgba(148, 163, 184, 0.22)";
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+        ctx.strokeStyle = active
+          ? isSweetspot ? "#fb923c" : "#facc15"
+          : "#94a3b8";
+        ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+      }
 
       ctx.fillStyle = "#fde68a";
       ctx.fillText(`${move.id}:${fighter.moveFrame} ${getMovePhase(fighter, move)}`, fighter.x, fighter.y + 40);
@@ -133,7 +140,7 @@ function renderMoveDebug(
     fighter.y + 88,
   );
   ctx.fillText(
-    `launch 0/50/100 ${getLaunchSpeed(move, 0).toFixed(0)}/${getLaunchSpeed(move, 50).toFixed(0)}/${getLaunchSpeed(move, 100).toFixed(0)} box ${move.hitbox.width}x${move.hitbox.height}`,
+    `launch 0/50/100 ${getLaunchSpeed(move, 0).toFixed(0)}/${getLaunchSpeed(move, 50).toFixed(0)}/${getLaunchSpeed(move, 100).toFixed(0)} boxes ${move.hitboxes?.length ?? 1}`,
     fighter.x,
     fighter.y + 104,
   );

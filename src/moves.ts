@@ -11,6 +11,25 @@ export type MoveRole =
   | "air-control"
   | "placeholder";
 
+export type KnockbackDefinition = {
+  base: number;
+  growth: number;
+  damageFactor: number;
+  angleDeg: number;
+};
+
+export type MoveHitboxDefinition = {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  damage?: number;
+  knockback?: KnockbackDefinition;
+  shieldDamage?: number;
+  hitstopFrames?: number;
+};
+
 export type MoveDefinition = {
   id: string;
   button: MoveButton;
@@ -22,13 +41,9 @@ export type MoveDefinition = {
   activeFrames: number;
   recoveryFrames: number;
   damage: number;
-  knockback: {
-    base: number;
-    growth: number;
-    damageFactor: number;
-    angleDeg: number;
-  };
+  knockback: KnockbackDefinition;
   hitbox: { x: number; y: number; width: number; height: number };
+  hitboxes?: MoveHitboxDefinition[];
   shieldDamage: number;
   hitstopFrames: number;
   movementMultiplier?: number;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getCharacter } from "./characters";
-import { getLaunchSpeed, getScaledKnockback, resolveAttackCollision } from "./combat";
+import { getLaunchSpeed, getResolvedHit, getScaledKnockback, resolveAttackCollision } from "./combat";
 import { createTestFighter } from "./testHelpers";
 
 describe("combat", () => {
@@ -28,9 +28,10 @@ describe("combat", () => {
   });
 
   it("uses the shield box before the hurtbox and blocks damage", () => {
-    const move = getCharacter("marth").moves.forwardTilt;
+    const move = getCharacter("captainFalcon").moves.forwardTilt;
     const attacker = createTestFighter({
       id: "attacker",
+      characterId: "captainFalcon",
       x: 400,
       currentMoveId: move.id,
       moveFrame: move.startupFrames,
@@ -47,6 +48,31 @@ describe("combat", () => {
     expect(defender.shield).toBe(100 - move.shieldDamage);
     expect(defender.state).toBe("shield");
     expect(defender.velocityX).toBe(getLaunchSpeed(move, 0) * 0.35);
+  });
+
+  it("uses the first matching sweetspot hitbox overrides", () => {
+    const move = getCharacter("marth").moves.forwardTilt;
+    const sweetspot = move.hitboxes?.[0];
+    const attacker = createTestFighter({
+      id: "attacker",
+      x: 400,
+      currentMoveId: move.id,
+      moveFrame: move.startupFrames,
+    });
+    const defender = createTestFighter({ id: "defender", x: 520 });
+
+    if (!sweetspot) {
+      throw new Error("Expected Marth forward tilt to define a sweetspot");
+    }
+
+    resolveAttackCollision(attacker, defender);
+
+    const resolvedHit = getResolvedHit(move, sweetspot);
+    const knockback = getScaledKnockback(resolvedHit, resolvedHit.damage);
+
+    expect(defender.damagePercent).toBe(resolvedHit.damage);
+    expect(defender.velocityX).toBe(knockback.x);
+    expect(defender.hitstopFrames).toBe(resolvedHit.hitstopFrames);
   });
 
   it("scales knockback with accumulated damage", () => {

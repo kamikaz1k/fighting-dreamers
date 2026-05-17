@@ -8,6 +8,7 @@ function tuneMove(move: MoveDefinition, overrides: Partial<MoveDefinition>): Mov
     ...overrides,
     knockback: overrides.knockback ?? move.knockback,
     hitbox: overrides.hitbox ?? move.hitbox,
+    hitboxes: overrides.hitboxes ?? move.hitboxes,
   };
 }
 
@@ -24,6 +25,20 @@ export const marthMoves: Record<string, MoveDefinition> = {
     damage: 8,
     knockback: { base: 300, growth: 7, damageFactor: 7, angleDeg: 18 },
     hitbox: { x: 30, y: -78, width: 72, height: 22 },
+    hitboxes: [
+      {
+        id: "sweetspot",
+        x: 82,
+        y: -78,
+        width: 20,
+        height: 22,
+        damage: 11,
+        knockback: { base: 360, growth: 9, damageFactor: 8, angleDeg: 18 },
+        shieldDamage: 18,
+        hitstopFrames: 6,
+      },
+      { id: "sourspot", x: 30, y: -78, width: 52, height: 22 },
+    ],
   }),
   upTilt: tuneMove(moveDefinitions.upTilt, {
     startupFrames: 6,
@@ -42,6 +57,20 @@ export const marthMoves: Record<string, MoveDefinition> = {
     damage: 16,
     knockback: { base: 610, growth: 12, damageFactor: 8, angleDeg: 18 },
     hitbox: { x: 34, y: -70, width: 86, height: 28 },
+    hitboxes: [
+      {
+        id: "sweetspot",
+        x: 94,
+        y: -70,
+        width: 26,
+        height: 28,
+        damage: 20,
+        knockback: { base: 720, growth: 14, damageFactor: 9, angleDeg: 18 },
+        shieldDamage: 30,
+        hitstopFrames: 10,
+      },
+      { id: "sourspot", x: 34, y: -70, width: 60, height: 28 },
+    ],
   }),
   upSmash: tuneMove(moveDefinitions.upSmash, {
     startupFrames: 15,
@@ -77,12 +106,40 @@ export const marthMoves: Record<string, MoveDefinition> = {
     damage: 8,
     knockback: { base: 250, growth: 5, damageFactor: 7, angleDeg: 62 },
     hitbox: { x: 28, y: -82, width: 86, height: 34 },
+    hitboxes: [
+      {
+        id: "sweetspot",
+        x: 92,
+        y: -82,
+        width: 22,
+        height: 34,
+        damage: 10,
+        knockback: { base: 320, growth: 7, damageFactor: 8, angleDeg: 62 },
+        shieldDamage: 16,
+        hitstopFrames: 6,
+      },
+      { id: "sourspot", x: 28, y: -82, width: 64, height: 34 },
+    ],
   }),
   backAir: tuneMove(moveDefinitions.backAir, {
     startupFrames: 7,
     damage: 9,
     knockback: { base: 330, growth: 8, damageFactor: 7, angleDeg: 24 },
     hitbox: { x: -96, y: -78, width: 74, height: 28 },
+    hitboxes: [
+      {
+        id: "sweetspot",
+        x: -96,
+        y: -78,
+        width: 22,
+        height: 28,
+        damage: 12,
+        knockback: { base: 400, growth: 10, damageFactor: 8, angleDeg: 24 },
+        shieldDamage: 20,
+        hitstopFrames: 7,
+      },
+      { id: "sourspot", x: -74, y: -78, width: 52, height: 28 },
+    ],
   }),
   upAir: tuneMove(moveDefinitions.upAir, {
     startupFrames: 6,

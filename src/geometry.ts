@@ -1,17 +1,36 @@
 import { getCharacter } from "./characters";
 import type { Fighter, Rect } from "./types";
-import type { MoveDefinition } from "./moves";
+import type { MoveDefinition, MoveHitboxDefinition } from "./moves";
 
 export function getMoveHitbox(fighter: Fighter, move: MoveDefinition): Rect {
+  return getMoveHitboxes(fighter, move)[0].rect;
+}
+
+export function getMoveHitboxes(
+  fighter: Fighter,
+  move: MoveDefinition,
+): Array<{ definition: MoveHitboxDefinition; rect: Rect }> {
+  const hitboxDefinitions = move.hitboxes ?? [{
+    id: "default",
+    ...move.hitbox,
+  }];
+
+  return hitboxDefinitions.map((definition) => ({
+    definition,
+    rect: getMoveHitboxRect(fighter, definition),
+  }));
+}
+
+function getMoveHitboxRect(fighter: Fighter, hitbox: MoveHitboxDefinition): Rect {
   const x = fighter.facing === 1
-    ? fighter.x + move.hitbox.x
-    : fighter.x - move.hitbox.x - move.hitbox.width;
+    ? fighter.x + hitbox.x
+    : fighter.x - hitbox.x - hitbox.width;
 
   return {
     x,
-    y: fighter.y + move.hitbox.y,
-    width: move.hitbox.width,
-    height: move.hitbox.height,
+    y: fighter.y + hitbox.y,
+    width: hitbox.width,
+    height: hitbox.height,
   };
 }
 
