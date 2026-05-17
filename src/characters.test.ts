@@ -6,7 +6,8 @@ describe("characters", () => {
     const captainFalcon = getCharacter("captainFalcon");
     const marth = getCharacter("marth");
 
-    expect(captainFalcon.movement.maxGroundSpeed).toBeGreaterThan(marth.movement.maxGroundSpeed);
+    expect(captainFalcon.movement.maxGroundSpeed).toBeGreaterThan(marth.movement.maxGroundSpeed * 1.25);
+    expect(captainFalcon.movement.maxAirSpeed).toBeGreaterThan(marth.movement.maxAirSpeed * 1.1);
     expect(marth.moves.forwardAir.hitbox.width).toBeGreaterThan(captainFalcon.moves.forwardAir.hitbox.width);
     expect(marth.moves.forwardAir.hitboxes).toHaveLength(2);
     expect(captainFalcon.moves.neutralAir.hitWindows).toHaveLength(2);
