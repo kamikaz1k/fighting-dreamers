@@ -3,7 +3,7 @@ import { getCharacter } from "./characters";
 import type { Fighter } from "./types";
 
 export function createTestFighter(overrides: Partial<Fighter> = {}): Fighter {
-  const characterId = overrides.characterId ?? "dreamer";
+  const characterId = overrides.characterId ?? "marth";
   const character = getCharacter(characterId);
 
   return {

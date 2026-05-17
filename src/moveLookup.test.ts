@@ -110,8 +110,8 @@ describe("move lookup", () => {
   });
 
   it("selects moves from the fighter character moveset", () => {
-    const dreamer = createTestFighter({ characterId: "dreamer" });
-    const striker = createTestFighter({ characterId: "striker" });
+    const captainFalcon = createTestFighter({ characterId: "captainFalcon" });
+    const marth = createTestFighter({ characterId: "marth" });
 
     const action = {
       button: "special" as const,
@@ -122,7 +122,7 @@ describe("move lookup", () => {
       framesRemaining: 6,
     };
 
-    expect(getMoveForBufferedAction(dreamer, action).damage).toBe(11);
-    expect(getMoveForBufferedAction(striker, action).damage).toBe(13);
+    expect(getMoveForBufferedAction(captainFalcon, action).damage).toBe(11);
+    expect(getMoveForBufferedAction(marth, action).damage).toBe(8);
   });
 });

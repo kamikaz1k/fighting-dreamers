@@ -351,12 +351,12 @@ describe("physics", () => {
   });
 
   it("uses character-specific movement config", () => {
-    const dreamer = createTestFighter({ characterId: "dreamer" });
-    const striker = createTestFighter({ characterId: "striker" });
+    const captainFalcon = createTestFighter({ characterId: "captainFalcon" });
+    const marth = createTestFighter({ characterId: "marth" });
 
-    applyMovement(dreamer, { ...idleCommand, moveX: 1 });
-    applyMovement(striker, { ...idleCommand, moveX: 1 });
+    applyMovement(captainFalcon, { ...idleCommand, moveX: 1 });
+    applyMovement(marth, { ...idleCommand, moveX: 1 });
 
-    expect(dreamer.velocityX).toBeGreaterThan(striker.velocityX);
+    expect(captainFalcon.velocityX).toBeGreaterThan(marth.velocityX);
   });
 });

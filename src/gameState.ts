@@ -19,7 +19,7 @@ export function createInitialFighters(): Fighter[] {
   return [
     createFighter({
       id: "p1",
-      characterId: "dreamer",
+      characterId: "captainFalcon",
       name: "Player 1",
       x: 360,
       color: "#38bdf8",
@@ -27,7 +27,7 @@ export function createInitialFighters(): Fighter[] {
     }),
     createFighter({
       id: "cpu",
-      characterId: "striker",
+      characterId: "marth",
       name: "CPU",
       x: 600,
       color: "#fb7185",

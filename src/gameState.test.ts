@@ -56,15 +56,15 @@ describe("game state", () => {
   it("creates fighters from character definitions", () => {
     const [player, cpu] = createInitialFighters();
 
-    expect(player.characterId).toBe("dreamer");
-    expect(player.width).toBe(52);
-    expect(player.height).toBe(83);
-    expect(player.maxShield).toBe(100);
+    expect(player.characterId).toBe("captainFalcon");
+    expect(player.width).toBe(54);
+    expect(player.height).toBe(86);
+    expect(player.maxShield).toBe(95);
     expect(player.airJumpsRemaining).toBe(1);
-    expect(cpu.characterId).toBe("striker");
-    expect(cpu.width).toBe(58);
-    expect(cpu.height).toBe(86);
-    expect(cpu.maxShield).toBe(90);
+    expect(cpu.characterId).toBe("marth");
+    expect(cpu.width).toBe(52);
+    expect(cpu.height).toBe(84);
+    expect(cpu.maxShield).toBe(100);
   });
 
   it("supports fallback spawn points beyond configured slots", () => {

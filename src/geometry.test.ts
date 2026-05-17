@@ -56,7 +56,7 @@ describe("geometry", () => {
   });
 
   it("uses character-specific shield boxes", () => {
-    expect(getShieldBox(createTestFighter({ characterId: "dreamer" })).width).toBe(92);
-    expect(getShieldBox(createTestFighter({ characterId: "striker" })).width).toBe(104);
+    expect(getShieldBox(createTestFighter({ characterId: "captainFalcon" })).width).toBe(92);
+    expect(getShieldBox(createTestFighter({ characterId: "marth" })).width).toBe(100);
   });
 });

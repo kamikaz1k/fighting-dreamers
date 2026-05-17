@@ -74,7 +74,7 @@ describe("actions", () => {
   });
 
   it("sets and ticks character move cooldowns", () => {
-    const fighter = createTestFighter();
+    const fighter = createTestFighter({ characterId: "captainFalcon" });
     const move = moveDefinitions.upSpecial;
 
     startAttack(fighter, move);
@@ -87,16 +87,16 @@ describe("actions", () => {
   });
 
   it("uses character-specific cooldowns", () => {
-    const fighter = createTestFighter({ characterId: "striker" });
+    const fighter = createTestFighter({ characterId: "marth" });
     const move = moveDefinitions.upSpecial;
 
     startAttack(fighter, move);
 
-    expect(fighter.moveCooldowns.get(move.id)).toBe(28);
+    expect(fighter.moveCooldowns.get(move.id)).toBe(22);
   });
 
   it("shares cooldown between grounded and aerial up special", () => {
-    const fighter = createTestFighter();
+    const fighter = createTestFighter({ characterId: "captainFalcon" });
 
     startAttack(fighter, moveDefinitions.upSpecial);
 
@@ -208,12 +208,12 @@ describe("actions", () => {
   });
 
   it("uses character-specific shield config", () => {
-    const dreamer = createTestFighter({ characterId: "dreamer", shield: 50 });
-    const striker = createTestFighter({ characterId: "striker", shield: 50 });
+    const captainFalcon = createTestFighter({ characterId: "captainFalcon", shield: 50 });
+    const marth = createTestFighter({ characterId: "marth", shield: 50 });
 
-    updateShield(dreamer, { ...idleCommand, shieldHeld: true });
-    updateShield(striker, { ...idleCommand, shieldHeld: true });
+    updateShield(captainFalcon, { ...idleCommand, shieldHeld: true });
+    updateShield(marth, { ...idleCommand, shieldHeld: true });
 
-    expect(striker.shield).toBeLessThan(dreamer.shield);
+    expect(marth.shield).toBe(captainFalcon.shield);
   });
 });

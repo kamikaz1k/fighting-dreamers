@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { getCharacter } from "./characters";
 import { getLaunchSpeed, getScaledKnockback, resolveAttackCollision } from "./combat";
-import { moveDefinitions } from "./moves";
 import { createTestFighter } from "./testHelpers";
 
 describe("combat", () => {
   it("applies damage percent, scaled knockback, hitstun, hitstop, and hit-once tracking", () => {
-    const move = moveDefinitions.forwardTilt;
+    const move = getCharacter("marth").moves.forwardTilt;
     const attacker = createTestFighter({
       id: "attacker",
       x: 400,
@@ -28,7 +28,7 @@ describe("combat", () => {
   });
 
   it("uses the shield box before the hurtbox and blocks damage", () => {
-    const move = moveDefinitions.forwardTilt;
+    const move = getCharacter("marth").moves.forwardTilt;
     const attacker = createTestFighter({
       id: "attacker",
       x: 400,
@@ -50,7 +50,7 @@ describe("combat", () => {
   });
 
   it("scales knockback with accumulated damage", () => {
-    const move = moveDefinitions.forwardTilt;
+    const move = getCharacter("marth").moves.forwardTilt;
 
     expect(getLaunchSpeed(move, 50)).toBe(
       move.knockback.base + move.knockback.growth * 50 + move.damage * move.knockback.damageFactor,
