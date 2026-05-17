@@ -42,9 +42,13 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
   const wasGrounded = fighter.grounded;
   const previousY = fighter.y;
   const movement = getCharacter(fighter.characterId).movement;
+  const currentMove = getCurrentMove(fighter);
+  const airControlMultiplier = fighter.state === "attack" && !fighter.grounded
+    ? currentMove?.airControlMultiplier ?? 1
+    : 1;
   const acceleration = fighter.grounded
     ? movement.groundAcceleration
-    : movement.airAcceleration;
+    : movement.airAcceleration * airControlMultiplier;
   const maxSpeed = fighter.grounded ? movement.maxGroundSpeed : movement.maxAirSpeed;
 
   if (fighter.grounded && command.moveY === 1 && isOnAnyPlatform(fighter)) {
@@ -71,8 +75,8 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
 
   fighter.velocityX = clamp(fighter.velocityX, -maxSpeed, maxSpeed);
 
-  if (fighter.state === "attack") {
-    fighter.velocityX *= getCurrentMove(fighter)?.movementMultiplier ?? 1;
+  if (fighter.state === "attack" && fighter.grounded) {
+    fighter.velocityX *= currentMove?.groundedMovementMultiplier ?? 1;
   }
 
   if (fighter.grounded && fighter.landingJumpCooldownFrames > 0) {

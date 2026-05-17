@@ -42,7 +42,7 @@ export const captainFalconMoves: Record<string, MoveDefinition> = {
     hitbox: { x: 18, y: -72, width: 64, height: 42 },
     shieldDamage: 32,
     hitstopFrames: 10,
-    movementMultiplier: 0.1,
+    groundedMovementMultiplier: 0.1,
   }),
   sideSpecial: tuneMove(moveDefinitions.sideSpecial, {
     startupFrames: 11,
@@ -105,7 +105,7 @@ export const captainFalconMoves: Record<string, MoveDefinition> = {
     hitbox: { x: 24, y: -72, width: 40, height: 28 },
     shieldDamage: 22,
     hitstopFrames: 8,
-    movementMultiplier: 0.54,
+    airControlMultiplier: 0.54,
   }),
   upAir: tuneMove(moveDefinitions.upAir, {
     startupFrames: 5,
@@ -130,7 +130,7 @@ export const captainFalconMoves: Record<string, MoveDefinition> = {
     hitbox: { x: -28, y: -76, width: 62, height: 42 },
     shieldDamage: 32,
     hitstopFrames: 10,
-    movementMultiplier: 0.18,
+    airControlMultiplier: 0.18,
   }),
 };
 

@@ -54,7 +54,8 @@ export type MoveDefinition = {
   hitWindows?: MoveHitWindowDefinition[];
   shieldDamage: number;
   hitstopFrames: number;
-  movementMultiplier?: number;
+  groundedMovementMultiplier?: number;
+  airControlMultiplier?: number;
   selfVelocity?: { x: number; y: number };
   cooldownKey?: string;
 };
@@ -74,7 +75,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: 24, y: -78, width: 38, height: 24 },
     shieldDamage: 12,
     hitstopFrames: 4,
-    movementMultiplier: 0.45,
+    groundedMovementMultiplier: 0.45,
   },
   forwardTilt: {
     id: "forwardTilt",
@@ -90,7 +91,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: 28, y: -76, width: 48, height: 24 },
     shieldDamage: 15,
     hitstopFrames: 5,
-    movementMultiplier: 0.4,
+    groundedMovementMultiplier: 0.4,
   },
   upTilt: {
     id: "upTilt",
@@ -106,7 +107,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: -14, y: -124, width: 44, height: 48 },
     shieldDamage: 14,
     hitstopFrames: 5,
-    movementMultiplier: 0.5,
+    groundedMovementMultiplier: 0.5,
   },
   downTilt: {
     id: "downTilt",
@@ -122,7 +123,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: 18, y: -38, width: 42, height: 26 },
     shieldDamage: 13,
     hitstopFrames: 4,
-    movementMultiplier: 0.45,
+    groundedMovementMultiplier: 0.45,
   },
   forwardSmash: {
     id: "forwardSmash",
@@ -139,7 +140,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: 30, y: -64, width: 72, height: 32 },
     shieldDamage: 24,
     hitstopFrames: 8,
-    movementMultiplier: 0.25,
+    groundedMovementMultiplier: 0.25,
   },
   upSmash: {
     id: "upSmash",
@@ -156,7 +157,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: -18, y: -136, width: 56, height: 62 },
     shieldDamage: 22,
     hitstopFrames: 8,
-    movementMultiplier: 0.25,
+    groundedMovementMultiplier: 0.25,
   },
   downSmash: {
     id: "downSmash",
@@ -173,7 +174,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: -38, y: -34, width: 96, height: 32 },
     shieldDamage: 22,
     hitstopFrames: 8,
-    movementMultiplier: 0.25,
+    groundedMovementMultiplier: 0.25,
   },
   neutralSpecial: {
     id: "neutralSpecial",
@@ -189,7 +190,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: 22, y: -58, width: 54, height: 28 },
     shieldDamage: 18,
     hitstopFrames: 6,
-    movementMultiplier: 0.35,
+    groundedMovementMultiplier: 0.35,
   },
   sideSpecial: {
     id: "sideSpecial",
@@ -205,7 +206,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: 30, y: -62, width: 66, height: 30 },
     shieldDamage: 22,
     hitstopFrames: 7,
-    movementMultiplier: 0.28,
+    groundedMovementMultiplier: 0.28,
   },
   upSpecial: {
     id: "upSpecial",
@@ -221,7 +222,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: -16, y: -132, width: 50, height: 58 },
     shieldDamage: 20,
     hitstopFrames: 7,
-    movementMultiplier: 0.3,
+    groundedMovementMultiplier: 0.3,
     selfVelocity: { x: 260, y: -860 },
     cooldownKey: "upSpecial",
   },
@@ -239,7 +240,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: 16, y: -32, width: 58, height: 30 },
     shieldDamage: 19,
     hitstopFrames: 6,
-    movementMultiplier: 0.35,
+    groundedMovementMultiplier: 0.35,
   },
   neutralAir: {
     id: "neutralAir",
@@ -255,7 +256,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: -23, y: -76, width: 46, height: 34 },
     shieldDamage: 12,
     hitstopFrames: 4,
-    movementMultiplier: 0.72,
+    airControlMultiplier: 0.72,
   },
   forwardAir: {
     id: "forwardAir",
@@ -271,7 +272,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: 26, y: -72, width: 54, height: 30 },
     shieldDamage: 14,
     hitstopFrames: 5,
-    movementMultiplier: 0.65,
+    airControlMultiplier: 0.65,
   },
   backAir: {
     id: "backAir",
@@ -287,7 +288,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: -70, y: -72, width: 50, height: 30 },
     shieldDamage: 14,
     hitstopFrames: 5,
-    movementMultiplier: 0.65,
+    airControlMultiplier: 0.65,
   },
   upAir: {
     id: "upAir",
@@ -303,7 +304,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: -14, y: -120, width: 44, height: 48 },
     shieldDamage: 14,
     hitstopFrames: 5,
-    movementMultiplier: 0.7,
+    airControlMultiplier: 0.7,
   },
   downAir: {
     id: "downAir",
@@ -319,7 +320,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: 0, y: -40, width: 42, height: 44 },
     shieldDamage: 14,
     hitstopFrames: 5,
-    movementMultiplier: 0.62,
+    airControlMultiplier: 0.62,
   },
   airNeutralSpecial: {
     id: "airNeutralSpecial",
@@ -335,7 +336,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: -31, y: -70, width: 62, height: 36 },
     shieldDamage: 20,
     hitstopFrames: 6,
-    movementMultiplier: 0.5,
+    airControlMultiplier: 0.5,
   },
   airSideSpecial: {
     id: "airSideSpecial",
@@ -351,7 +352,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: 30, y: -66, width: 68, height: 34 },
     shieldDamage: 22,
     hitstopFrames: 7,
-    movementMultiplier: 0.45,
+    airControlMultiplier: 0.45,
   },
   airUpSpecial: {
     id: "airUpSpecial",
@@ -367,7 +368,7 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: -18, y: -132, width: 54, height: 58 },
     shieldDamage: 20,
     hitstopFrames: 7,
-    movementMultiplier: 0.48,
+    airControlMultiplier: 0.48,
     selfVelocity: { x: 260, y: -860 },
     cooldownKey: "upSpecial",
   },
@@ -385,6 +386,6 @@ export const moveDefinitions: Record<string, MoveDefinition> = {
     hitbox: { x: -4, y: -36, width: 54, height: 48 },
     shieldDamage: 22,
     hitstopFrames: 7,
-    movementMultiplier: 0.42,
+    airControlMultiplier: 0.42,
   },
 };

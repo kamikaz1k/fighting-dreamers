@@ -46,6 +46,37 @@ describe("physics", () => {
     expect(fighter.facing).toBe(1);
   });
 
+  it("preserves existing aerial momentum while attacking", () => {
+    const fighter = createTestFighter({
+      state: "attack",
+      currentMoveId: "neutralAir",
+      grounded: false,
+      y: 300,
+      velocityX: 180,
+    });
+
+    applyMovement(fighter, idleCommand);
+
+    expect(fighter.velocityX).toBe(180);
+  });
+
+  it("still allows reduced steering during aerial attacks", () => {
+    const fighter = createTestFighter({
+      state: "attack",
+      currentMoveId: "neutralAir",
+      grounded: false,
+      y: 300,
+      velocityX: 0,
+    });
+
+    applyMovement(fighter, { ...idleCommand, moveX: 1 });
+
+    expect(fighter.velocityX).toBeGreaterThan(0);
+    expect(fighter.velocityX).toBeLessThan(
+      movementConfig.airAcceleration * (1 / 60),
+    );
+  });
+
   it("requires jump press to start a grounded jump after landing cooldown", () => {
     expect(shouldStartJump(
       createTestFighter({ grounded: true, landingJumpCooldownFrames: 0 }),

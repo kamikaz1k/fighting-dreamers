@@ -86,7 +86,7 @@ export const marthMoves: Record<string, MoveDefinition> = {
     hitbox: { x: 34, y: -72, width: 82, height: 28 },
     shieldDamage: 28,
     hitstopFrames: 8,
-    movementMultiplier: 0.2,
+    groundedMovementMultiplier: 0.2,
   }),
   sideSpecial: tuneMove(moveDefinitions.sideSpecial, {
     startupFrames: 8,
