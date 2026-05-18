@@ -1,0 +1,250 @@
+{
+  "source": "https://www.fightcore.gg/characters",
+  "downloadedAt": "2026-05-18T03:43:47.073Z",
+  "characterCount": 27,
+  "characters": [
+    {
+      "id": 0,
+      "name": "Female Wireframe",
+      "normalizedName": "fwireframe",
+      "slug": "fwireframe",
+      "sourceUrl": "https://www.fightcore.gg/characters/0/fwireframe/",
+      "file": "characters/0-fwireframe.json",
+      "moveCount": 11
+    },
+    {
+      "id": 209,
+      "name": "Ice Climbers",
+      "normalizedName": "iceclimbers",
+      "slug": "iceclimbers",
+      "sourceUrl": "https://www.fightcore.gg/characters/209/iceclimbers/",
+      "file": "characters/209-iceclimbers.json",
+      "moveCount": 46
+    },
+    {
+      "id": 210,
+      "name": "Kirby",
+      "normalizedName": "kirby",
+      "slug": "kirby",
+      "sourceUrl": "https://www.fightcore.gg/characters/210/kirby/",
+      "file": "characters/210-kirby.json",
+      "moveCount": 74
+    },
+    {
+      "id": 211,
+      "name": "Yoshi",
+      "normalizedName": "yoshi",
+      "slug": "yoshi",
+      "sourceUrl": "https://www.fightcore.gg/characters/211/yoshi/",
+      "file": "characters/211-yoshi.json",
+      "moveCount": 47
+    },
+    {
+      "id": 212,
+      "name": "Samus",
+      "normalizedName": "samus",
+      "slug": "samus",
+      "sourceUrl": "https://www.fightcore.gg/characters/212/samus/",
+      "file": "characters/212-samus.json",
+      "moveCount": 47
+    },
+    {
+      "id": 213,
+      "name": "Luigi",
+      "normalizedName": "luigi",
+      "slug": "luigi",
+      "sourceUrl": "https://www.fightcore.gg/characters/213/luigi/",
+      "file": "characters/213-luigi.json",
+      "moveCount": 50
+    },
+    {
+      "id": 214,
+      "name": "Jigglypuff",
+      "normalizedName": "jigglypuff",
+      "slug": "jigglypuff",
+      "sourceUrl": "https://www.fightcore.gg/characters/214/jigglypuff/",
+      "file": "characters/214-jigglypuff.json",
+      "moveCount": 47
+    },
+    {
+      "id": 215,
+      "name": "Dr. Mario",
+      "normalizedName": "drmario",
+      "slug": "drmario",
+      "sourceUrl": "https://www.fightcore.gg/characters/215/drmario/",
+      "file": "characters/215-drmario.json",
+      "moveCount": 49
+    },
+    {
+      "id": 216,
+      "name": "Ganondorf",
+      "normalizedName": "ganondorf",
+      "slug": "ganondorf",
+      "sourceUrl": "https://www.fightcore.gg/characters/216/ganondorf/",
+      "file": "characters/216-ganondorf.json",
+      "moveCount": 45
+    },
+    {
+      "id": 217,
+      "name": "Mewtwo",
+      "normalizedName": "mewtwo",
+      "slug": "mewtwo",
+      "sourceUrl": "https://www.fightcore.gg/characters/217/mewtwo/",
+      "file": "characters/217-mewtwo.json",
+      "moveCount": 46
+    },
+    {
+      "id": 218,
+      "name": "Falco",
+      "normalizedName": "falco",
+      "slug": "falco",
+      "sourceUrl": "https://www.fightcore.gg/characters/218/falco/",
+      "file": "characters/218-falco.json",
+      "moveCount": 48
+    },
+    {
+      "id": 219,
+      "name": "Mr. Game & Watch",
+      "normalizedName": "mrgame&watch",
+      "slug": "mrgame&watch",
+      "sourceUrl": "https://www.fightcore.gg/characters/219/mrgame%26watch/",
+      "file": "characters/219-mrgame&watch.json",
+      "moveCount": 45
+    },
+    {
+      "id": 220,
+      "name": "Young Link",
+      "normalizedName": "younglink",
+      "slug": "younglink",
+      "sourceUrl": "https://www.fightcore.gg/characters/220/younglink/",
+      "file": "characters/220-younglink.json",
+      "moveCount": 49
+    },
+    {
+      "id": 221,
+      "name": "Pichu",
+      "normalizedName": "pichu",
+      "slug": "pichu",
+      "sourceUrl": "https://www.fightcore.gg/characters/221/pichu/",
+      "file": "characters/221-pichu.json",
+      "moveCount": 46
+    },
+    {
+      "id": 222,
+      "name": "Marth",
+      "normalizedName": "marth",
+      "slug": "marth",
+      "sourceUrl": "https://www.fightcore.gg/characters/222/marth/",
+      "file": "characters/222-marth.json",
+      "moveCount": 52
+    },
+    {
+      "id": 223,
+      "name": "Roy",
+      "normalizedName": "roy",
+      "slug": "roy",
+      "sourceUrl": "https://www.fightcore.gg/characters/223/roy/",
+      "file": "characters/223-roy.json",
+      "moveCount": 59
+    },
+    {
+      "id": 224,
+      "name": "Fox",
+      "normalizedName": "fox",
+      "slug": "fox",
+      "sourceUrl": "https://www.fightcore.gg/characters/224/fox/",
+      "file": "characters/224-fox.json",
+      "moveCount": 49
+    },
+    {
+      "id": 227,
+      "name": "Captain Falcon",
+      "normalizedName": "captainfalcon",
+      "slug": "captainfalcon",
+      "sourceUrl": "https://www.fightcore.gg/characters/227/captainfalcon/",
+      "file": "characters/227-captainfalcon.json",
+      "moveCount": 49
+    },
+    {
+      "id": 236,
+      "name": "Mario",
+      "normalizedName": "mario",
+      "slug": "mario",
+      "sourceUrl": "https://www.fightcore.gg/characters/236/mario/",
+      "file": "characters/236-mario.json",
+      "moveCount": 48
+    },
+    {
+      "id": 237,
+      "name": "Pikachu",
+      "normalizedName": "pikachu",
+      "slug": "pikachu",
+      "sourceUrl": "https://www.fightcore.gg/characters/237/pikachu/",
+      "file": "characters/237-pikachu.json",
+      "moveCount": 47
+    },
+    {
+      "id": 238,
+      "name": "Link",
+      "normalizedName": "link",
+      "slug": "link",
+      "sourceUrl": "https://www.fightcore.gg/characters/238/link/",
+      "file": "characters/238-link.json",
+      "moveCount": 49
+    },
+    {
+      "id": 239,
+      "name": "Zelda",
+      "normalizedName": "zelda",
+      "slug": "zelda",
+      "sourceUrl": "https://www.fightcore.gg/characters/239/zelda/",
+      "file": "characters/239-zelda.json",
+      "moveCount": 46
+    },
+    {
+      "id": 240,
+      "name": "Peach",
+      "normalizedName": "peach",
+      "slug": "peach",
+      "sourceUrl": "https://www.fightcore.gg/characters/240/peach/",
+      "file": "characters/240-peach.json",
+      "moveCount": 48
+    },
+    {
+      "id": 241,
+      "name": "Bowser",
+      "normalizedName": "bowser",
+      "slug": "bowser",
+      "sourceUrl": "https://www.fightcore.gg/characters/241/bowser/",
+      "file": "characters/241-bowser.json",
+      "moveCount": 48
+    },
+    {
+      "id": 242,
+      "name": "Donkey Kong",
+      "normalizedName": "donkeykong",
+      "slug": "donkeykong",
+      "sourceUrl": "https://www.fightcore.gg/characters/242/donkeykong/",
+      "file": "characters/242-donkeykong.json",
+      "moveCount": 50
+    },
+    {
+      "id": 243,
+      "name": "Ness",
+      "normalizedName": "ness",
+      "slug": "ness",
+      "sourceUrl": "https://www.fightcore.gg/characters/243/ness/",
+      "file": "characters/243-ness.json",
+      "moveCount": 50
+    },
+    {
+      "id": 260,
+      "name": "Sheik",
+      "normalizedName": "sheik",
+      "slug": "sheik",
+      "sourceUrl": "https://www.fightcore.gg/characters/260/sheik/",
+      "file": "characters/260-sheik.json",
+      "moveCount": 46
+    }
+  ]
+}
