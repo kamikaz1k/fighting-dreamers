@@ -11,6 +11,8 @@ character-specific move sets.
   extractor.
 - `fightcore/characters/` contains raw per-character JSON payloads exported from
   FightCore character pages by `scripts/download-fightcore-frame-data.mjs`.
+- `normalized/` contains repo-owned reference JSON emitted by
+  `scripts/normalize-melee-frame-data.mjs`.
 
 The extractor dumps are useful for compact move timing and hitbox reference, but
 their default prepared dumps do not include every special move. The FightCore
@@ -39,6 +41,19 @@ npm run frame-data:download:fightcore
 
 That rewrites `fightcore/characters/*.json` and `fightcore/manifest.json` from
 the current FightCore character index.
+
+## Normalizing working data
+
+Run:
+
+```sh
+npm run frame-data:normalize
+```
+
+The first normalization pass covers Captain Falcon only. It keeps every source
+action, labels the actions our engine already implements, and preserves source
+hit timing plus extractor metadata without attempting to convert Melee-space
+bone-relative hitboxes into canvas rectangles.
 
 ## Current focus
 
