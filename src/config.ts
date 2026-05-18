@@ -54,7 +54,7 @@ export const roundConfig = {
 export const blastZoneConfig = {
   left: -240,
   right: WORLD_WIDTH + 240,
-  top: -220,
+  top: -286,
   bottom: WORLD_HEIGHT + 220,
 };
 

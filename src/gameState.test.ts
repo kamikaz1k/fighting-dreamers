@@ -127,6 +127,10 @@ describe("game state", () => {
     expect(blastZoneConfig.bottom).toBeGreaterThan(WORLD_HEIGHT + VIEW_MARGIN_Y);
   });
 
+  it("keeps a taller upper blast zone for vertical survival", () => {
+    expect(Math.abs(blastZoneConfig.top)).toBe(286);
+  });
+
   it("resets the round when KO pause expires", () => {
     const fighters = createInitialFighters();
     fighters[0].x = blastZoneConfig.left - 1;
