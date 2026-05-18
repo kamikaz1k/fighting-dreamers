@@ -174,6 +174,7 @@ export const marthCharacter: CharacterDefinition = {
     airAcceleration: 1380,
     maxGroundSpeed: 278,
     maxAirSpeed: 238,
+    initialDashSpeed: 241,
   },
   shield: {
     ...shieldConfig,

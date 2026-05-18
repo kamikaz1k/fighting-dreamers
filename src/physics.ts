@@ -30,6 +30,10 @@ export function updateMovementState(fighter: Fighter): void {
     return;
   }
 
+  if (fighter.state === "dash" && fighter.dashFramesRemaining > 0) {
+    return;
+  }
+
   fighter.state = Math.abs(fighter.velocityX) > 5 ? "run" : "idle";
 }
 
@@ -62,8 +66,11 @@ export function applyMovement(
   }
 
   updateCrouchState(fighter, command, platformsEnabled);
+  updateDashState(fighter, command, movement);
 
-  if (command.moveX !== 0) {
+  if (fighter.state === "dash" && fighter.dashDirection) {
+    fighter.velocityX = fighter.dashDirection * movement.initialDashSpeed;
+  } else if (command.moveX !== 0) {
     if (canChangeFacing(fighter)) {
       fighter.facing = command.moveX;
     }
@@ -120,14 +127,16 @@ export function applyMovement(
     return;
   }
 
-  const platform = getLandingPlatform(fighter, previousY, command, platformsEnabled);
+  const platform = !wasGrounded
+    ? getLandingPlatform(fighter, previousY, command, platformsEnabled)
+    : null;
 
   if (platform) {
     landFighter(fighter, platform.y, wasGrounded, movement.maxAirJumps);
     return;
   }
 
-  if (canLandOnMainPlatform(fighter, previousY)) {
+  if (!wasGrounded && canLandOnMainPlatform(fighter, previousY)) {
     landFighter(fighter, FLOOR_Y, wasGrounded, movement.maxAirJumps);
   }
 }
@@ -146,6 +155,8 @@ function landFighter(
   fighter.jumpCutApplied = false;
   fighter.fastFalling = false;
   fighter.ledgeSide = null;
+  fighter.dashDirection = null;
+  fighter.dashFramesRemaining = 0;
   fighter.upSpecialAvailable = true;
 
   if (!wasGrounded) {
@@ -231,6 +242,8 @@ function grabLedge(fighter: Fighter, side: -1 | 1): void {
   fighter.velocityY = 0;
   fighter.grounded = false;
   fighter.fastFalling = false;
+  fighter.dashDirection = null;
+  fighter.dashFramesRemaining = 0;
 }
 
 function updateLedgeState(fighter: Fighter, command: FighterCommand): void {
@@ -294,6 +307,48 @@ export function canChangeFacing(fighter: Fighter): boolean {
     && fighter.state !== "attack"
     && fighter.state !== "hitstun"
     && fighter.state !== "ko";
+}
+
+function updateDashState(
+  fighter: Fighter,
+  command: FighterCommand,
+  movement: ReturnType<typeof getCharacter>["movement"],
+): void {
+  if (!fighter.grounded || fighter.state === "attack" || fighter.state === "shield" || fighter.state === "crouch") {
+    clearDashState(fighter);
+    return;
+  }
+
+  if (command.moveXPressed !== 0) {
+    startDash(fighter, command.moveXPressed, movement.dashFrames);
+    return;
+  }
+
+  if (fighter.state !== "dash") {
+    return;
+  }
+
+  fighter.dashFramesRemaining = Math.max(0, fighter.dashFramesRemaining - 1);
+
+  if (fighter.dashFramesRemaining === 0) {
+    fighter.dashDirection = null;
+  }
+}
+
+function startDash(
+  fighter: Fighter,
+  direction: -1 | 1,
+  dashFrames: number,
+): void {
+  fighter.state = "dash";
+  fighter.facing = direction;
+  fighter.dashDirection = direction;
+  fighter.dashFramesRemaining = dashFrames;
+}
+
+function clearDashState(fighter: Fighter): void {
+  fighter.dashDirection = null;
+  fighter.dashFramesRemaining = 0;
 }
 
 function updateCrouchState(

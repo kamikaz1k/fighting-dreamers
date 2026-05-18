@@ -200,7 +200,7 @@ function renderFighterDebug(ctx: CanvasRenderingContext2D, fighter: Fighter): vo
   ctx.font = "11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
   ctx.textAlign = "center";
   ctx.fillText(
-    `${fighter.characterId} ${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)} lcd:${fighter.landingJumpCooldownFrames} aj:${fighter.airJumpsRemaining}`,
+    `${fighter.characterId} ${fighter.state} vx:${fighter.velocityX.toFixed(0)} vy:${fighter.velocityY.toFixed(0)} dash:${fighter.dashFramesRemaining} lcd:${fighter.landingJumpCooldownFrames} aj:${fighter.airJumpsRemaining}`,
     fighter.x,
     fighter.y + 24,
   );

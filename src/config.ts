@@ -17,6 +17,8 @@ export const movementConfig = {
   airAcceleration: 1450,
   maxGroundSpeed: 285,
   maxAirSpeed: 245,
+  initialDashSpeed: 250,
+  dashFrames: 15,
   groundFriction: 2100,
   gravity: 1850,
   jumpVelocity: -789,

@@ -11,6 +11,7 @@ import type { FighterCommand } from "./types";
 
 const idleCommand: FighterCommand = {
   moveX: 0,
+  moveXPressed: 0,
   moveY: 0,
   jumpPressed: false,
   jumpHeld: false,
@@ -44,6 +45,55 @@ describe("physics", () => {
     applyMovement(fighter, { ...idleCommand, moveX: -1 });
 
     expect(fighter.facing).toBe(1);
+  });
+
+  it("starts a character-specific dash on a fresh horizontal press", () => {
+    const captainFalcon = createTestFighter({ characterId: "captainFalcon" });
+    const marth = createTestFighter({ characterId: "marth" });
+
+    applyMovement(captainFalcon, { ...idleCommand, moveX: 1, moveXPressed: 1 });
+    applyMovement(marth, { ...idleCommand, moveX: 1, moveXPressed: 1 });
+    updateMovementState(captainFalcon);
+    updateMovementState(marth);
+
+    expect(captainFalcon.state).toBe("dash");
+    expect(marth.state).toBe("dash");
+    expect(captainFalcon.velocityX).toBe(338);
+    expect(marth.velocityX).toBe(241);
+    expect(captainFalcon.dashFramesRemaining).toBe(15);
+  });
+
+  it("transitions from dash into run after the dash window ends", () => {
+    const fighter = createTestFighter({
+      state: "dash",
+      dashDirection: 1,
+      dashFramesRemaining: 1,
+    });
+
+    applyMovement(fighter, { ...idleCommand, moveX: 1 });
+    updateMovementState(fighter);
+
+    expect(fighter.dashFramesRemaining).toBe(0);
+    expect(fighter.dashDirection).toBeNull();
+    expect(fighter.state).toBe("run");
+  });
+
+  it("restarts dash in the opposite direction on a fresh reverse press", () => {
+    const fighter = createTestFighter({
+      state: "dash",
+      facing: 1,
+      dashDirection: 1,
+      dashFramesRemaining: 8,
+      velocityX: 338,
+    });
+
+    applyMovement(fighter, { ...idleCommand, moveX: -1, moveXPressed: -1 });
+    updateMovementState(fighter);
+
+    expect(fighter.state).toBe("dash");
+    expect(fighter.facing).toBe(-1);
+    expect(fighter.velocityX).toBe(-241);
+    expect(fighter.dashFramesRemaining).toBe(15);
   });
 
   it("preserves existing aerial momentum while attacking", () => {

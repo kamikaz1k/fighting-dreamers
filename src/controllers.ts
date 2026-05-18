@@ -4,6 +4,7 @@ import type { Controller, ControllerContext, FighterCommand } from "./types";
 
 export const idleCommand: FighterCommand = {
   moveX: 0,
+  moveXPressed: 0,
   moveY: 0,
   jumpPressed: false,
   jumpHeld: false,
@@ -22,18 +23,19 @@ export class CpuController implements Controller {
   private attackCooldownFrames = 30;
   private shieldFramesRemaining = 0;
   private cachedCommand: FighterCommand = idleCommand;
+  private previousMoveX: -1 | 0 | 1 = 0;
 
   update(context: ControllerContext): FighterCommand {
     this.attackCooldownFrames = Math.max(0, this.attackCooldownFrames - 1);
     this.reactionFramesRemaining -= 1;
 
     if (this.reactionFramesRemaining > 0) {
-      return this.cachedCommand;
+      return this.withHorizontalPressEdge(this.cachedCommand);
     }
 
     this.reactionFramesRemaining = 10 + (context.frame % 9);
     this.cachedCommand = this.chooseCommand(context);
-    return this.cachedCommand;
+    return this.withHorizontalPressEdge(this.cachedCommand);
   }
 
   private chooseCommand(context: ControllerContext): FighterCommand {
@@ -85,6 +87,15 @@ export class CpuController implements Controller {
     this.intent = "approach";
     return { ...idleCommand, moveX: directionToOpponent };
   }
+
+  private withHorizontalPressEdge(command: FighterCommand): FighterCommand {
+    const moveXPressed = command.moveX !== 0 && command.moveX !== this.previousMoveX
+      ? command.moveX
+      : 0;
+
+    this.previousMoveX = command.moveX;
+    return { ...command, moveXPressed };
+  }
 }
 
 export class KeyboardController implements Controller {
@@ -115,6 +126,7 @@ export class KeyboardController implements Controller {
 
     const command: FighterCommand = {
       moveX: this.readHorizontal(),
+      moveXPressed: this.readHorizontalPressed(),
       moveY: this.readVertical(),
       jumpPressed: this.consumePressed("Space"),
       jumpHeld: this.heldKeys.has("Space"),
@@ -129,6 +141,17 @@ export class KeyboardController implements Controller {
     this.releasedKeys.clear();
     this.smashDirectionFramesRemaining = Math.max(0, this.smashDirectionFramesRemaining - 1);
     return command;
+  }
+
+  private readHorizontalPressed(): -1 | 0 | 1 {
+    const left = this.pressedKeys.has("KeyA");
+    const right = this.pressedKeys.has("KeyD");
+
+    if (left === right) {
+      return 0;
+    }
+
+    return left ? -1 : 1;
   }
 
   private readHorizontal(): -1 | 0 | 1 {

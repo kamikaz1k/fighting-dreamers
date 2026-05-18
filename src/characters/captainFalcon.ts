@@ -185,6 +185,7 @@ export const captainFalconCharacter: CharacterDefinition = {
     airAcceleration: 1650,
     maxGroundSpeed: 360,
     maxAirSpeed: 275,
+    initialDashSpeed: 338,
     gravity: 2050,
     maxFallSpeed: 820,
     fastFallSpeed: 1080,

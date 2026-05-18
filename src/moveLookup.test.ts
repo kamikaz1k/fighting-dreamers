@@ -5,6 +5,7 @@ import type { FighterCommand } from "./types";
 
 const idleCommand: FighterCommand = {
   moveX: 0,
+  moveXPressed: 0,
   moveY: 0,
   jumpPressed: false,
   jumpHeld: false,

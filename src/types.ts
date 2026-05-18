@@ -1,6 +1,6 @@
 import type { MoveButton, MoveDirection } from "./moves";
 
-export type FighterState = "idle" | "run" | "crouch" | "jump" | "fall" | "ledge" | "attack" | "shield" | "hitstun" | "ko";
+export type FighterState = "idle" | "dash" | "run" | "crouch" | "jump" | "fall" | "ledge" | "attack" | "shield" | "hitstun" | "ko";
 
 export type BufferedAction = {
   button: MoveButton;
@@ -30,6 +30,8 @@ export type Fighter = {
   jumpCutApplied: boolean;
   fastFalling: boolean;
   ledgeSide: -1 | 1 | null;
+  dashDirection: -1 | 1 | null;
+  dashFramesRemaining: number;
   upSpecialAvailable: boolean;
   damagePercent: number;
   shield: number;
@@ -46,6 +48,7 @@ export type Fighter = {
 
 export type FighterCommand = {
   moveX: -1 | 0 | 1;
+  moveXPressed: -1 | 0 | 1;
   moveY: -1 | 0 | 1;
   jumpPressed: boolean;
   jumpHeld: boolean;

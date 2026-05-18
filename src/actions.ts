@@ -134,6 +134,8 @@ export function startAttack(
   action?: BufferedAction,
 ): void {
   fighter.state = "attack";
+  fighter.dashDirection = null;
+  fighter.dashFramesRemaining = 0;
   fighter.currentMoveId = move.id;
   fighter.moveFrame = 0;
   fighter.hitFighterIdsThisMove.clear();
