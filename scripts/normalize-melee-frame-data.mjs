@@ -60,11 +60,41 @@ const characterConfigs = {
     groupedFile: "grouped/Captain Falcon.framedata.json",
     fullHitboxesFile: "full-hitboxes/Captain Falcon.framedata.json",
     actionMap: captainFalconActionMap,
+    activeWindowOverrides: {
+      sideb: [
+        namedWindow("detector_ground", 15, 34, "move", "Search window before contact."),
+        namedWindow("uppercut", 3, 7, "after-contact", "Triggered after the detector connects."),
+        namedWindow("downpunch", 3, 7, "after-contact", "Triggered after the detector connects."),
+      ],
+      asideb: [
+        namedWindow("detector_air", 15, 34, "move", "Search window before contact."),
+        namedWindow("uppercut", 3, 7, "after-contact", "Triggered after the detector connects."),
+        namedWindow("downpunch", 3, 7, "after-contact", "Triggered after the detector connects."),
+      ],
+      downb: [
+        namedWindow("ground_clean", 14, 16, "move"),
+        namedWindow("ground_mid", 17, 24, "move"),
+        namedWindow("ground_late", 25, 32, "move"),
+        namedWindow("landing", null, null, "on-landing", "Triggered by the landing hitbox."),
+      ],
+      upb: [
+        namedWindow("hold", 13, 33, "move", "Grab search window."),
+        namedWindow("release", 2, 6, "after-grab", "Triggered after Falcon Dive grabs."),
+      ],
+      aupb: [
+        namedWindow("hold", 13, 33, "move", "Grab search window."),
+        namedWindow("release", 2, 6, "after-grab", "Triggered after Falcon Dive grabs."),
+      ],
+    },
   },
 };
 
 function action(id, kind, context, direction, overrides = {}) {
   return { id, kind, context, direction, ...overrides };
+}
+
+function namedWindow(hitName, startFrame, endFrame, timingBasis, note = null) {
+  return { hitName, startFrame, endFrame, timingBasis, note };
 }
 
 async function main() {
@@ -110,7 +140,13 @@ async function normalizeCharacter(characterId, config) {
     },
     movement: normalizeMovement(fightCore.characterStatistics),
     actions: fightCore.moves
-      .map((move) => normalizeAction(move, grouped[move.normalizedName], fullHitboxes[move.normalizedName], config.actionMap))
+      .map((move) => normalizeAction(
+        move,
+        grouped[move.normalizedName],
+        fullHitboxes[move.normalizedName],
+        config.actionMap,
+        config.activeWindowOverrides?.[move.normalizedName],
+      ))
       .sort(compareActions),
   };
 }
@@ -130,11 +166,12 @@ function normalizeMovement(stats) {
   };
 }
 
-function normalizeAction(move, groupedMove, fullHitboxMove, actionMap) {
+function normalizeAction(move, groupedMove, fullHitboxMove, actionMap, activeWindowOverride) {
   const mappedAction = actionMap[move.normalizedName];
-  const activeWindows = normalizeActiveWindows(move);
-  const firstActiveFrame = activeWindows[0]?.startFrame ?? null;
-  const lastActiveFrame = activeWindows.at(-1)?.endFrame ?? null;
+  const activeWindows = normalizeActiveWindows(move, activeWindowOverride);
+  const moveTimedWindows = activeWindows.filter((window) => window.timingBasis === "move");
+  const firstActiveFrame = getFirstActiveFrame(moveTimedWindows);
+  const lastActiveFrame = getLastActiveFrame(moveTimedWindows);
   const inferredKind = actionTypeByFightCoreType[move.type] ?? "unknown";
 
   return {
@@ -146,8 +183,14 @@ function normalizeAction(move, groupedMove, fullHitboxMove, actionMap) {
     direction: mappedAction?.direction ?? inferDirection(move.normalizedName),
     gameMoveId: mappedAction?.gameMoveId ?? null,
     implementationStatus: mappedAction?.gameMoveId ? "implemented" : "reference-only",
+    timingModel: inferTimingModel(activeWindows),
+    sourceNotes: move.notes ?? null,
     frames: {
       total: normalizeOptionalNumber(move.totalFrames),
+      declaredActiveRange: {
+        startFrame: normalizeOptionalNumber(move.start),
+        endFrame: normalizeOptionalNumber(move.end),
+      },
       firstActive: firstActiveFrame,
       lastActive: lastActiveFrame,
       startup: firstActiveFrame === null ? null : Math.max(0, firstActiveFrame - 1),
@@ -167,11 +210,45 @@ function normalizeAction(move, groupedMove, fullHitboxMove, actionMap) {
   };
 }
 
-function normalizeActiveWindows(move) {
-  return move.hits.map((hit, index) => ({
+function normalizeActiveWindows(move, activeWindowOverride) {
+  if (activeWindowOverride) {
+    return activeWindowOverride.map((window, index) => {
+      const hit = move.hits.find((candidate) => candidate.name === window.hitName);
+
+      if (!hit) {
+        throw new Error(`Missing named hit ${window.hitName} for ${move.normalizedName}`);
+      }
+
+      return normalizeHitWindow(hit, index, window);
+    });
+  }
+
+  const hasOnlyPlaceholderWindows = move.hits.length > 0
+    && move.hits.every((hit) => hit.start === 0 && hit.end === 0)
+    && (move.start ?? 0) > 0
+    && (move.end ?? 0) > 0;
+
+  return move.hits.map((hit, index) => normalizeHitWindow(
+    hit,
+    index,
+    hasOnlyPlaceholderWindows
+      ? { startFrame: null, endFrame: null, timingBasis: "unknown", note: "Per-variant timing is not present in the source rows." }
+      : {},
+  ));
+}
+
+function normalizeHitWindow(hit, index, override = {}) {
+  return {
     id: `hit${index + 1}`,
-    startFrame: normalizeOptionalNumber(hit.start),
-    endFrame: normalizeOptionalNumber(hit.end),
+    sourceName: hit.name ?? null,
+    startFrame: "startFrame" in override
+      ? normalizeOptionalNumber(override.startFrame)
+      : normalizeOptionalNumber(hit.start),
+    endFrame: "endFrame" in override
+      ? normalizeOptionalNumber(override.endFrame)
+      : normalizeOptionalNumber(hit.end),
+    timingBasis: override.timingBasis ?? "move",
+    note: override.note ?? null,
     hitboxes: hit.hitboxes.map((hitbox) => ({
       id: hitbox.name,
       damage: hitbox.damage,
@@ -186,7 +263,7 @@ function normalizeActiveWindows(move) {
         defenderFrames: hitbox.hitlagDefender,
       },
     })),
-  }));
+  };
 }
 
 function normalizeGroupedExtractor(move) {
@@ -288,6 +365,38 @@ function inferDirection(sourceId) {
 
 function normalizeOptionalNumber(value) {
   return typeof value === "number" ? value : null;
+}
+
+function getFirstActiveFrame(windows) {
+  const frames = windows
+    .map((window) => window.startFrame)
+    .filter((frame) => frame !== null);
+
+  return frames.length === 0 ? null : Math.min(...frames);
+}
+
+function getLastActiveFrame(windows) {
+  const frames = windows
+    .map((window) => window.endFrame)
+    .filter((frame) => frame !== null);
+
+  return frames.length === 0 ? null : Math.max(...frames);
+}
+
+function inferTimingModel(windows) {
+  if (windows.every((window) => window.timingBasis === "unknown")) {
+    return "unknown";
+  }
+
+  if (windows.some((window) => window.timingBasis !== "move")) {
+    return "conditional";
+  }
+
+  if (windows.every((window) => window.startFrame === null && window.endFrame === null)) {
+    return "unknown";
+  }
+
+  return "absolute";
 }
 
 function compareActions(left, right) {

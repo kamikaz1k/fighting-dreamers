@@ -30,12 +30,18 @@
       "direction": "down",
       "gameMoveId": "airDownSpecial",
       "implementationStatus": "implemented",
+      "timingModel": "unknown",
+      "sourceNotes": "can also do 11% damage. landing lag only occurs if ground hitbox is activated, which is also the weak hitbox",
       "frames": {
         "total": 57,
-        "firstActive": 0,
-        "lastActive": 0,
-        "startup": 0,
-        "recovery": 57,
+        "declaredActiveRange": {
+          "startFrame": 15,
+          "endFrame": 29
+        },
+        "firstActive": null,
+        "lastActive": null,
+        "startup": null,
+        "recovery": null,
         "interruptibleAsSoonAs": null,
         "landingLag": 45,
         "lCanceledLandingLag": null,
@@ -45,8 +51,11 @@
       "activeWindows": [
         {
           "id": "hit1",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "air_clean",
+          "startFrame": null,
+          "endFrame": null,
+          "timingBasis": "unknown",
+          "note": "Per-variant timing is not present in the source rows.",
           "hitboxes": [
             {
               "id": "id2",
@@ -80,8 +89,11 @@
         },
         {
           "id": "hit2",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "air_mid",
+          "startFrame": null,
+          "endFrame": null,
+          "timingBasis": "unknown",
+          "note": "Per-variant timing is not present in the source rows.",
           "hitboxes": [
             {
               "id": "id1",
@@ -115,8 +127,11 @@
         },
         {
           "id": "hit3",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "air_late",
+          "startFrame": null,
+          "endFrame": null,
+          "timingBasis": "unknown",
+          "note": "Per-variant timing is not present in the source rows.",
           "hitboxes": [
             {
               "id": "id2",
@@ -162,12 +177,18 @@
       "direction": "neutral",
       "gameMoveId": "airNeutralSpecial",
       "implementationStatus": "implemented",
+      "timingModel": "unknown",
+      "sourceNotes": null,
       "frames": {
         "total": 99,
-        "firstActive": 0,
-        "lastActive": 0,
-        "startup": 0,
-        "recovery": 99,
+        "declaredActiveRange": {
+          "startFrame": 52,
+          "endFrame": 56
+        },
+        "firstActive": null,
+        "lastActive": null,
+        "startup": null,
+        "recovery": null,
         "interruptibleAsSoonAs": 65,
         "landingLag": null,
         "lCanceledLandingLag": null,
@@ -177,8 +198,11 @@
       "activeWindows": [
         {
           "id": "hit1",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "air",
+          "startFrame": null,
+          "endFrame": null,
+          "timingBasis": "unknown",
+          "note": "Per-variant timing is not present in the source rows.",
           "hitboxes": [
             {
               "id": "id2",
@@ -238,12 +262,18 @@
       "direction": "forward",
       "gameMoveId": "airSideSpecial",
       "implementationStatus": "implemented",
+      "timingModel": "conditional",
+      "sourceNotes": "once side b collides with a player, the punch hitbox starts, active frames 3-7, with 45 frames endlag",
       "frames": {
         "total": 79,
-        "firstActive": 0,
-        "lastActive": 0,
-        "startup": 0,
-        "recovery": 79,
+        "declaredActiveRange": {
+          "startFrame": 15,
+          "endFrame": 34
+        },
+        "firstActive": 15,
+        "lastActive": 34,
+        "startup": 14,
+        "recovery": 45,
         "interruptibleAsSoonAs": null,
         "landingLag": 20,
         "lCanceledLandingLag": null,
@@ -253,29 +283,11 @@
       "activeWindows": [
         {
           "id": "hit1",
-          "startFrame": 0,
-          "endFrame": 0,
-          "hitboxes": [
-            {
-              "id": "id0",
-              "damage": 7,
-              "angleDeg": 90,
-              "knockbackGrowth": 80,
-              "setKnockback": 0,
-              "baseKnockback": 78,
-              "effect": "Flame",
-              "shieldStunFrames": 5,
-              "hitlag": {
-                "attackerFrames": 5,
-                "defenderFrames": 5
-              }
-            }
-          ]
-        },
-        {
-          "id": "hit2",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "detector_air",
+          "startFrame": 15,
+          "endFrame": 34,
+          "timingBasis": "move",
+          "note": "Search window before contact.",
           "hitboxes": [
             {
               "id": "id2",
@@ -322,9 +334,36 @@
           ]
         },
         {
+          "id": "hit2",
+          "sourceName": "uppercut",
+          "startFrame": 3,
+          "endFrame": 7,
+          "timingBasis": "after-contact",
+          "note": "Triggered after the detector connects.",
+          "hitboxes": [
+            {
+              "id": "id0",
+              "damage": 7,
+              "angleDeg": 90,
+              "knockbackGrowth": 80,
+              "setKnockback": 0,
+              "baseKnockback": 78,
+              "effect": "Flame",
+              "shieldStunFrames": 5,
+              "hitlag": {
+                "attackerFrames": 5,
+                "defenderFrames": 5
+              }
+            }
+          ]
+        },
+        {
           "id": "hit3",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "downpunch",
+          "startFrame": 3,
+          "endFrame": 7,
+          "timingBasis": "after-contact",
+          "note": "Triggered after the detector connects.",
           "hitboxes": [
             {
               "id": "id0",
@@ -356,12 +395,18 @@
       "direction": "up",
       "gameMoveId": "airUpSpecial",
       "implementationStatus": "implemented",
+      "timingModel": "conditional",
+      "sourceNotes": "can grab ledge 5 frames after active end. if grabbed, hit is active frames 2-6 and hit animation takes a total of 79 frames",
       "frames": {
         "total": 64,
-        "firstActive": 0,
-        "lastActive": 0,
-        "startup": 0,
-        "recovery": 64,
+        "declaredActiveRange": {
+          "startFrame": 13,
+          "endFrame": 33
+        },
+        "firstActive": 13,
+        "lastActive": 33,
+        "startup": 12,
+        "recovery": 31,
         "interruptibleAsSoonAs": null,
         "landingLag": null,
         "lCanceledLandingLag": null,
@@ -371,8 +416,11 @@
       "activeWindows": [
         {
           "id": "hit1",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "hold",
+          "startFrame": 13,
+          "endFrame": 33,
+          "timingBasis": "move",
+          "note": "Grab search window.",
           "hitboxes": [
             {
               "id": "id1",
@@ -392,8 +440,11 @@
         },
         {
           "id": "hit2",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "release",
+          "startFrame": 2,
+          "endFrame": 6,
+          "timingBasis": "after-grab",
+          "note": "Triggered after Falcon Dive grabs.",
           "hitboxes": [
             {
               "id": "id1",
@@ -439,12 +490,18 @@
       "direction": "back",
       "gameMoveId": "backAir",
       "implementationStatus": "implemented",
+      "timingModel": "unknown",
+      "sourceNotes": null,
       "frames": {
         "total": 35,
-        "firstActive": 0,
-        "lastActive": 0,
-        "startup": 0,
-        "recovery": 35,
+        "declaredActiveRange": {
+          "startFrame": 10,
+          "endFrame": 17
+        },
+        "firstActive": null,
+        "lastActive": null,
+        "startup": null,
+        "recovery": null,
         "interruptibleAsSoonAs": 29,
         "landingLag": 18,
         "lCanceledLandingLag": 9,
@@ -454,8 +511,11 @@
       "activeWindows": [
         {
           "id": "hit1",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "clean",
+          "startFrame": null,
+          "endFrame": null,
+          "timingBasis": "unknown",
+          "note": "Per-variant timing is not present in the source rows.",
           "hitboxes": [
             {
               "id": "id1",
@@ -503,8 +563,11 @@
         },
         {
           "id": "hit2",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "late",
+          "startFrame": null,
+          "endFrame": null,
+          "timingBasis": "unknown",
+          "note": "Per-variant timing is not present in the source rows.",
           "hitboxes": [
             {
               "id": "id1",
@@ -692,8 +755,14 @@
       "direction": "down",
       "gameMoveId": "downAir",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 44,
+        "declaredActiveRange": {
+          "startFrame": 16,
+          "endFrame": 20
+        },
         "firstActive": 16,
         "lastActive": 20,
         "startup": 15,
@@ -707,8 +776,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 16,
           "endFrame": 20,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id2",
@@ -825,8 +897,14 @@
       "direction": "down",
       "gameMoveId": "downSmash",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 49,
+        "declaredActiveRange": {
+          "startFrame": 19,
+          "endFrame": 32
+        },
         "firstActive": 19,
         "lastActive": 32,
         "startup": 18,
@@ -840,8 +918,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 19,
           "endFrame": 22,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -875,8 +956,11 @@
         },
         {
           "id": "hit2",
+          "sourceName": null,
           "startFrame": 29,
           "endFrame": 32,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -1002,12 +1086,18 @@
       "direction": "down",
       "gameMoveId": "downSpecial",
       "implementationStatus": "implemented",
+      "timingModel": "conditional",
+      "sourceNotes": "strong hit frames 14-16, weaker hit frames 17-24, weakest hit frames 25-32",
       "frames": {
         "total": 64,
-        "firstActive": 0,
-        "lastActive": 0,
-        "startup": 0,
-        "recovery": 64,
+        "declaredActiveRange": {
+          "startFrame": 14,
+          "endFrame": 32
+        },
+        "firstActive": 14,
+        "lastActive": 32,
+        "startup": 13,
+        "recovery": 32,
         "interruptibleAsSoonAs": null,
         "landingLag": null,
         "lCanceledLandingLag": null,
@@ -1017,8 +1107,11 @@
       "activeWindows": [
         {
           "id": "hit1",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "ground_clean",
+          "startFrame": 14,
+          "endFrame": 16,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -1066,8 +1159,11 @@
         },
         {
           "id": "hit2",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "ground_mid",
+          "startFrame": 17,
+          "endFrame": 24,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -1101,8 +1197,11 @@
         },
         {
           "id": "hit3",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "ground_late",
+          "startFrame": 25,
+          "endFrame": 32,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -1136,8 +1235,11 @@
         },
         {
           "id": "hit4",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "landing",
+          "startFrame": null,
+          "endFrame": null,
+          "timingBasis": "on-landing",
+          "note": "Triggered by the landing hitbox.",
           "hitboxes": [
             {
               "id": "id0",
@@ -1197,8 +1299,14 @@
       "direction": "down",
       "gameMoveId": "downTilt",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 35,
+        "declaredActiveRange": {
+          "startFrame": 10,
+          "endFrame": 15
+        },
         "firstActive": 10,
         "lastActive": 15,
         "startup": 9,
@@ -1212,8 +1320,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 10,
           "endFrame": 15,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id2",
@@ -1331,8 +1442,14 @@
       "direction": "forward",
       "gameMoveId": "forwardAir",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 39,
+        "declaredActiveRange": {
+          "startFrame": 14,
+          "endFrame": 30
+        },
         "firstActive": 14,
         "lastActive": 30,
         "startup": 13,
@@ -1346,8 +1463,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 14,
           "endFrame": 16,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -1381,8 +1501,11 @@
         },
         {
           "id": "hit2",
+          "sourceName": null,
           "startFrame": 17,
           "endFrame": 30,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -1508,8 +1631,14 @@
       "direction": "forward",
       "gameMoveId": "forwardSmash",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 64,
+        "declaredActiveRange": {
+          "startFrame": 18,
+          "endFrame": 21
+        },
         "firstActive": 18,
         "lastActive": 21,
         "startup": 17,
@@ -1523,8 +1652,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 18,
           "endFrame": 21,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -1570,8 +1702,14 @@
       "direction": "forward",
       "gameMoveId": "forwardTilt",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 29,
+        "declaredActiveRange": {
+          "startFrame": 9,
+          "endFrame": 11
+        },
         "firstActive": 9,
         "lastActive": 11,
         "startup": 8,
@@ -1585,8 +1723,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 9,
           "endFrame": 11,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -1646,8 +1787,14 @@
       "direction": "neutral",
       "gameMoveId": "jab",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 21,
+        "declaredActiveRange": {
+          "startFrame": 3,
+          "endFrame": 5
+        },
         "firstActive": 3,
         "lastActive": 5,
         "startup": 2,
@@ -1661,8 +1808,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 3,
           "endFrame": 5,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -1778,8 +1928,14 @@
       "direction": "neutral",
       "gameMoveId": "neutralAir",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 44,
+        "declaredActiveRange": {
+          "startFrame": 7,
+          "endFrame": 29
+        },
         "firstActive": 7,
         "lastActive": 29,
         "startup": 6,
@@ -1793,8 +1949,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 7,
           "endFrame": 12,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -1842,8 +2001,11 @@
         },
         {
           "id": "hit2",
+          "sourceName": null,
           "startFrame": 20,
           "endFrame": 29,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -2007,12 +2169,18 @@
       "direction": "neutral",
       "gameMoveId": "neutralSpecial",
       "implementationStatus": "implemented",
+      "timingModel": "unknown",
+      "sourceNotes": null,
       "frames": {
         "total": 99,
-        "firstActive": 0,
-        "lastActive": 0,
-        "startup": 0,
-        "recovery": 99,
+        "declaredActiveRange": {
+          "startFrame": 52,
+          "endFrame": 56
+        },
+        "firstActive": null,
+        "lastActive": null,
+        "startup": null,
+        "recovery": null,
         "interruptibleAsSoonAs": 65,
         "landingLag": null,
         "lCanceledLandingLag": null,
@@ -2022,8 +2190,11 @@
       "activeWindows": [
         {
           "id": "hit1",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "ground",
+          "startFrame": null,
+          "endFrame": null,
+          "timingBasis": "unknown",
+          "note": "Per-variant timing is not present in the source rows.",
           "hitboxes": [
             {
               "id": "id2",
@@ -2083,12 +2254,18 @@
       "direction": "forward",
       "gameMoveId": "sideSpecial",
       "implementationStatus": "implemented",
+      "timingModel": "conditional",
+      "sourceNotes": "once side b collides with a player, the punch hitbox starts, active frames 3-7, with 25 frames endlag",
       "frames": {
         "total": 79,
-        "firstActive": 0,
-        "lastActive": 0,
-        "startup": 0,
-        "recovery": 79,
+        "declaredActiveRange": {
+          "startFrame": 15,
+          "endFrame": 34
+        },
+        "firstActive": 15,
+        "lastActive": 34,
+        "startup": 14,
+        "recovery": 45,
         "interruptibleAsSoonAs": null,
         "landingLag": null,
         "lCanceledLandingLag": null,
@@ -2098,8 +2275,11 @@
       "activeWindows": [
         {
           "id": "hit1",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "detector_ground",
+          "startFrame": 15,
+          "endFrame": 34,
+          "timingBasis": "move",
+          "note": "Search window before contact.",
           "hitboxes": [
             {
               "id": "id0",
@@ -2147,8 +2327,11 @@
         },
         {
           "id": "hit2",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "uppercut",
+          "startFrame": 3,
+          "endFrame": 7,
+          "timingBasis": "after-contact",
+          "note": "Triggered after the detector connects.",
           "hitboxes": [
             {
               "id": "id0",
@@ -2168,8 +2351,11 @@
         },
         {
           "id": "hit3",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "downpunch",
+          "startFrame": 3,
+          "endFrame": 7,
+          "timingBasis": "after-contact",
+          "note": "Triggered after the detector connects.",
           "hitboxes": [
             {
               "id": "id0",
@@ -2201,8 +2387,14 @@
       "direction": "up",
       "gameMoveId": "upAir",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 33,
+        "declaredActiveRange": {
+          "startFrame": 6,
+          "endFrame": 13
+        },
         "firstActive": 6,
         "lastActive": 13,
         "startup": 5,
@@ -2216,8 +2408,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 6,
           "endFrame": 10,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -2251,8 +2446,11 @@
         },
         {
           "id": "hit2",
+          "sourceName": null,
           "startFrame": 11,
           "endFrame": 13,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -2444,8 +2642,14 @@
       "direction": "up",
       "gameMoveId": "upSmash",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": "active 21-22 and 27-28, first hit can do 8% or 14%, second hit can do 12%-13%",
       "frames": {
         "total": 54,
+        "declaredActiveRange": {
+          "startFrame": 21,
+          "endFrame": 28
+        },
         "firstActive": 21,
         "lastActive": 28,
         "startup": 20,
@@ -2459,8 +2663,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 21,
           "endFrame": 22,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -2522,8 +2729,11 @@
         },
         {
           "id": "hit2",
+          "sourceName": null,
           "startFrame": 27,
           "endFrame": 28,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -2701,12 +2911,18 @@
       "direction": "up",
       "gameMoveId": "upSpecial",
       "implementationStatus": "implemented",
+      "timingModel": "conditional",
+      "sourceNotes": "can grab ledge 5 frames after active end. if grabbed, hit is active frames 2-6 and hit animation takes a total of 79 frames",
       "frames": {
         "total": 64,
-        "firstActive": 0,
-        "lastActive": 0,
-        "startup": 0,
-        "recovery": 64,
+        "declaredActiveRange": {
+          "startFrame": 13,
+          "endFrame": 33
+        },
+        "firstActive": 13,
+        "lastActive": 33,
+        "startup": 12,
+        "recovery": 31,
         "interruptibleAsSoonAs": null,
         "landingLag": null,
         "lCanceledLandingLag": null,
@@ -2716,8 +2932,11 @@
       "activeWindows": [
         {
           "id": "hit1",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "hold",
+          "startFrame": 13,
+          "endFrame": 33,
+          "timingBasis": "move",
+          "note": "Grab search window.",
           "hitboxes": [
             {
               "id": "id1",
@@ -2737,8 +2956,11 @@
         },
         {
           "id": "hit2",
-          "startFrame": 0,
-          "endFrame": 0,
+          "sourceName": "release",
+          "startFrame": 2,
+          "endFrame": 6,
+          "timingBasis": "after-grab",
+          "note": "Triggered after Falcon Dive grabs.",
           "hitboxes": [
             {
               "id": "id1",
@@ -2784,8 +3006,14 @@
       "direction": "up",
       "gameMoveId": "upTilt",
       "implementationStatus": "implemented",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 39,
+        "declaredActiveRange": {
+          "startFrame": 17,
+          "endFrame": 21
+        },
         "firstActive": 17,
         "lastActive": 21,
         "startup": 16,
@@ -2799,8 +3027,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 17,
           "endFrame": 21,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -2891,8 +3122,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": null,
       "frames": {
         "total": 49,
+        "declaredActiveRange": {
+          "startFrame": 0,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -2917,8 +3154,14 @@
       "direction": "back",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 49,
+        "declaredActiveRange": {
+          "startFrame": 12,
+          "endFrame": 19
+        },
         "firstActive": 12,
         "lastActive": 19,
         "startup": 11,
@@ -2932,8 +3175,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 12,
           "endFrame": 19,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id2",
@@ -3049,8 +3295,14 @@
       "direction": "back",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": "Hit: 19-20 (Both Sides), 28-29 (Both Sides)\r\nInvincible: 1-29",
       "frames": {
         "total": 49,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -3075,8 +3327,14 @@
       "direction": "back",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": "Horizontal Movement At: 5\r\nDistance: 11 ft\r\nInvincible: 1-19",
       "frames": {
         "total": 35,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -3101,8 +3359,14 @@
       "direction": "back",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": "Horizontal Movement At: 15\r\nDistance: 11 ft\r\nInvincible: 1-25",
       "frames": {
         "total": 35,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -3127,8 +3391,14 @@
       "direction": "back",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": "Horizontal Movement At: 8\r\nDistance: 13.6 ft\r\nInvincible: 1-20",
       "frames": {
         "total": 40,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -3153,8 +3423,14 @@
       "direction": "forward",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 39,
+        "declaredActiveRange": {
+          "startFrame": 7,
+          "endFrame": 16
+        },
         "firstActive": 7,
         "lastActive": 16,
         "startup": 6,
@@ -3168,8 +3444,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 7,
           "endFrame": 9,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -3189,8 +3468,11 @@
         },
         {
           "id": "hit2",
+          "sourceName": null,
           "startFrame": 10,
           "endFrame": 16,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -3222,8 +3504,14 @@
       "direction": "forward",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 40,
+        "declaredActiveRange": {
+          "startFrame": 11,
+          "endFrame": 12
+        },
         "firstActive": 11,
         "lastActive": 12,
         "startup": 10,
@@ -3237,8 +3525,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 11,
           "endFrame": 12,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id2",
@@ -3375,8 +3666,14 @@
       "direction": "down",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 39,
+        "declaredActiveRange": {
+          "startFrame": 0,
+          "endFrame": 0
+        },
         "firstActive": 0,
         "lastActive": 0,
         "startup": 0,
@@ -3390,8 +3687,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": "unknown",
           "startFrame": 0,
           "endFrame": 0,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -3442,8 +3742,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 0,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": 0,
         "lastActive": 0,
         "startup": 0,
@@ -3457,8 +3763,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": "slow",
           "startFrame": 0,
           "endFrame": 0,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -3492,8 +3801,11 @@
         },
         {
           "id": "hit2",
+          "sourceName": "fast",
           "startFrame": 0,
           "endFrame": 0,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -3553,8 +3865,14 @@
       "direction": "forward",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": "Hit: 20-21 (Behind), 26-27 (Front)\r\nInvincible: 1-27",
       "frames": {
         "total": 49,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": 0,
         "lastActive": 0,
         "startup": 0,
@@ -3568,8 +3886,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": "back_hit1",
           "startFrame": 0,
           "endFrame": 0,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -3631,8 +3952,11 @@
         },
         {
           "id": "hit2",
+          "sourceName": "back_hit2",
           "startFrame": 0,
           "endFrame": 0,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -3694,8 +4018,11 @@
         },
         {
           "id": "hit3",
+          "sourceName": "front_hit1",
           "startFrame": 0,
           "endFrame": 0,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -3729,8 +4056,11 @@
         },
         {
           "id": "hit4",
+          "sourceName": "front_hit2",
           "startFrame": 0,
           "endFrame": 0,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -3776,8 +4106,14 @@
       "direction": "forward",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": "Horizontal Movement At: 5\r\nDistance: 11 ft\r\nInvincible: 1-23",
       "frames": {
         "total": 35,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -3802,8 +4138,14 @@
       "direction": "forward",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": "Horizontal Movement At: 10\r\nDistance: 11 ft\r\nInvincible: 1-19",
       "frames": {
         "total": 35,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -3828,8 +4170,14 @@
       "direction": "forward",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 39,
+        "declaredActiveRange": {
+          "startFrame": 11,
+          "endFrame": 17
+        },
         "firstActive": 11,
         "lastActive": 17,
         "startup": 10,
@@ -3843,8 +4191,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 11,
           "endFrame": 17,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id2",
@@ -3960,8 +4311,14 @@
       "direction": "forward-down",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 29,
+        "declaredActiveRange": {
+          "startFrame": 9,
+          "endFrame": 11
+        },
         "firstActive": 9,
         "lastActive": 11,
         "startup": 8,
@@ -3975,8 +4332,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 9,
           "endFrame": 11,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -4036,8 +4396,14 @@
       "direction": "forward-up",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 29,
+        "declaredActiveRange": {
+          "startFrame": 9,
+          "endFrame": 11
+        },
         "firstActive": 9,
         "lastActive": 11,
         "startup": 8,
@@ -4051,8 +4417,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 9,
           "endFrame": 11,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id2",
@@ -4112,8 +4481,14 @@
       "direction": "forward",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": "Horizontal Movement At: 11\r\nDistance: 16.6 ft\r\nInvincible: 1-20",
       "frames": {
         "total": 40,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -4138,8 +4513,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 30,
+        "declaredActiveRange": {
+          "startFrame": 7,
+          "endFrame": 8
+        },
         "firstActive": 7,
         "lastActive": 8,
         "startup": 6,
@@ -4153,8 +4534,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 7,
           "endFrame": 8,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -4266,8 +4650,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 19,
+        "declaredActiveRange": {
+          "startFrame": 4,
+          "endFrame": 6
+        },
         "firstActive": 4,
         "lastActive": 6,
         "startup": 3,
@@ -4281,8 +4671,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 4,
           "endFrame": 6,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -4398,8 +4791,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 31,
+        "declaredActiveRange": {
+          "startFrame": 6,
+          "endFrame": 12
+        },
         "firstActive": 6,
         "lastActive": 12,
         "startup": 5,
@@ -4413,8 +4812,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 6,
           "endFrame": 9,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -4448,8 +4850,11 @@
         },
         {
           "id": "hit2",
+          "sourceName": null,
           "startFrame": 10,
           "endFrame": 12,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id1",
@@ -4599,8 +5004,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": "Invincible: 1-20",
       "frames": {
         "total": 26,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -4625,8 +5036,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 0,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": 4,
         "lastActive": 4,
         "startup": 3,
@@ -4640,8 +5057,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 4,
           "endFrame": 4,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -4713,8 +5133,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 0,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": 4,
         "lastActive": 5,
         "startup": 3,
@@ -4728,8 +5154,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 4,
           "endFrame": 5,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -4775,8 +5204,14 @@
       "direction": "back",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": null,
       "frames": {
         "total": 31,
+        "declaredActiveRange": {
+          "startFrame": 4,
+          "endFrame": 19
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -4801,8 +5236,14 @@
       "direction": "forward",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": null,
       "frames": {
         "total": 31,
+        "declaredActiveRange": {
+          "startFrame": 4,
+          "endFrame": 19
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -4827,8 +5268,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": null,
       "frames": {
         "total": 32,
+        "declaredActiveRange": {
+          "startFrame": 3,
+          "endFrame": 20
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -4853,8 +5300,14 @@
       "direction": "up",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "absolute",
+      "sourceNotes": null,
       "frames": {
         "total": 43,
+        "declaredActiveRange": {
+          "startFrame": 11,
+          "endFrame": 28
+        },
         "firstActive": 11,
         "lastActive": 28,
         "startup": 10,
@@ -4868,8 +5321,11 @@
       "activeWindows": [
         {
           "id": "hit1",
+          "sourceName": null,
           "startFrame": 11,
           "endFrame": 28,
+          "timingBasis": "move",
+          "note": null,
           "hitboxes": [
             {
               "id": "id0",
@@ -4985,8 +5441,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": "Invincible: 1-14\r\nInput an upwards direction anywhere on 1-4 for walljump tech on 6)",
       "frames": {
         "total": 31,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,
@@ -5011,8 +5473,14 @@
       "direction": "neutral",
       "gameMoveId": null,
       "implementationStatus": "reference-only",
+      "timingModel": "unknown",
+      "sourceNotes": null,
       "frames": {
         "total": 40,
+        "declaredActiveRange": {
+          "startFrame": null,
+          "endFrame": null
+        },
         "firstActive": null,
         "lastActive": null,
         "startup": null,

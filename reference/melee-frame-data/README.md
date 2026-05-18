@@ -55,6 +55,10 @@ action, labels the actions our engine already implements, and preserves source
 hit timing plus extractor metadata without attempting to convert Melee-space
 bone-relative hitboxes into canvas rectangles.
 
+Special moves can expose conditional timing. For example, Falcon's side special
+records its search window on the move timeline, then stores the punch windows as
+`after-contact`; Falcon Dive stores its release hit as `after-grab`.
+
 ## Current focus
 
 - `grouped/Captain Falcon.framedata.json`
