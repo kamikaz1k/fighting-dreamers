@@ -240,6 +240,35 @@ describe("physics", () => {
     expect(fighter.y).toBeGreaterThan(mainPlatform.y);
   });
 
+  it("falls through disabled side platforms", () => {
+    const platform = stagePlatforms[0];
+    const fighter = createTestFighter({
+      grounded: true,
+      x: platform.x + platform.width / 2,
+      y: platform.y,
+    });
+
+    applyMovement(fighter, idleCommand, false);
+
+    expect(fighter.grounded).toBe(false);
+    expect(fighter.y).toBeGreaterThan(platform.y);
+  });
+
+  it("does not land on disabled side platforms", () => {
+    const platform = stagePlatforms[0];
+    const fighter = createTestFighter({
+      grounded: false,
+      x: platform.x + platform.width / 2,
+      y: platform.y - 2,
+      velocityY: 180,
+    });
+
+    applyMovement(fighter, idleCommand, false);
+
+    expect(fighter.grounded).toBe(false);
+    expect(fighter.y).toBeGreaterThan(platform.y);
+  });
+
   it("does not land on empty space beside the main platform", () => {
     const fighter = createTestFighter({
       grounded: false,

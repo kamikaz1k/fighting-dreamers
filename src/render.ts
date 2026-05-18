@@ -25,6 +25,7 @@ export type RenderState = {
   latestCommandsByFighterId: Map<string, FighterCommand>;
   cpuIntent: string;
   debugEnabled: boolean;
+  platformsEnabled: boolean;
   interpolationAlpha: number;
   simulationFrames: number;
   totalSimulatedSeconds: number;
@@ -37,7 +38,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: RenderState): v
 
   ctx.save();
   ctx.translate(VIEW_MARGIN_X, VIEW_MARGIN_Y);
-  renderStage(ctx);
+  renderStage(ctx, state.platformsEnabled);
   renderFighters(ctx, state.fighters, state.debugEnabled);
   ctx.restore();
 
@@ -45,7 +46,7 @@ export function renderGame(ctx: CanvasRenderingContext2D, state: RenderState): v
   renderRoundOverlay(ctx, state.winnerName);
 }
 
-function renderStage(ctx: CanvasRenderingContext2D): void {
+function renderStage(ctx: CanvasRenderingContext2D, platformsEnabled: boolean): void {
   ctx.fillStyle = "#1f2937";
   ctx.fillRect(mainPlatform.x, mainPlatform.y, mainPlatform.width, mainPlatform.height);
 
@@ -55,6 +56,10 @@ function renderStage(ctx: CanvasRenderingContext2D): void {
   ctx.strokeStyle = "#475569";
   ctx.lineWidth = 2;
   ctx.strokeRect(mainPlatform.x, mainPlatform.y, mainPlatform.width, mainPlatform.height);
+
+  if (!platformsEnabled) {
+    return;
+  }
 
   for (const platform of stagePlatforms) {
     ctx.fillStyle = "#334155";
@@ -238,6 +243,7 @@ function renderDebugHud(ctx: CanvasRenderingContext2D, state: RenderState): void
   ctx.fillText(`Fixed timestep: ${state.simulationFrames} frames`, VIEW_WIDTH / 2, 104);
   ctx.fillText(`Sim time: ${state.totalSimulatedSeconds.toFixed(2)}s`, VIEW_WIDTH / 2, 126);
   ctx.fillText(`Render alpha: ${state.interpolationAlpha.toFixed(2)}`, VIEW_WIDTH / 2, 148);
+  ctx.fillText(`Platforms: ${state.platformsEnabled ? "on" : "off"}`, VIEW_WIDTH / 2, 170);
 
   renderCommandReadout(ctx, state);
   renderTuningReadout(ctx, state.fighters);
@@ -382,6 +388,7 @@ function renderControlsGuide(ctx: CanvasRenderingContext2D): void {
     "J: attack",
     "K: special",
     "L: shield",
+    "P: platforms",
     "`: debug",
   ];
   const lineHeight = 16;

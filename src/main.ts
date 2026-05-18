@@ -49,10 +49,15 @@ let simulationFrames = 0;
 let roundPauseFrames = 0;
 let winnerName: string | null = null;
 let debugEnabled = debugConfig.enabled;
+let platformsEnabled = true;
 
 window.addEventListener("keydown", (event) => {
   if (event.code === "Backquote") {
     debugEnabled = !debugEnabled;
+  }
+
+  if (event.code === "KeyP") {
+    platformsEnabled = !platformsEnabled;
   }
 });
 
@@ -75,7 +80,7 @@ function update(): void {
     const command = latestCommandsByFighterId.get(fighter.id) ?? idleCommand;
     updateHitstun(fighter);
     updateActions(fighter, command);
-    applyMovement(fighter, command);
+    applyMovement(fighter, command, platformsEnabled);
     updateMovementState(fighter);
   }
 
@@ -104,6 +109,7 @@ function render(interpolationAlpha: number): void {
     latestCommandsByFighterId,
     cpuIntent: cpuController.intent,
     debugEnabled,
+    platformsEnabled,
     interpolationAlpha,
     simulationFrames,
     totalSimulatedSeconds,

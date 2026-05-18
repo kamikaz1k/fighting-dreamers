@@ -33,7 +33,11 @@ export function updateMovementState(fighter: Fighter): void {
   fighter.state = Math.abs(fighter.velocityX) > 5 ? "run" : "idle";
 }
 
-export function applyMovement(fighter: Fighter, command: FighterCommand): void {
+export function applyMovement(
+  fighter: Fighter,
+  command: FighterCommand,
+  platformsEnabled = true,
+): void {
   if (fighter.state === "ledge") {
     updateLedgeState(fighter, command);
     return;
@@ -51,13 +55,13 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
     : movement.airAcceleration * airControlMultiplier;
   const maxSpeed = fighter.grounded ? movement.maxGroundSpeed : movement.maxAirSpeed;
 
-  if (fighter.grounded && command.moveY === 1 && isOnAnyPlatform(fighter)) {
+  if (fighter.grounded && command.moveY === 1 && isOnAnyPlatform(fighter, platformsEnabled)) {
     fighter.grounded = false;
-  } else if (fighter.grounded && !isSupported(fighter)) {
+  } else if (fighter.grounded && !isSupported(fighter, platformsEnabled)) {
     fighter.grounded = false;
   }
 
-  updateCrouchState(fighter, command);
+  updateCrouchState(fighter, command, platformsEnabled);
 
   if (command.moveX !== 0) {
     if (canChangeFacing(fighter)) {
@@ -116,7 +120,7 @@ export function applyMovement(fighter: Fighter, command: FighterCommand): void {
     return;
   }
 
-  const platform = getLandingPlatform(fighter, previousY, command);
+  const platform = getLandingPlatform(fighter, previousY, command, platformsEnabled);
 
   if (platform) {
     landFighter(fighter, platform.y, wasGrounded, movement.maxAirJumps);
@@ -151,9 +155,13 @@ function landFighter(
   }
 }
 
-function isSupported(fighter: Fighter): boolean {
+function isSupported(fighter: Fighter, platformsEnabled: boolean): boolean {
   if (isOnPlatform(fighter, mainPlatform)) {
     return true;
+  }
+
+  if (!platformsEnabled) {
+    return false;
   }
 
   return stagePlatforms.some((platform) => isOnPlatform(fighter, platform));
@@ -243,16 +251,17 @@ function updateLedgeState(fighter: Fighter, command: FighterCommand): void {
   fighter.upSpecialAvailable = true;
 }
 
-function isOnAnyPlatform(fighter: Fighter): boolean {
-  return stagePlatforms.some((platform) => isOnPlatform(fighter, platform));
+function isOnAnyPlatform(fighter: Fighter, platformsEnabled: boolean): boolean {
+  return platformsEnabled && stagePlatforms.some((platform) => isOnPlatform(fighter, platform));
 }
 
 function getLandingPlatform(
   fighter: Fighter,
   previousY: number,
   command: FighterCommand,
+  platformsEnabled: boolean,
 ): StagePlatform | null {
-  if (fighter.velocityY < 0 || command.moveY === 1) {
+  if (!platformsEnabled || fighter.velocityY < 0 || command.moveY === 1) {
     return null;
   }
 
@@ -287,8 +296,12 @@ export function canChangeFacing(fighter: Fighter): boolean {
     && fighter.state !== "ko";
 }
 
-function updateCrouchState(fighter: Fighter, command: FighterCommand): void {
-  if (!fighter.grounded || isOnAnyPlatform(fighter)) {
+function updateCrouchState(
+  fighter: Fighter,
+  command: FighterCommand,
+  platformsEnabled: boolean,
+): void {
+  if (!fighter.grounded || isOnAnyPlatform(fighter, platformsEnabled)) {
     if (fighter.state === "crouch") {
       fighter.state = "idle";
     }
