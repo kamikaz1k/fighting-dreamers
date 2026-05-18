@@ -32,7 +32,7 @@ export function resolveAttackCollision(attacker: Fighter, defender: Fighter): vo
   } else {
     defender.damagePercent += hit.damage;
     const knockback = getScaledKnockback(hit, defender.damagePercent);
-    defender.velocityX = attacker.facing * knockback.x;
+    defender.velocityX = attacker.facing * (matchedHitbox.launchFacing ?? 1) * knockback.x;
     defender.velocityY = knockback.y;
     defender.grounded = false;
     defender.state = "hitstun";

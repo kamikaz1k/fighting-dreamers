@@ -101,16 +101,16 @@ describe("combat", () => {
       characterId: "captainFalcon",
       x: 400,
       currentMoveId: move.id,
-      moveFrame: 5,
+      moveFrame: 7,
     });
     const defender = createTestFighter({ id: "defender", x: 448 });
 
     resolveAttackCollision(attacker, defender);
     resolveAttackCollision(attacker, defender);
-    attacker.moveFrame = 12;
+    attacker.moveFrame = 20;
     resolveAttackCollision(attacker, defender);
 
-    expect(defender.damagePercent).toBe(10);
+    expect(defender.damagePercent).toBe(13);
     expect(attacker.hitFighterIdsThisMove).toEqual(new Set([
       "kick1:defender",
       "kick2:defender",
@@ -121,11 +121,42 @@ describe("combat", () => {
     const move = getCharacter("captainFalcon").moves.neutralAir;
     const fighter = createTestFighter({
       characterId: "captainFalcon",
-      moveFrame: 12,
+      moveFrame: 20,
     });
 
     expect(getActiveHitWindow(fighter, move)?.id).toBe("kick2");
-    expect(getMoveRecoveryStartFrame(move)).toBe(16);
+    expect(getMoveRecoveryStartFrame(move)).toBe(29);
+  });
+
+  it("uses front then back hit windows for Falcon down smash", () => {
+    const move = getCharacter("captainFalcon").moves.downSmash;
+    const fighter = createTestFighter({
+      characterId: "captainFalcon",
+      moveFrame: 19,
+    });
+
+    expect(getActiveHitWindow(fighter, move)?.id).toBe("frontKick");
+
+    fighter.moveFrame = 29;
+
+    expect(getActiveHitWindow(fighter, move)?.id).toBe("backKick");
+    expect(getMoveRecoveryStartFrame(move)).toBe(32);
+  });
+
+  it("launches Falcon down smash's back hit behind him", () => {
+    const move = getCharacter("captainFalcon").moves.downSmash;
+    const attacker = createTestFighter({
+      id: "attacker",
+      characterId: "captainFalcon",
+      x: 400,
+      currentMoveId: move.id,
+      moveFrame: 29,
+    });
+    const defender = createTestFighter({ id: "defender", x: 350 });
+
+    resolveAttackCollision(attacker, defender);
+
+    expect(defender.velocityX).toBeLessThan(0);
   });
 
   it("treats alternate hit windows with the same group as one hit", () => {

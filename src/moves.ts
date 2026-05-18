@@ -24,6 +24,7 @@ export type MoveHitboxDefinition = {
   y: number;
   width: number;
   height: number;
+  launchFacing?: -1 | 1;
   damage?: number;
   knockback?: KnockbackDefinition;
   shieldDamage?: number;

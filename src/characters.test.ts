@@ -11,6 +11,10 @@ describe("characters", () => {
     expect(marth.moves.forwardAir.hitbox.width).toBeGreaterThan(captainFalcon.moves.forwardAir.hitbox.width);
     expect(marth.moves.forwardAir.hitboxes).toHaveLength(2);
     expect(captainFalcon.moves.neutralAir.hitWindows).toHaveLength(2);
+    expect(captainFalcon.moves.downSmash.hitWindows?.map((window) => window.id)).toEqual([
+      "frontKick",
+      "backKick",
+    ]);
     expect(captainFalcon.moves.forwardAir.damage).toBeGreaterThan(marth.moves.forwardAir.damage);
     expect(marth.moves.forwardAir.knockback.growth).toBeLessThan(captainFalcon.moves.forwardAir.knockback.growth);
     expect(captainFalcon.cooldowns.upSpecial).toBe(20);
