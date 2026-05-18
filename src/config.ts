@@ -52,10 +52,10 @@ export const roundConfig = {
 };
 
 export const blastZoneConfig = {
-  left: -140,
-  right: WORLD_WIDTH + 140,
-  top: -180,
-  bottom: WORLD_HEIGHT + 180,
+  left: -240,
+  right: WORLD_WIDTH + 240,
+  top: -220,
+  bottom: WORLD_HEIGHT + 220,
 };
 
 export const debugConfig = {

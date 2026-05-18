@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { FLOOR_Y, blastZoneConfig, roundConfig } from "./config";
+import {
+  FLOOR_Y,
+  VIEW_MARGIN_X,
+  VIEW_MARGIN_Y,
+  WORLD_HEIGHT,
+  WORLD_WIDTH,
+  blastZoneConfig,
+  roundConfig,
+} from "./config";
 import {
   createInitialFighters,
   getFallbackSpawnPoint,
@@ -110,6 +118,13 @@ describe("game state", () => {
       y: blastZoneConfig.top + createTestFighter().height - 1,
     }))).toBe(true);
     expect(isOutsideBlastZone(createTestFighter({ y: blastZoneConfig.bottom + 1 }))).toBe(true);
+  });
+
+  it("keeps blast zones beyond the visible viewport", () => {
+    expect(blastZoneConfig.left).toBeLessThan(-VIEW_MARGIN_X);
+    expect(blastZoneConfig.right).toBeGreaterThan(WORLD_WIDTH + VIEW_MARGIN_X);
+    expect(blastZoneConfig.top).toBeLessThan(-VIEW_MARGIN_Y);
+    expect(blastZoneConfig.bottom).toBeGreaterThan(WORLD_HEIGHT + VIEW_MARGIN_Y);
   });
 
   it("resets the round when KO pause expires", () => {
