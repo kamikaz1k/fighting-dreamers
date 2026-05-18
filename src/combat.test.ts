@@ -171,4 +171,18 @@ describe("combat", () => {
     expect(defender.damagePercent).toBeLessThan(move.damage);
     expect(defender.hitstopFrames).toBe(resolvedHit.hitstopFrames);
   });
+
+  it("keeps clean knee launch strongly horizontal", () => {
+    const move = getCharacter("captainFalcon").moves.forwardAir;
+    const cleanKnee = move.hitWindows?.[0]?.hitboxes?.[0];
+
+    if (!cleanKnee) {
+      throw new Error("Expected Falcon forward air to define a clean knee");
+    }
+
+    const resolvedHit = getResolvedHit(move, cleanKnee);
+    const knockback = getScaledKnockback(resolvedHit, 50);
+
+    expect(knockback.x).toBeGreaterThan(Math.abs(knockback.y) * 3);
+  });
 });
