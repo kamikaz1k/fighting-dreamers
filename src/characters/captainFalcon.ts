@@ -98,7 +98,7 @@ export const captainFalconMoves: Record<string, MoveDefinition> = {
   }),
   forwardAir: tuneMove(moveDefinitions.forwardAir, {
     startupFrames: 12,
-    activeFrames: 3,
+    activeFrames: 6,
     recoveryFrames: 22,
     damage: 18,
     knockback: { base: 520, growth: 13, damageFactor: 9, angleDeg: 32 },
@@ -106,6 +106,46 @@ export const captainFalconMoves: Record<string, MoveDefinition> = {
     shieldDamage: 22,
     hitstopFrames: 8,
     airControlMultiplier: 0.54,
+    hitWindows: [
+      {
+        id: "cleanKnee",
+        hitGroupId: "knee",
+        startFrame: 12,
+        endFrame: 14,
+        hitboxes: [
+          {
+            id: "cleanKnee",
+            x: 24,
+            y: -72,
+            width: 40,
+            height: 28,
+            damage: 18,
+            knockback: { base: 520, growth: 13, damageFactor: 9, angleDeg: 32 },
+            shieldDamage: 22,
+            hitstopFrames: 8,
+          },
+        ],
+      },
+      {
+        id: "lateKnee",
+        hitGroupId: "knee",
+        startFrame: 14,
+        endFrame: 18,
+        hitboxes: [
+          {
+            id: "lateKnee",
+            x: 24,
+            y: -72,
+            width: 40,
+            height: 28,
+            damage: 7,
+            knockback: { base: 220, growth: 5, damageFactor: 7, angleDeg: 24 },
+            shieldDamage: 12,
+            hitstopFrames: 4,
+          },
+        ],
+      },
+    ],
   }),
   upAir: tuneMove(moveDefinitions.upAir, {
     startupFrames: 5,

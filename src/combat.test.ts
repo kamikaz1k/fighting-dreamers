@@ -127,4 +127,48 @@ describe("combat", () => {
     expect(getActiveHitWindow(fighter, move)?.id).toBe("kick2");
     expect(getMoveRecoveryStartFrame(move)).toBe(16);
   });
+
+  it("treats alternate hit windows with the same group as one hit", () => {
+    const move = getCharacter("captainFalcon").moves.forwardAir;
+    const attacker = createTestFighter({
+      id: "attacker",
+      characterId: "captainFalcon",
+      x: 400,
+      currentMoveId: move.id,
+      moveFrame: 12,
+    });
+    const defender = createTestFighter({ id: "defender", x: 448 });
+
+    resolveAttackCollision(attacker, defender);
+    attacker.moveFrame = 14;
+    resolveAttackCollision(attacker, defender);
+
+    expect(defender.damagePercent).toBe(18);
+    expect(attacker.hitFighterIdsThisMove).toEqual(new Set(["knee:defender"]));
+  });
+
+  it("uses weaker late knee values after the clean hit window ends", () => {
+    const move = getCharacter("captainFalcon").moves.forwardAir;
+    const lateKnee = move.hitWindows?.[1]?.hitboxes?.[0];
+    const attacker = createTestFighter({
+      id: "attacker",
+      characterId: "captainFalcon",
+      x: 400,
+      currentMoveId: move.id,
+      moveFrame: 14,
+    });
+    const defender = createTestFighter({ id: "defender", x: 448 });
+
+    if (!lateKnee) {
+      throw new Error("Expected Falcon forward air to define a late knee");
+    }
+
+    resolveAttackCollision(attacker, defender);
+
+    const resolvedHit = getResolvedHit(move, lateKnee);
+
+    expect(defender.damagePercent).toBe(resolvedHit.damage);
+    expect(defender.damagePercent).toBeLessThan(move.damage);
+    expect(defender.hitstopFrames).toBe(resolvedHit.hitstopFrames);
+  });
 });

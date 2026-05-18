@@ -137,7 +137,7 @@ function renderMoveDebug(
     fighter.y + 56,
   );
   ctx.fillText(
-    `phase ${getMovePhase(fighter, move)} s/a/r ${move.startupFrames}/${getMoveRecoveryStartFrame(move) - move.startupFrames}/${move.recoveryFrames}`,
+    `phase ${getMovePhase(fighter, move)} s/a/r ${move.startupFrames}/${getMoveRecoveryStartFrame(move) - move.startupFrames}/${move.recoveryFrames} window ${getActiveHitWindow(fighter, move)?.id ?? "-"}`,
     fighter.x,
     fighter.y + 72,
   );

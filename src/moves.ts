@@ -32,6 +32,7 @@ export type MoveHitboxDefinition = {
 
 export type MoveHitWindowDefinition = {
   id: string;
+  hitGroupId?: string;
   startFrame: number;
   endFrame: number;
   hitboxes?: MoveHitboxDefinition[];

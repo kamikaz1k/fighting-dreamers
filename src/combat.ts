@@ -144,5 +144,5 @@ function getMoveHitWindows(move: MoveDefinition): MoveHitWindowDefinition[] {
 }
 
 function getHitTrackingKey(hitWindow: MoveHitWindowDefinition, defender: Fighter): string {
-  return `${hitWindow.id}:${defender.id}`;
+  return `${hitWindow.hitGroupId ?? hitWindow.id}:${defender.id}`;
 }
